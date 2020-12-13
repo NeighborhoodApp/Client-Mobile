@@ -5,19 +5,23 @@ import Main from './components/MainFile';
 import Register from './components/Register';
 import Login from './components/Login';
 import { createStackNavigator } from '@react-navigation/stack'
+import { Provider } from 'react-redux';
+import store from './store';
 
 export default function App() {
 
   const Stack = createStackNavigator()
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="Main" component={Main} />
-        <Stack.Screen name="Login" component={Login} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Main" component={Main} />
+          <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="Login" component={Login} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }
 
