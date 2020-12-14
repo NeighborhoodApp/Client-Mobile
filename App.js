@@ -1,12 +1,13 @@
 import { NavigationContainer } from '@react-navigation/native';
-import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { Provider } from 'react-redux';
+import { createStackNavigator } from '@react-navigation/stack'
+import React from 'react';
+import store from './store';
 import Main from './components/MainFile';
 import Register from './components/Register';
 import Login from './components/Login';
-import { createStackNavigator } from '@react-navigation/stack'
-import { Provider } from 'react-redux';
-import store from './store';
+import ChooseComplex from './components/ChooseComplex';
 
 export default function App() {
 
@@ -15,10 +16,11 @@ export default function App() {
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <Stack.Navigator>
+        <Stack.Navigator initialRouteName='Login'>
           <Stack.Screen name="Main" component={Main} />
           <Stack.Screen name="Register" component={Register} />
           <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="ChooseComplex" component={ChooseComplex} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>
