@@ -14,6 +14,7 @@ export default function callServer(option) {
   if (option.body) {
     payloadAxios['data'] = option.body;
   }
+  
   return async (dispatch) => {
     try {
       if (option.headers) {
@@ -22,20 +23,23 @@ export default function callServer(option) {
           access_token: value,
         };
       }
-      console.log('disini');
 
+      console.log('wxios fetch call server', payloadAxios);
       dispatch({ type: option.type + '_LOADING', payload: true });
       const { data } = await axios(payloadAxios);
-      console.log(data);
+      console.log('from server', data);
       dispatch({
         type: option.type,
-        stage: aption.stage || null,
+        stage: option.stage || null,
         payload: option.id ? option.id : option.deletedId ? option.deletedId : data,
       });
     } catch (error) {
-      console.log(error);
-      console.log('axios', error.stack);
-      dispatch({ type: option.type + '_ERROR', payload: error });
+      // console.log('axios', error.response || error.message);
+      dispatch({
+        type: option.type + '_ERROR',
+        stage: option.stage || null,
+        payload: error.response.data || { msg: 'Somthing error on fetch' },
+      });
     } finally {
       dispatch({ type: option.type + '_LOADING', payload: false });
     }

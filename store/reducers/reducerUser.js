@@ -9,15 +9,17 @@ const initState = {
 export default function reducer(state = initState, action) {
   switch (action.type) {
     case 'SET_USERS':
-      return { ...state, users: action.payload, stage: action.stage, error: null, stage: null };
+      return { ...state, users: action.payload, stage: action.stage, error: null };
     case 'SET_USER':
-      return { ...state, user: action.payload, stage: action.stage, error: null, stage: null };
+      return { ...state, user: action.payload, stage: action.stage, error: null };
     case 'SET_USERS_LOADING':
     case 'SET_USER_LOADING':
       return { ...state, loading: action.payload };
     case 'SET_USERS_ERROR':
     case 'SET_USER_ERROR':
-      return { ...state, error: action.payload };
+      return { ...state, stage: action.stage, error: action.payload };
+    case 'REMOVE_STAGE_ERROR':
+      return { ...state, stage: null, error: null };
     default:
       return state;
   }

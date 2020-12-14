@@ -4,20 +4,19 @@ import AppLoading from 'expo-app-loading';
 import { useFonts, Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat';
 import { FontAwesome, Fontisto, Feather, Entypo } from '@expo/vector-icons';
-import { useDispatch, useSelector } from 'react-redux';
-import callServer from '../helpers/callServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import errorHandler from '../helpers/errorHandler';
+import { axios } from '../helpers/Axios';
+
 const defaultVal = {
   fullname: '',
   email: '',
   password: '',
   address: '',
 }
+
 function JoinUs({ navigation }) {
   const [payload, setPayload] = useState(defaultVal);
-  const dispatch = useDispatch();
-  const message = null;
-  const { user, loading, error, stage } = useSelector((state) => state.reducerUser);
 
   const [loaded] = useFonts({
     Ubuntu_300Light,
@@ -25,15 +24,10 @@ function JoinUs({ navigation }) {
     Ubuntu_500Medium,
   });
 
-  if (stage === 'joinus') {
-    if (error) {
-      message = errorHandler(error);
-      console.log(message);
-    } else if (user.fullname) {
-      toLogin();
-    }
-  }
-  console.log(user, loading);
+  const toLogin = () => {
+    navigation.navigate('Login');
+  };
+
   const handleInput = (text, name) => {
     const value = {
       ...payload,
@@ -42,23 +36,24 @@ function JoinUs({ navigation }) {
     setPayload(value);
   };
 
-  const toLogin = () => {
-    navigation.navigate('Login');
-  };
-
-  const prosesJoin = () => {
+  const prosesJoin = async () => {
     if (payload.fullname && payload.email && payload.password && payload.address) {
-      const option = {
-        url: 'users/register-warga',
-        method: 'post',
-        body: payload,
-        headers: false,
-        type: 'SET_USER',
-        stage: 'joinus',
-      };
-      dispatch(callServer(option));
+      try {
+        const { data } = await axios({
+          url: 'users/register-warga',
+          method: 'post',
+          data: payload,
+        });
+        const jsonValue = JSON.stringify(data);
+        await AsyncStorage.setItem('userlogedin', jsonValue);
+        navigation.dispatch('Login');
+        console.log('Welcome,' + data.fullname);
+      } catch (error) {
+        const msg = errorHandler(error);
+        console.log(msg);
+      }
     } else {
-      console.log('All field required!');;
+      console.log('All field required!');
     }
   };
 
