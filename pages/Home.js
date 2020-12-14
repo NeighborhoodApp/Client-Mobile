@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Button } from 'react-native'
 
 function Home({navigation}) {    
     function goJoin(){
-        navigation.navigate('GetStarted')
+        navigation.navigate('Profile')
     }
     return (
         <View style={styles.container}>
