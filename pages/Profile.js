@@ -11,8 +11,8 @@ function Profile({navigation}) {
         Ubuntu_300Light, Montserrat_600SemiBold, Ubuntu_500Medium
     });
 
-    function goJoin(){
-        navigation.navigate('Discover')
+    function toNotification(){
+        navigation.navigate('Notification')
     }
     return (
         <View style={styles.container}>
@@ -67,7 +67,7 @@ function Profile({navigation}) {
                 <View style={styles.hr}/>
                 {/* >>>>>> BUTTON FOR CREATE FEES <<<<<<< */}
                 <TouchableOpacity style={styles.btn}>
-                    <Text style={styles.submit}> SUBMIT </Text>
+                    <Text style={styles.submit} onPress={toNotification} > SUBMIT </Text>
                 </TouchableOpacity>
                 
             </View>

@@ -8,7 +8,7 @@ import {
   DrawerItemList,
   DrawerItem,
 } from '@react-navigation/drawer';
-import { Home, GetStarted, JoinUs, Login, Waiting, Discover, Profile } from './pages';
+import { Home, GetStarted, JoinUs, Login, Waiting, Discover, Profile, Notification } from './pages';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Avatar } from 'react-native-paper';
 
@@ -64,6 +64,7 @@ export default function App() {
             color:  '#fff',
             }
           }} />
+        <Stack.Screen name="Notification" component={Notification} />
       </Stack.Navigator>
     </NavigationContainer>
   );
