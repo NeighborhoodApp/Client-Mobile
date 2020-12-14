@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   },
   secondLine: {
     marginTop: 30,
-    fontFamily: 'Montserrat_500Medium',
+    fontFamily: 'Ubuntu_500Medium',
     fontSize: 16,
     color: 'white',
     textAlign: 'center',

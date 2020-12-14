@@ -46,12 +46,14 @@ function JoinUs({ navigation }) {
         });
         const jsonValue = JSON.stringify(data);
         await AsyncStorage.setItem('userlogedin', jsonValue);
-        toLogin();
+        navigation.dispatch('Login');
         console.log('Welcome,' + data.fullname);
       } catch (error) {
         const msg = errorHandler(error);
         console.log(msg);
       }
+    } else {
+      console.log('All field required!');
     }
   };
 

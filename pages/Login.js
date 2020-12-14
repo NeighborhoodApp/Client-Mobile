@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import { useFonts, Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat';
 import { Fontisto, Feather } from '@expo/vector-icons';
+import errorHandler from '../helpers/errorHandler';
+import { axios } from '../helpers/Axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+  const defaultVal = {
+    email: '',
+    password: '',
+  };
 
 function Login({ navigation }) {
+  const [payload, setPayload] = useState(defaultVal);
+
   let [loaded] = useFonts({
     Ubuntu_300Light,
     Montserrat_600SemiBold,
@@ -13,16 +23,43 @@ function Login({ navigation }) {
   });
 
   const toJoin = () => {
-    navigation.navigate('JoinUs');
+    navigation.replace('JoinUs');
   }
 
   const toWaiting = () => {
     navigation.navigate('Waiting');
   }
 
-  const prosesLogin = () => {
-    
-  }
+  const handleInput = (text, name) => {
+    const value = {
+      ...payload,
+      [name]: text,
+    };
+    setPayload(value);
+  };
+
+  const prosesLogin = async () => {
+    if (payload.email && payload.password) {
+      try {
+        const { data } = await axios({
+          url: 'users/login-client',
+          method: 'post',
+          data: payload,
+        });
+        console.log(data);
+        const jsonValue = JSON.stringify(data);
+        await AsyncStorage.setItem('userlogedin', jsonValue);
+        navigation.replace('Waiting');
+        console.log('Welcome,' + data.fullname);
+      } catch (error) {
+        // console.log(error.response || )
+        const msg = errorHandler(error);
+        console.log(msg);
+      }
+    } else {
+      console.log('All field required!')
+    }
+  };
 
   if (!loaded) {
     return <AppLoading />;
@@ -33,12 +70,18 @@ function Login({ navigation }) {
         <Text style={styles.title}>Login</Text>
         <View style={styles.input}>
           <Fontisto name="email" size={20} color="white" style={{ marginLeft: 5 }} />
-          <TextInput style={styles.Textinput} placeholder="Email" placeholderTextColor="#FFF" />
+          <TextInput
+            onChangeText={(text) => handleInput(text, 'email')}
+            style={styles.Textinput}
+            placeholder="Email"
+            placeholderTextColor="#FFF"
+          />
         </View>
         <View style={styles.hr} />
         <View style={styles.input}>
           <Feather name="lock" size={20} color="white" style={{ marginLeft: 5 }} />
           <TextInput
+            onChangeText={(text) => handleInput(text, 'password')}
             style={styles.Textinput}
             placeholder="Password"
             placeholderTextColor="#FFF"
@@ -46,7 +89,9 @@ function Login({ navigation }) {
           />
         </View>
         <View style={styles.hr} />
-        <TouchableOpacity style={styles.btn} onPress={toWaiting}>
+        <TouchableOpacity
+          onPress={() => prosesLogin()}
+          style={styles.btn}>
           <Text style={styles.btn_Text}> SUBMIT </Text>
         </TouchableOpacity>
         <View style={styles.footer}>
