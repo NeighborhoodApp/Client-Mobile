@@ -16,6 +16,7 @@ function PickLocation () {
     const [selectedValue, setSelectedValue] = useState("uk");
     return (
     <View style={styles.container}>
+         <Image style={styles.house} source={require('../assets/house.gif')} />
         <View style={styles.box}>
             <Text style={styles.firstLine}> Pick Real Estate </Text>
             <DropDownPicker
@@ -37,7 +38,6 @@ function PickLocation () {
                 // onChangeItem={item => selectedValue({ selectedValue: item.value })}
             />
         </View>
-        <Image style={styles.house} source={require('../assets/house.gif')} />
         <View style={styles.footer}>
             <View style={styles.row} >
             <Text style={styles.next}> Next </Text> 
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
         marginLeft:-30,
         position: 'absolute',
-        bottom: 90
+        bottom: 80
         // marginTop: 90
     },
     box: {
