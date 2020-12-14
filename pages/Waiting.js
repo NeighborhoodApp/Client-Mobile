@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useFonts, Ubuntu_300Light, Ubuntu_500Medium, Ubuntu_700Bold } from '@expo-google-fonts/ubuntu';
 import { Montserrat_500Medium } from '@expo-google-fonts/montserrat';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AppLoading from 'expo-app-loading';
 
 const defaultValue = {
   address: '',
@@ -29,6 +30,7 @@ function Waiting() {
   }, []);
 
   console.log(user);
+  if (!loaded) return <AppLoading />;
 
   return (
     <View style={styles.container}>
