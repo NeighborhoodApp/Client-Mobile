@@ -12,12 +12,16 @@ function Login({ navigation }) {
     Ubuntu_500Medium,
   });
 
-  function toJoin() {
+  const toJoin = () => {
     navigation.navigate('JoinUs');
   }
 
-  function toWaiting() {
+  const toWaiting = () => {
     navigation.navigate('Waiting');
+  }
+
+  const prosesLogin = () => {
+    
   }
 
   if (!loaded) {

@@ -1,20 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import { useFonts, Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat';
 import { FontAwesome, Fontisto, Feather, Entypo } from '@expo/vector-icons';
+import { useDispatch } from 'react-redux';
+import callServer from '../helpers/callServer';
 
 function JoinUs({ navigation }) {
-  let [loaded] = useFonts({
+  const [payload, setPayload] = useState();
+  const dispatch = useDispatch();
+
+  const [loaded] = useFonts({
     Ubuntu_300Light,
     Montserrat_600SemiBold,
     Ubuntu_500Medium,
   });
 
-  function toLogin() {
+  const handleInput = (text, name) => {
+    // const na;
+    const value = {
+      ...payload,
+      [name]: text,
+    };
+    setPayload(value);
+  };
+
+  const toLogin = () => {
     navigation.navigate('Login');
-  }
+  };
+
+  const prosesJoin = (e) => {
+    const option = {
+      url: '',
+      method,
+      body,
+      headers,
+      type,
+    };
+    dispatch(callServer(option))
+  };
 
   if (!loaded) {
     return <AppLoading />;
@@ -25,17 +50,29 @@ function JoinUs({ navigation }) {
         <Text style={styles.title}>JoinUs</Text>
         <View style={styles.input}>
           <FontAwesome name="user" size={20} color="white" style={{ marginLeft: 10 }} />
-          <TextInput style={styles.Textinput} placeholder="Full Name" placeholderTextColor="#FFF" />
+          <TextInput
+            onChangeText={(text) => handleInput(text, 'fullname')}
+            style={styles.Textinput}
+            placeholder="Full Name"
+            placeholderTextColor="#FFF"
+          />
         </View>
         <View style={styles.hr} />
         <View style={styles.input}>
           <Fontisto name="email" size={20} color="white" style={{ marginLeft: 5 }} />
-          <TextInput style={styles.Textinput} placeholder="Email" placeholderTextColor="#FFF" />
+          <TextInput
+            onChangeText={(text) => handleInput(text, 'email')}
+            style={styles.Textinput}
+            placeholder="Email"
+            placeholderTextColor="#FFF"
+          />
         </View>
         <View style={styles.hr} />
         <View style={styles.input}>
           <Feather name="lock" size={20} color="white" style={{ marginLeft: 5 }} />
           <TextInput
+            name="password"
+            onChangeText={(text) => handleInput(text, 'password')}
             style={styles.Textinput}
             placeholder="Password"
             placeholderTextColor="#FFF"
@@ -45,7 +82,12 @@ function JoinUs({ navigation }) {
         <View style={styles.hr} />
         <View style={styles.input}>
           <Entypo name="location" size={20} color="white" style={{ marginLeft: 6 }} />
-          <TextInput style={styles.Textinput} placeholder="Address" placeholderTextColor="#FFF" />
+          <TextInput
+            onChangeText={(text) => handleInput(text, 'address')}
+            style={styles.Textinput}
+            placeholder="Address"
+            placeholderTextColor="#FFF"
+          />
         </View>
         <View style={styles.hr} />
         <TouchableOpacity style={styles.btn}>
