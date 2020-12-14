@@ -8,7 +8,7 @@ function Home({ navigation }) {
   useEffect(() => {
     const getUser = async () => {
       const value = await AsyncStorage.getItem('userlogedin');
-      // setUser(JSON.parse(value));
+      setUser(JSON.parse(value));
 
       if (value) {
         navigation.replace('Waiting');
