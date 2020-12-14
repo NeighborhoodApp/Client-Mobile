@@ -52,7 +52,6 @@ function Login({ navigation }) {
         navigation.replace('Waiting');
         console.log('Welcome,' + data.fullname);
       } catch (error) {
-        // console.log(error.response || )
         const msg = errorHandler(error);
         console.log(msg);
       }
