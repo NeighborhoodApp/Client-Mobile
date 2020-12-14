@@ -13,7 +13,7 @@ function Home({ navigation }) {
       if (value) {
         navigation.replace('Waiting');
       } else {
-        navigation.navigate('GetStarted');
+        navigation.navigate('PickLocation');
       }
     };
     getUser();
@@ -24,7 +24,7 @@ function Home({ navigation }) {
     if (user) {
       navigation.replace('JoinUs');
     } else {
-      navigation.navigate('GetStarted');
+      navigation.navigate('PickLocation');
     }
   }
   return (

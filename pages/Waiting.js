@@ -11,6 +11,7 @@ const defaultValue = {
   fullname: '',
   id: '',
 };
+
 function Waiting() {
   let [loaded] = useFonts({
     Ubuntu_300Light,
