@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { axios } from '../config/Axios';
+import { axios } from './Axios';
 
 /**
  *
- * @param {url, method, body, headers, type} option
+ * @param {url, stage, method, body, headers, type} option
  */
 export default function callServer(option) {
   const payloadAxios = {
@@ -14,7 +14,6 @@ export default function callServer(option) {
   if (option.body) {
     payloadAxios['data'] = option.body;
   }
-
   return async (dispatch) => {
     try {
       if (option.headers) {
@@ -23,13 +22,19 @@ export default function callServer(option) {
           access_token: value,
         };
       }
+      console.log('disini');
+
       dispatch({ type: option.type + '_LOADING', payload: true });
       const { data } = await axios(payloadAxios);
       console.log(data);
-      dispatch({ type: option.type, payload: option.id ? option.id : option.deletedId ? option.deletedId : data });
+      dispatch({
+        type: option.type,
+        stage: aption.stage || null,
+        payload: option.id ? option.id : option.deletedId ? option.deletedId : data,
+      });
     } catch (error) {
       console.log(error);
-      console.log(error.response);
+      console.log('axios', error.stack);
       dispatch({ type: option.type + '_ERROR', payload: error });
     } finally {
       dispatch({ type: option.type + '_LOADING', payload: false });

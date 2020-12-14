@@ -4,12 +4,20 @@ import AppLoading from 'expo-app-loading';
 import { useFonts, Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat';
 import { FontAwesome, Fontisto, Feather, Entypo } from '@expo/vector-icons';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
-
+import errorHandler from '../helpers/errorHandler';
+const defaultVal = {
+  fullname: '',
+  email: '',
+  password: '',
+  address: '',
+}
 function JoinUs({ navigation }) {
-  const [payload, setPayload] = useState();
+  const [payload, setPayload] = useState(defaultVal);
   const dispatch = useDispatch();
+  const message = null;
+  const { user, loading, error, stage } = useSelector((state) => state.reducerUser);
 
   const [loaded] = useFonts({
     Ubuntu_300Light,
@@ -17,8 +25,16 @@ function JoinUs({ navigation }) {
     Ubuntu_500Medium,
   });
 
+  if (stage === 'joinus') {
+    if (error) {
+      message = errorHandler(error);
+      console.log(message);
+    } else if (user.fullname) {
+      toLogin();
+    }
+  }
+  console.log(user, loading);
   const handleInput = (text, name) => {
-    // const na;
     const value = {
       ...payload,
       [name]: text,
@@ -30,15 +46,20 @@ function JoinUs({ navigation }) {
     navigation.navigate('Login');
   };
 
-  const prosesJoin = (e) => {
-    const option = {
-      url: '',
-      method,
-      body,
-      headers,
-      type,
-    };
-    dispatch(callServer(option))
+  const prosesJoin = () => {
+    if (payload.fullname && payload.email && payload.password && payload.address) {
+      const option = {
+        url: 'users/register-warga',
+        method: 'post',
+        body: payload,
+        headers: false,
+        type: 'SET_USER',
+        stage: 'joinus',
+      };
+      dispatch(callServer(option));
+    } else {
+      console.log('All field required!');;
+    }
   };
 
   if (!loaded) {
@@ -90,7 +111,7 @@ function JoinUs({ navigation }) {
           />
         </View>
         <View style={styles.hr} />
-        <TouchableOpacity style={styles.btn}>
+        <TouchableOpacity onPress={() => prosesJoin()} style={styles.btn}>
           <Text style={styles.btn_Text}> SUBMIT </Text>
         </TouchableOpacity>
         <View style={styles.footer}>
