@@ -4,32 +4,54 @@ import axios from 'axios';
 
 const url = 'http://localhost:3000/'
 
+export function register (data) {
+  return (dispatch, getState) => {
+    console.log(data);
+    dispatch({ type: 'DELETE ERROR' })
+    dispatch({type: 'LOADING START'})
+    axios({ method: 'post', url: url + 'users/register-warga', data })
+      .then(data => {
+        dispatch({ type: 'SUCCESS' })
+      })
+      .catch(error => {
+        dispatch({ type: 'ERROR', error: error.response.data.msg })
+      })
+      .finally(_=> dispatch({ type: 'LOADING END'}))
+  }
+}
+
 export function fetchRealEstate () {
   return dispatch => {
-    console.log('sampai dalam');
     dispatch({ type: 'LOADING START'})
     axios({
       method: 'get',
       url: url + 'RealEstates'
-    }).then(({data}) => {
-      console.log(url);
+    })
+      .then(({data}) => {
       dispatch({ type: 'GET REAL ESTATE', data })
-      dispatch({ type: 'LOADING END'})
-    }).catch(err => console.log(err))
+    })
+      .catch(err => console.log(err))
+      .finally(_=> {
+        dispatch({ type: 'LOADING END'})
+      })
+
   }
 }
 
 export function fetchComplex () {
   return dispatch => {
-    console.log('sampai dalam');
     dispatch({ type: 'LOADING START'})
     axios({
       method: 'get',
       url: url + 'Complexs'
-    }).then(({data}) => {
+    })
+      .then(({data}) => {
       dispatch({ type: 'GET COMPLEX', data })
-      dispatch({ type: 'LOADING END'})
-    }).catch(err => console.log(err))
+    })
+      .catch(err => console.log(err))
+      .finally(_=> {
+        dispatch({ type: 'LOADING END'})
+      })
   }
 }
 
@@ -51,6 +73,10 @@ function reducer (state = {
       return { ...state, loading: true }
     case 'LOADING END':
       return { ...state, loading: false }
+    case 'ERROR':
+      return { ...state, error: action.error }
+    case 'DELETE ERROR':
+      return { ...state, error: false }
     case 'GET REAL ESTATE':
       return { ...state, realEstate: action.data }
     case 'GET COMPLEX':

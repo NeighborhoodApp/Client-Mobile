@@ -3,7 +3,8 @@ import { Picker } from '@react-native-picker/picker';
 import { ActivityIndicator, Button, Text, View } from 'react-native';
 import { fetchComplex, fetchRealEstate, login } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
-import { lightGreen100 } from 'react-native-paper/lib/typescript/src/styles/colors';
+import { widthPercentageToDP as wdt, heightPercentageToDP as hgt } from 'react-native-responsive-screen';
+
 
 export default function ChooseComplex (props) {
   const dispatch = useDispatch()
@@ -12,39 +13,38 @@ export default function ChooseComplex (props) {
   const [selectedComplex, setSelectedComplex] = useState()
 
   const handleRealEstate = (val) => {
-    console.log(typeof val);
+    setSelectedRealEstate(val)
   }
   const handleComplexs = val => {
-    console.log(val);
+    setSelectedComplex(val)
   }
 
   useEffect(() => {
     dispatch(fetchRealEstate())
     dispatch(fetchComplex())
   }, [])
-
   useEffect(() => {
   }, [selectedRealEstate])
-
   
-  
-  if (loading) return <ActivityIndicator size='large' ></ActivityIndicator>
+  if (loading) return <ActivityIndicator size='large' color='purple' style={{ flex: 1, justifyContent: "center", alignItems: "center" }} ></ActivityIndicator>
   
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Picker
-        style={{height: 50, width: 100}}
-        onValueChange={itemValue => handleRealEstate(itemValue) }>
-        {realEstate.map(val => <Picker.Item label={val.name} value={val.id} key={val.id} />)}
-      </Picker>
-      <Picker
-        style={{height: 50, width: 100}}
-        onValueChange={val => handleComplexs(val)}>
-        {complex.map(val => {
-          // if (val.RealEstateId === selectedRealEstate) return <Picker.Item label={val.name} value={val} key={val.id} />
-        })}
-      </Picker>
-      <Button title='Pilih' />
+      <View style={{ flex: 1, width: wdt('100%'), justifyContent: "center", alignItems: "center" }}>
+        <Picker
+          style={{height: 50, width: wdt('95%')}}
+          onValueChange={itemValue => handleRealEstate(itemValue) }>
+            {realEstate.map(val => <Picker.Item label={val.name} value={val.id} key={val.id} />)}
+        </Picker>
+        <Picker
+          style={{height: 50, width: wdt('95%')}}
+          onValueChange={val => handleComplexs(val)}>
+          {complex.map(val => {
+            if (val.RealEstateId == selectedRealEstate) return <Picker.Item label={val.name} value={val} key={val.id} />
+          })}
+        </Picker>
+        <Button title='Pilih' />
+      </View>
     </View>
   )
 }

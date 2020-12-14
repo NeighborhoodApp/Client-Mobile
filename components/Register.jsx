@@ -2,23 +2,35 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, View, Button, ActivityIndicator, ActivityIndicatorComponent } from 'react-native';
 import TextBox from 'react-native-password-eye';
 import { widthPercentageToDP as wdt, heightPercentageToDP as hgt } from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux';
+import { register } from '../store'
 
 export default function Register (props) {
+  const { loading, error } = useSelector(s => s)
   const [fullname, setFullname] = useState('')
   const [address, setAddress] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const dispatch = useDispatch()
 
   const handleFullname = (val) => setFullname(val)
   const handleAddress = (val) => setAddress(val)
   const handleEmail = (val) => setEmail(val)
   const handlePassword = (val) => setPassword(val)
+  const handleRegister = _=> {
+    console.log(fullname, address, email, password);
+    dispatch(register({ fullname, address, email, password }))
+  }
 
-  if (loading) return <ActivityIndicator size="large" />
+  useEffect(_=> {}, [error])
+  console.log(error);
+
+  if (loading) return <ActivityIndicator size='large' color='purple' style={{ flex: 1, justifyContent: "center", alignItems: "center" }} ></ActivityIndicator>
 
   return (
     <View style={styles.form}>
       <View style={styles.box}>
+        {error && (<Text>{error} </Text>)}
         <Text>Full Name</Text>
         <TextInput style={styles.input} onChangeText={handleFullname}></TextInput>
         <Text>Address</Text>
@@ -27,7 +39,7 @@ export default function Register (props) {
         <TextInput style={styles.input} onChangeText={handleEmail} ></TextInput>
         <Text>Password</Text>
         <TextBox onChangeText={handlePassword} containerStyles={[styles.input]} secureTextEntry={true} />
-        <Button title='Register' />
+        <Button title='Register' onPress={handleRegister}/>
       </View>
     </View>
   )

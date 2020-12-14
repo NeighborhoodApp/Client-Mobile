@@ -4,6 +4,7 @@ import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TextBox from 'react-native-password-eye';
 import { login } from '../store';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export default function Login (props) {
   const [email, setEmail] = useState('')
@@ -30,6 +31,8 @@ export default function Login (props) {
       .catch(console.log)
   }, [])
 
+  const toRegister = _=> props.navigation.navigate('Register')
+
   return (
     <View style={styles.form}>
       <View style={styles.box}>
@@ -38,6 +41,11 @@ export default function Login (props) {
         <Text>Password</Text>
         <TextBox onChangeText={handlePassword} containerStyles={[styles.input]} secureTextEntry={true} />
         <Button title='Login' onPress={handleSubmit} />
+        <View>
+          <TouchableOpacity onPress={toRegister}>
+            <Text>Not registered??</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   )
