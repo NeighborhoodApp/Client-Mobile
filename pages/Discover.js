@@ -1,10 +1,11 @@
 import React, { useState }  from 'react'
 import { View, Text, StyleSheet, Picker } from 'react-native'
 import { Avatar } from 'react-native-paper';
-
+import DropDownPicker from 'react-native-dropdown-picker';
+import Icon from 'react-native-vector-icons/Feather';
 
 function Discover () {   
-    const [selectedValue, setSelectedValue] = useState("java");
+    const [selectedValue, setSelectedValue] = useState("public");
 
     return (
         <View style={styles.container}>
@@ -16,16 +17,21 @@ function Discover () {
                 />
                 <View style={styles.column}>
                     <Text style={styles.name}>Bambang Gentolet</Text>
-                    <Picker
-                        selectedValue={selectedValue}
-                        style={styles.picker}
+                    <DropDownPicker
+                        items={[
+                            {label: 'Public', value: 'public', hidden: true },
+                            {label: 'Neighbours of Complex', value: 'complex' },
+                        ]}
+                        defaultValue={selectedValue}
+                        containerStyle={{height: 30, width: '80%', justifyContent: 'center', alignSelf: 'center'}}
+                        style={{backgroundColor: '#fafafa'}}
+                        itemStyle={{
+                            justifyContent: 'flex-start'
+                        }}
+                        dropDownStyle={{backgroundColor: '#fafafa'}}
                         onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
-                        itemStyle={{ backgroundColor: "grey", color: "blue", fontSize:17 }}
-                        // textStyle={{ fontSize: 2 }}
-                    >
-                        <Picker.Item label="Public" value="Public" style={styles.size} />
-                        <Picker.Item label="Neighbours of Complex" value="Complex" />
-                    </Picker>
+                        // onChangeItem={item => selectedValue({ selectedValue: item.value })}
+                    />
                 </View>
             </View>
         </View>
