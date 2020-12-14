@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, Image, TouchableOpacity, StyleSheet, Button, View } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
+<<<<<<< HEAD
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -12,12 +13,18 @@ import { Home, GetStarted, JoinUs, Login, Waiting, Discover, Profile, Notificati
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Avatar } from 'react-native-paper';
 
+=======
+import { Home, GetStarted, JoinUs, Login, Waiting} from './pages'
+import { Provider } from 'react-redux';
+import store from './store';
+>>>>>>> 7abd48d6a38c5d9a4c6f95f321a2e879b8c778b1
 
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
+<<<<<<< HEAD
       <Stack.Navigator>
         <Stack.Screen name="Home" component={Home} options={{
           title: 'Discover',
@@ -66,6 +73,17 @@ export default function App() {
           }} />
         <Stack.Screen name="Notification" component={Notification} />
       </Stack.Navigator>
+=======
+      <Provider store={store}>
+        <Stack.Navigator>
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="GetStarted" component={GetStarted} options={{  headerShown: false  }}  />
+          <Stack.Screen name="JoinUs" component={JoinUs} options={{  headerShown: false  }} />
+          <Stack.Screen name="Login" component={Login} options={{  headerShown: false  }} />
+          <Stack.Screen name="Waiting" component={Waiting} options={{  headerShown: false  }} />
+        </Stack.Navigator>
+      </Provider>
+>>>>>>> 7abd48d6a38c5d9a4c6f95f321a2e879b8c778b1
     </NavigationContainer>
   );
 }
