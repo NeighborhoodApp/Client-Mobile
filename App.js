@@ -50,9 +50,6 @@ export default function App() {
                                   <Text style={styles.title}>Discover</Text>
                                   <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0"/>
                               </View>),
-            headerRight: ({ navigation }) => (<TouchableOpacity style={{marginRight: 30, borderWidth:3, borderColor:'white', borderRadius:50}} onPress={() => {navigation.navigate('Menu')}}>
-                                  <Avatar.Image size={48} source={{ uri: 'https://i.pinimg.com/474x/73/c3/e7/73c3e7cca66a885c53718d8f3688b02c.jpg',}}/>
-                                </TouchableOpacity> ),
             headerLeft: null,
             headerStyle: {
               backgroundColor: '#161C2B',

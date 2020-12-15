@@ -2,14 +2,46 @@ import React, { useState, useEffect }  from 'react'
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native'
 import { Avatar } from 'react-native-paper';
 import DropDownPicker from 'react-native-dropdown-picker';
-import {  useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
-import { FontAwesome } from '@expo/vector-icons';
+import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { Card } from 'react-native-paper';
+import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
+import BottomNavigator from '../components/BottomNavigator'
+import * as ImagePicker from 'expo-image-picker';
 
 function Discover ({ navigation }) {   
     let [loaded] = useFonts({
-        Poppins_600SemiBold
+        Poppins_600SemiBold, Ubuntu_300Light
     });
+
+    // >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<<
+    const [image, setImage] = useState(null);
+
+    useEffect(() => {
+      (async () => {
+        if (Platform.OS !== 'web') {
+          const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+          if (status !== 'granted') {
+            alert('Sorry, we need camera roll permissions to make this work!');
+          }
+        }
+      })();
+    }, []);
+  
+    const pickImage = async () => {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+  
+      console.log(result);
+  
+      if (!result.cancelled) {
+        setImage(result.uri);
+      }
+    };
 
     // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
     useEffect(() => {
@@ -39,13 +71,14 @@ function Discover ({ navigation }) {
                 />
                 <View style={styles.boxProfile}>
                     <Text style={styles.name}>Bambang Gentolet</Text>
+                    <View style={{flexDirection:'row', width:'60%'}}>
                     <DropDownPicker
                         items={[
                             {label: 'Public', value: 'public', hidden: true },
-                            {label: 'Complex', value: 'complex' },
+                            {label: 'Tetonggo', value: 'tetonggo' },
                         ]}
                         defaultValue={selectedValue}
-                        containerStyle={{height: 30, width: '80%', alignSelf: 'flex-start'}}
+                        containerStyle={{height: 29, width: '70%', alignSelf: 'flex-start', marginTop:4}}
                         style={{backgroundColor: '#fafafa'}}
                         itemStyle={{
                             justifyContent: 'flex-start'
@@ -58,16 +91,21 @@ function Discover ({ navigation }) {
                             color: '#000'
                         }}
                     />
+                    {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
+                    <TouchableOpacity onPress={pickImage}><Text style={styles.addPhotos}><MaterialIcons name="add-a-photo" size={14} color="#707070"/>  Photo</Text></TouchableOpacity>
+                    {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
+                    </View>
                 </View>
             </View>
             <View style={styles.boxCard}>
-                <View style={styles.boxText}>
-                    <TextInput style={styles.inputText} placeholder="What’s on your mind?"/>
+                {image && <Card style={styles.card}><Card.Cover source={{ uri:image }} /></Card>}
+                <View style={styles.boxStatus}>
+                    <TextInput style={styles.inputStatus} placeholder="What’s on your mind?" placeholderTextColor="white"/>
                 </View>
             </View>
         </View>
             
-            {/* >>>>>>>>>>>>> BATAS SUCI <<<<<<<<<<<<< */}
+        {/* >>>>>>>>>>>>> BATAS SUCI <<<<<<<<<<<<< */}
         <View style={styles.box}>
             <View style={styles.hr} />
             <View style={styles.row}>
@@ -91,7 +129,6 @@ function Discover ({ navigation }) {
                 </Card>
                 <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> 2</Text>
             </View>
-            {/* <View style={styles.hr} /> */}
         </View>
         <View style={styles.box}>
             <View style={styles.hr} />
@@ -119,6 +156,7 @@ function Discover ({ navigation }) {
             <View style={styles.hr} />
         </View>
       </ScrollView>
+      <BottomNavigator></BottomNavigator>
     </SafeAreaView >
     )
 }
@@ -146,7 +184,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'white',
-        paddingBottom: 50,
+        paddingBottom: 60,
         // backgroundColor: '#FAFAFA',
         borderTopRightRadius: 35,
         borderTopLeftRadius: 35,
@@ -214,12 +252,29 @@ const styles = StyleSheet.create({
     }, 
     boxText: {
         width:'97%', 
+        marginBottom:6,
+        color: 'white',
+    },
+    inputStatus: {
+        width: '100%',
+        marginTop:15,
+        marginBottom: 15,
+        fontSize: 18,
+        color: 'white',
+        marginLeft: 15
     },
     boxImage: {
         width:'100%', 
     },
+    boxStatus: {
+        width:'96%',
+        backgroundColor: '#161C2B',
+        borderRadius:10,
+        borderWidth:0.5
+    },
     boxCard: {
         width:'90%', 
+        // backgroundColor: '#161C2B'
     },
     card: {
         justifyContent: 'flex-start',
@@ -232,7 +287,15 @@ const styles = StyleSheet.create({
         marginBottom: 8,
         marginTop:5
     },
-    
+    addPhotos: {
+        fontFamily:'Ubuntu_300Light',
+        fontSize: 13, marginTop:3,
+        fontWeight:'bold', marginLeft:10, 
+        justifyContent:"center", borderWidth:0.5, 
+        padding:5,paddingHorizontal:13, height:29, 
+        backgroundColor:'#FAFAFA', borderColor:'#E3E3E3', 
+        borderRadius:5
+    }
 });
   
 
