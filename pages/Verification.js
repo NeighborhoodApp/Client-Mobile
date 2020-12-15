@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Avatar } from 'react-native-paper';
 import { useFonts, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import { Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import AppLoading from 'expo-app-loading';
+import VerificationList from '../components/VerificationList';
+import { useDispatch, useSelector } from 'react-redux';
+import callServer from '../helpers/callServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Verification() {
   const [loaded] = useFonts({
@@ -12,56 +15,87 @@ function Verification() {
     Ubuntu_500Medium,
   });
 
-  if (!loaded) return <AppLoading />;
+  const [admin, setAdmin] = useState();
+  const { users, loading, stage, error } = useSelector((state) => state.reducerUser);
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.items}>
-        <Text style={styles.title}> New </Text>
-        <View style={styles.row}>
-          <Avatar.Image
-            size={55}
-            source={{
-              uri: 'https://i.pinimg.com/originals/b5/a6/3b/b5a63b0da8d66df3dd10f269be70ea88.jpg',
-            }}
-          />
-          <View style={styles.column}>
-            <Text style={styles.name}>Maria DB</Text>
-            <Text style={styles.address}>Jl. Bojongkenyot VI G-18</Text>
-          </View>
-          <View style={styles.container_button}>
-            <TouchableOpacity onPress={() => console.log('Pressed')} style={styles.btn_confirm}>
-              <Text style={styles.confirm}> Confirm </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => console.log('Pressed')} style={styles.btn_delete}>
-              <Text style={styles.delete}> Delete </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.row}>
-          <Avatar.Image
-            size={55}
-            source={{
-              uri:
-                'https://previews.123rf.com/images/rido/rido1204/rido120400047/13283722-happy-smiling-guy-showing-thumb-up-hand-sign-isolated-on-white-background.jpg',
-            }}
-          />
-          <View style={styles.column}>
-            <Text style={styles.name}>Postgre Siqil</Text>
-            <Text style={styles.address}>Jl. Bojongkenyot VI G-20</Text>
-          </View>
-          <View style={styles.container_button}>
-            <TouchableOpacity onPress={() => console.log('Pressed')} style={styles.btn_confirm}>
-              <Text style={styles.confirm}> Confirm </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => console.log('Pressed')} style={styles.btn_delete}>
-              <Text style={styles.delete}> Delete </Text>
-            </TouchableOpacity>
-          </View>
+  const filteredUsers = users.filter((user) => user.ComplexId === 1 && user.RoleId !== 2 && user.status === 'Inactive');
+
+  const dispatch = useDispatch();
+
+  const handleDecline = (id) => {
+    const updateUser = (id) => {
+      const option = {
+        url: `users/${id}`,
+        stage: 'updateUser',
+        method: 'patch',
+        body: {
+          status: 'Declined',
+        },
+        headers: true,
+        type: 'UPDATE_USER',
+        id: id,
+      };
+      dispatch(callServer(option));
+    };
+    updateUser(id);
+  };
+
+  const handleConfirm = (id) => {
+    const updateUser = (id) => {
+      const option = {
+        url: `users/${id}`,
+        stage: 'updateUser',
+        method: 'patch',
+        body: {
+          status: 'Active',
+        },
+        headers: true,
+        type: 'UPDATE_USER',
+        id: id,
+      };
+      dispatch(callServer(option));
+    };
+    updateUser(id);
+  };
+
+  useEffect(() => {
+    const fetchUsers = () => {
+      const option = {
+        url: 'users',
+        stage: 'getUsers',
+        method: 'get',
+        body: null,
+        headers: null,
+        type: 'SET_USERS',
+      };
+      dispatch(callServer(option));
+    };
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const value = await AsyncStorage.getItem('userlogedin');
+      const json = JSON.parse(value);
+      setAdmin(json);
+    };
+    getUser();
+  }, []);
+
+  if (!loaded) return <AppLoading />;
+  else if (loading) return <AppLoading />;
+  else {
+    return (
+      <View style={styles.container}>
+        <View style={styles.items}>
+          <Text style={styles.title}> New Users </Text>
+          {filteredUsers.map((user) => (
+            <VerificationList user={user} key={user.id} handleDecline={handleDecline} handleConfirm={handleConfirm} />
+          ))}
         </View>
       </View>
-    </View>
-  );
+    );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -78,6 +112,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     marginBottom: 15,
+    marginLeft: 10,
   },
   row: {
     flexDirection: 'row',

@@ -153,11 +153,11 @@ function PickLocation({ navigation }) {
             await AsyncStorage.setItem('userlogedin', jsonValue);
             navigation.replace('Waiting');
           } catch (error) {
-            console.log(error)
+            console.log(error);
           }
-        }
-        saveUser()
-      })
+        };
+        saveUser();
+      });
     }
   }
 
