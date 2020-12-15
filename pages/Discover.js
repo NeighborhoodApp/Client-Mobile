@@ -98,7 +98,7 @@ function Discover ({ navigation }) {
                 </View>
             </View>
             <View style={styles.boxCard}>
-                {image && <Card style={styles.card}><Card.Cover source={{ uri:image }} /></Card>}
+                {image && <Card style={styles.cardStatus}><Card.Cover source={{ uri:image }} /></Card>}
                 <View style={styles.boxStatus}>
                     <TextInput style={styles.inputStatus} placeholder="What’s on your mind?" placeholderTextColor="white"/>
                 </View>
@@ -277,6 +277,11 @@ const styles = StyleSheet.create({
         // backgroundColor: '#161C2B'
     },
     card: {
+        justifyContent: 'flex-start',
+        width:'94%', 
+    },
+    cardStatus: {
+        marginBottom:10,
         justifyContent: 'flex-start',
         width:'94%', 
     },
