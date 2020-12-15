@@ -12,6 +12,9 @@ export default function reducer(state = initState, action) {
     case 'SET_USERS':
       return { ...state, users: action.payload, stage: action.stage, error: null };
     case 'SET_USER':
+      if (action.payload.foundUser) {
+        return { ...state, user: action.payload.foundUser, stage: action.stage, error: null };
+      }
       return { ...state, user: action.payload, stage: action.stage, error: null };
     case 'UPDATE_USER':
       return { ...state, result: action.payload, stage: action.stage, error: null };

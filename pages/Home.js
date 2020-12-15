@@ -4,36 +4,32 @@ import { View, Text, StyleSheet, Button } from 'react-native';
 import { useDispatch } from 'react-redux';
 import callServer from '../helpers/callServer';
 
+let json = null;
 function Home({ navigation }) {
   const [user, setUser] = useState(null);
-  const dispatch = useDispatch();
 
   useEffect(() => {
     const getUser = async () => {
       const value = await AsyncStorage.getItem('userlogedin');
-      const json = JSON.parse(value);
+      json = JSON.parse(value);
       setUser(json);
-      if (json) {
-        if (!json.RealEstateId) {
-          navigation.replace('PickLocation');
-        } else if (json.status === 'Inactive') {
-          navigation.replace('Waiting');
-        } else {
-          navigation.replace('Discover');
-        }
-      } else {
-        navigation.navigate('GetStarted');
-      }
+      goJoin();
+      
     };
     getUser();
   }, []);
 
   const goJoin = () => {
-    console.log(user)
-    if (user) {
-      navigation.replace('JoinUs');
+    if (json) {
+      if (!json.RealEstateId) {
+        navigation.replace('PickLocation');
+      } else if (json.status === 'Inactive') {
+        navigation.replace('Waiting');
+      } else {
+        navigation.replace('Discover');
+      }
     } else {
-      navigation.navigate('PickLocation');
+      navigation.navigate('GetStarted');
     }
   }
   return (
