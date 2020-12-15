@@ -82,7 +82,23 @@ export default function App() {
             }} 
           />
           <Stack.Screen name="PickLocation" component={PickLocation} options={{headerShown: false}}/>
-          <Stack.Screen name="Menu" component={Menu} />
+          <Stack.Screen name="Menu" component={Menu} 
+           options={{
+            headerTitle: ()=> (<View style={styles.row}>
+                                <Image style={styles.logo} source={require('./assets/logo-menu.png')} />
+                                <Text style={styles.menuTitle}>Hi, Tetonggo {'\n'}Welcome Back!</Text>
+                              </View>),
+            headerLeft: null,
+            headerStyle: {
+              backgroundColor: '#161C2B',
+              height: 200,
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: { 
+              alignSelf: 'center',
+              color:  '#fff',
+              }
+            }} />
         </Stack.Navigator>
       </Provider>
     </NavigationContainer>
@@ -124,6 +140,19 @@ const styles = StyleSheet.create({
   },
   icon: {
     position: 'absolute',
+  },
+  logo: {
+    width: 126,
+    height: 111,
+    marginRight: 20,
+    left:0
+  }, 
+  menuTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color:  '#fff',
+    marginTop: 25,
+    marginRight:40
   }
 });
 
