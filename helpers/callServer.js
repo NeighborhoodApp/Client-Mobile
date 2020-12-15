@@ -22,13 +22,14 @@ export default function callServer(option) {
         const json = JSON.parse(value);
         payloadAxios['headers'] = {
           access_token: json.access_token,
+          coordinate: json.coordinate
         };
       }
 
       console.log('wxios fetch call server', payloadAxios);
       dispatch({ type: option.type + '_LOADING', payload: true });
       const { data } = await axios(payloadAxios);
-      console.log('from server', data);
+      // console.log('from server', data);
       dispatch({
         type: option.type,
         stage: option.stage || null,

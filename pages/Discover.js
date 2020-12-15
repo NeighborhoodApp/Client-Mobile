@@ -32,6 +32,17 @@ function Discover({ navigation }) {
       dispatch(callServer(option));
     };
 
+    // axios({
+    //   method: 'get',
+    //   url: 'http://192.168.1.12:3000/timeline',
+    //   headers: {
+    //     access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJ3YXJnYTFAbWFpbC5jb20iLCJSb2xlSWQiOjMsImlhdCI6MTYwODAzNDY5Mn0.mBH7BJBJVdL0p_xlhQ1Zkw57mxeU7IKdyVme36sdi5s'
+    //   }
+    // })
+    // .then(({data}) => {
+    //   console.log(data)
+    // })
+
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }} onPress={() => { navigation.navigate('Menu') }}>
@@ -45,7 +56,8 @@ function Discover({ navigation }) {
   const [selectedValue, setSelectedValue] = useState("public");
 
   if (!loaded) return <AppLoading />;
-console.log(timelines)
+  if (!timelines.length) return <Text>Loading</Text>
+  
   return (
     <SafeAreaView style={styles.bg}>
       <ScrollView
@@ -88,8 +100,67 @@ console.log(timelines)
             </View>
           </View>
         </View>
+        {
+          timelines.map((el, index) => {
+            return (
+              <View key={`timeline${index}`} style={styles.box}>
+                <View style={styles.hr} />
+                <View style={styles.row}>
+                  <Avatar.Image size={39}
+                    source={{
+                      uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
+                    }}
+                  />
+                  <View style={styles.boxProfile}>
+                    <Text style={styles.name}>{el.User.fullname}</Text>
+                    <Text styles={styles.location}>{el.User.Complex.name}</Text>
+                  </View>
+                </View>
+                <View style={styles.hr} />
+                <View style={styles.boxCard}>
+                  <View style={styles.boxText}>
+                    <Text style={styles.status}>{el.description}</Text>
+                  </View>
+                  {
+                    el.image &&
+                    <Card style={styles.card}>
+                      <Card.Cover source={{ uri: el.image }} />
+                    </Card>
+                  }
 
+                  <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}</Text>
+                </View>
+                <View style={styles.hr} />
+              </View>
+            )
+          })
+        }
         {/* >>>>>>>>>>>>> BATAS SUCI <<<<<<<<<<<<< */}
+        {/* <View style={styles.box}>
+          <View style={styles.hr} />
+          <View style={styles.row}>
+            <Avatar.Image size={39}
+              source={{
+                uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
+              }}
+            />
+            <View style={styles.boxProfile}>
+              <Text style={styles.name}>Bambang Gentolet</Text>
+              <Text styles={styles.location}>Komplek Bojongkenyot</Text>
+            </View>
+          </View>
+          <View style={styles.hr} />
+          <View style={styles.boxCard}>
+            <View style={styles.boxText}>
+              <Text style={styles.status}>Ada yang liat kucing aku ngga ya? Aku sedih sekali udah cari kemana-mana ga ketemu</Text>
+            </View>
+            <Card style={styles.card}>
+              <Card.Cover source={{ uri: 'https://mk0punsjokesui4twax7.kinstacdn.com/wp-content/uploads/2020/05/cute-cat.jpg' }} />
+            </Card>
+            <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> 2</Text>
+          </View> */}
+        {/* <View style={styles.hr} /> */}
+        {/* </View>
         <View style={styles.box}>
           <View style={styles.hr} />
           <View style={styles.row}>
@@ -113,33 +184,8 @@ console.log(timelines)
             </Card>
             <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> 2</Text>
           </View>
-          {/* <View style={styles.hr} /> */}
-        </View>
-        <View style={styles.box}>
           <View style={styles.hr} />
-          <View style={styles.row}>
-            <Avatar.Image size={39}
-              source={{
-                uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-              }}
-            />
-            <View style={styles.boxProfile}>
-              <Text style={styles.name}>Bambang Gentolet</Text>
-              <Text styles={styles.location}>Komplek Bojongkenyot</Text>
-            </View>
-          </View>
-          <View style={styles.hr} />
-          <View style={styles.boxCard}>
-            <View style={styles.boxText}>
-              <Text style={styles.status}>Ada yang liat kucing aku ngga ya? Aku sedih sekali udah cari kemana-mana ga ketemu</Text>
-            </View>
-            <Card style={styles.card}>
-              <Card.Cover source={{ uri: 'https://mk0punsjokesui4twax7.kinstacdn.com/wp-content/uploads/2020/05/cute-cat.jpg' }} />
-            </Card>
-            <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> 2</Text>
-          </View>
-          <View style={styles.hr} />
-        </View>
+        </View> */}
       </ScrollView>
     </SafeAreaView >
   )

@@ -8,6 +8,8 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@dicebear/avatars": "^4.5.2",
+    "@dicebear/avatars-male-sprites": "^4.5.2",
     "@expo-google-fonts/akronim": "^0.1.0",
     "@expo-google-fonts/montserrat": "^0.1.0",
     "@expo-google-fonts/poppins": "^0.1.0",
