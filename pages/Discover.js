@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native'
-import AppLoading from 'expo-app-loading';
 import { Avatar } from 'react-native-paper';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
-import { FontAwesome } from '@expo/vector-icons';
+import AppLoading from 'expo-app-loading';
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { Card } from 'react-native-paper';
+import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
+import BottomNavigator from '../components/BottomNavigator'
+// import * as ImagePicker from 'expo-image-picker';
+import ImagePicker from 'react-native-image-picker'
 import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
+import axios from 'axios'
 
 function Discover({ navigation }) {
   const { timelines, error, stage } = useSelector((state) => state.reducerTimeline);
@@ -15,11 +20,23 @@ function Discover({ navigation }) {
   const dispatch = useDispatch();
 
   let [loaded] = useFonts({
-    Poppins_600SemiBold
+    Poppins_600SemiBold, Ubuntu_300Light
   });
+
+  // >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<<
+  const [image, setImage] = useState(null);
 
   // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
   useEffect(() => {
+    // (async () => {
+    //   if (Platform.OS !== 'web') {
+    //     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    //     if (status !== 'granted') {
+    //       alert('Sorry, we need camera roll permissions to make this work!');
+    //     }
+    //   }
+    // })();
+
     const fetchTimeline = () => {
       const option = {
         url: 'timeline',
@@ -32,17 +49,6 @@ function Discover({ navigation }) {
       dispatch(callServer(option));
     };
 
-    // axios({
-    //   method: 'get',
-    //   url: 'http://192.168.1.12:3000/timeline',
-    //   headers: {
-    //     access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJ3YXJnYTFAbWFpbC5jb20iLCJSb2xlSWQiOjMsImlhdCI6MTYwODAzNDY5Mn0.mBH7BJBJVdL0p_xlhQ1Zkw57mxeU7IKdyVme36sdi5s'
-    //   }
-    // })
-    // .then(({data}) => {
-    //   console.log(data)
-    // })
-
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }} onPress={() => { navigation.navigate('Menu') }}>
@@ -53,11 +59,52 @@ function Discover({ navigation }) {
     fetchTimeline()
   }, [navigation])
 
+  // const pickImage = async () => {
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.All,
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
+
+  //   console.log(result);
+  //   const data = new FormData()
+  //   data.append('file', result.uri)
+  //   if (!result.cancelled) {
+  //     setImage(result.uri);
+  //     axios({
+  //       method: 'post',
+  //       url: 'http://192.168.1.12:3000/upload',
+  //       data: data,
+  //       header: {
+  //         'Content-Type': 'multipart/form-data'
+  //       }
+  //     })
+  //     .then(({data}) => {
+  //       console.log(data, 'tes');
+  //     })
+  //     .catch(err => {
+  //       console.log(err);
+  //     })
+  //   }
+  // };
+
+  const imageHandler = () => {
+    const options = {
+      noData: true
+    }
+    ImagePicker.launchImageLibrary({}, response => {
+     
+        console.log(response);
+      
+    })
+  }
+
   const [selectedValue, setSelectedValue] = useState("public");
 
   if (!loaded) return <AppLoading />;
   if (!timelines.length) return <Text>Loading</Text>
-  
+
   return (
     <SafeAreaView style={styles.bg}>
       <ScrollView
@@ -73,30 +120,36 @@ function Discover({ navigation }) {
             />
             <View style={styles.boxProfile}>
               <Text style={styles.name}>Bambang Gentolet</Text>
-              <DropDownPicker
-                items={[
-                  { label: 'Public', value: 'public', hidden: true },
-                  { label: 'Complex', value: 'complex' },
-                ]}
-                defaultValue={selectedValue}
-                containerStyle={{ height: 30, width: '80%', alignSelf: 'flex-start' }}
-                style={{ backgroundColor: '#fafafa' }}
-                itemStyle={{
-                  justifyContent: 'flex-start'
-                }}
-                dropDownStyle={{ backgroundColor: '#fafafa' }}
-                onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
-                labelStyle={{
-                  fontSize: 13,
-                  textAlign: 'left',
-                  color: '#000'
-                }}
-              />
+              <View style={{ flexDirection: 'row', width: '60%' }}>
+                <DropDownPicker
+                  items={[
+                    { label: 'Public', value: 'public', hidden: true },
+                    { label: 'Tetonggo', value: 'tetonggo' },
+                  ]}
+                  defaultValue={selectedValue}
+                  containerStyle={{ height: 29, width: '70%', alignSelf: 'flex-start', marginTop: 4 }}
+                  style={{ backgroundColor: '#fafafa' }}
+                  itemStyle={{
+                    justifyContent: 'flex-start'
+                  }}
+                  dropDownStyle={{ backgroundColor: '#fafafa' }}
+                  onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+                  labelStyle={{
+                    fontSize: 13,
+                    textAlign: 'left',
+                    color: '#000'
+                  }}
+                />
+                {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
+                <TouchableOpacity onPress={() => imageHandler()}><Text style={styles.addPhotos}><MaterialIcons name="add-a-photo" size={14} color="#707070" />  Photo</Text></TouchableOpacity>
+                {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
+              </View>
             </View>
           </View>
           <View style={styles.boxCard}>
-            <View style={styles.boxText}>
-              <TextInput style={styles.inputText} placeholder="What’s on your mind?" />
+            {image && <Card style={styles.cardStatus}><Card.Cover source={{ uri: image }} /></Card>}
+            <View style={styles.boxStatus}>
+              <TextInput style={styles.inputStatus} placeholder="What’s on your mind?" placeholderTextColor="white" />
             </View>
           </View>
         </View>
@@ -187,6 +240,7 @@ function Discover({ navigation }) {
           <View style={styles.hr} />
         </View> */}
       </ScrollView>
+      <BottomNavigator></BottomNavigator>
     </SafeAreaView >
   )
 }
@@ -300,7 +354,34 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginTop: 5
   },
-
+  inputStatus: {
+    width: '100%',
+    marginTop: 15,
+    marginBottom: 15,
+    fontSize: 18,
+    color: 'white',
+    marginLeft: 15
+  },
+  boxStatus: {
+    width: '96%',
+    backgroundColor: '#161C2B',
+    borderRadius: 10,
+    borderWidth: 0.5
+  },
+  cardStatus: {
+    marginBottom: 10,
+    justifyContent: 'flex-start',
+    width: '94%',
+  },
+  addPhotos: {
+    fontFamily: 'Ubuntu_300Light',
+    fontSize: 13, marginTop: 3,
+    fontWeight: 'bold', marginLeft: 10,
+    justifyContent: "center", borderWidth: 0.5,
+    padding: 5, paddingHorizontal: 13, height: 29,
+    backgroundColor: '#FAFAFA', borderColor: '#E3E3E3',
+    borderRadius: 5
+  }
 });
 
 
