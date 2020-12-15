@@ -20,7 +20,7 @@ export default function App() {
   return (
     <NavigationContainer>
        <Provider store={store}>
-        <Stack.Navigator initialRouteName='Profile'>
+        <Stack.Navigator>
           <Stack.Screen name="Home" component={Home} options={{
             title: 'Discover',
             headerRight: () => (

@@ -4,6 +4,7 @@ const initState = {
   error: null,
   loading: false,
   stage: null, // create, update, delete, edit, customize welcome
+  result: null
 };
 
 export default function reducer(state = initState, action) {
@@ -11,14 +12,20 @@ export default function reducer(state = initState, action) {
     case 'SET_USERS':
       return { ...state, users: action.payload, stage: action.stage, error: null };
     case 'SET_USER':
+      console.log(action.payload);
       return { ...state, user: action.payload, stage: action.stage, error: null };
+    case 'UPDATE_USER':
+      return { ...state, result: action.payload, stage: action.stage, error: null };
     case 'SET_USERS_LOADING':
       return { ...state, loading: action.payload };
     case 'SET_USER_LOADING':
       return { ...state, loading: action.payload };
+    case 'UPDATE_USER_LOADING':
+      return { ...state, loading: action.payload };
     case 'SET_USERS_ERROR':
         return { ...state, stage: action.stage, error: action.payload };
     case 'SET_USER_ERROR':
+    case 'UPDATE_USER_ERROR':
       return { ...state, stage: action.stage, error: action.payload };
     case 'REMOVE_STAGE_ERROR':
       return { ...state, stage: null, error: null };

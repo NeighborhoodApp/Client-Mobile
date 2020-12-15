@@ -4,9 +4,9 @@ import { Avatar } from 'react-native-paper';
 import { useFonts, Ubuntu_300Light,Ubuntu_500Medium } from '@expo-google-fonts/ubuntu'
 import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat'
 import { FontAwesome, Fontisto, Feather, Entypo, FontAwesome5, AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
-import AppLoading from 'expo-app-loading';
 import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer'
+import AppLoading from 'expo-app-loading';
 
 
 function Profile({navigation}) {    
@@ -24,15 +24,12 @@ function Profile({navigation}) {
       dispatch(callServer({
         url: 'users/5',
         method: 'get',
-        type: 'SET_USER',
-        headers: true
+        type: 'SET_USER'
       }))
     }, [])
 
     if (!loaded) return <AppLoading />
-
-    if (loading) return <AppLoading />
-
+    
     return (
         <View style={styles.container}>
             {/* >>>>>> PROFILE PAGE <<<<<<< */}
