@@ -16,8 +16,6 @@ function Home({ navigation }) {
       if (json) {
         if (!json.RealEstateId) {
           navigation.replace('PickLocation');
-        } else if (json.RoleId === 2) {
-          navigation.replace('Verification');
         } else if (json.status === 'Inactive') {
           navigation.replace('Waiting');
         } else {

@@ -17,28 +17,6 @@ export default function App() {
       <Provider store={store}>
         <Stack.Navigator>
           <Stack.Screen
-            name="Verification"
-            component={Verification}
-            options={{
-              headerTitle: () => (
-                <View style={styles.row}>
-                  <Text style={styles.title}>Verfication</Text>
-                  <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
-                </View>
-              ),
-              headerLeft: null,
-              headerStyle: {
-                backgroundColor: '#161C2B',
-                height: 100,
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                alignSelf: 'center',
-                color: '#fff',
-              },
-            }}
-          />
-          <Stack.Screen
             name="Home"
             component={Home}
             options={{
@@ -110,6 +88,28 @@ export default function App() {
               headerStyle: {
                 backgroundColor: '#161C2B',
                 height: 200,
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                alignSelf: 'center',
+                color: '#fff',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="Verification"
+            component={Verification}
+            options={{
+              headerTitle: () => (
+                <View style={styles.row}>
+                  <Text style={styles.title}>Verfication</Text>
+                  <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
+                </View>
+              ),
+              headerLeft: null,
+              headerStyle: {
+                backgroundColor: '#161C2B',
+                height: 100,
               },
               headerTintColor: '#fff',
               headerTitleStyle: {
