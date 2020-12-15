@@ -1,15 +1,27 @@
-import React, { useState }  from 'react'
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput } from 'react-native'
+import React, { useState, useEffect }  from 'react'
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native'
 import { Avatar } from 'react-native-paper';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {  useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
 import { FontAwesome } from '@expo/vector-icons';
 import { Card } from 'react-native-paper';
 
-function Discover () {   
+function Discover ({ navigation }) {   
     let [loaded] = useFonts({
         Poppins_600SemiBold
     });
+
+    // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
+    useEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <TouchableOpacity style={{marginRight: 30, borderWidth:3, borderColor:'white', borderRadius:50}} onPress={() => {navigation.navigate('Menu')}}>
+                    <Avatar.Image size={48} source={{ uri: 'https://i.pinimg.com/474x/73/c3/e7/73c3e7cca66a885c53718d8f3688b02c.jpg',}}/>
+                </TouchableOpacity> 
+            ),
+        })
+    }, [navigation])
+
     const [selectedValue, setSelectedValue] = useState("public");
 
     return (
@@ -20,7 +32,7 @@ function Discover () {
         >
         <View style={styles.boxAwal}>
             <View style={styles.row}>
-                <Avatar.Image size={55}
+                <Avatar.Image size={39} style={{marginTop:5}}
                     source={{
                         uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
                     }}
@@ -41,7 +53,7 @@ function Discover () {
                         dropDownStyle={{backgroundColor: '#fafafa'}}
                         onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
                         labelStyle={{
-                            fontSize: 14,
+                            fontSize: 13,
                             textAlign: 'left',
                             color: '#000'
                         }}
@@ -59,7 +71,7 @@ function Discover () {
         <View style={styles.box}>
             <View style={styles.hr} />
             <View style={styles.row}>
-                <Avatar.Image size={55}
+                <Avatar.Image size={39}
                     source={{
                         uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
                     }}
@@ -84,7 +96,7 @@ function Discover () {
         <View style={styles.box}>
             <View style={styles.hr} />
             <View style={styles.row}>
-                <Avatar.Image size={55}
+                <Avatar.Image size={39}
                     source={{
                         uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
                     }}
@@ -180,8 +192,8 @@ const styles = StyleSheet.create({
     },
     name: {
         fontFamily:'Poppins_600SemiBold',
-        fontSize: 15,
-        marginBottom: 2,
+        fontSize: 14,
+        marginBottom: 1,
         fontWeight:'bold'
     },
     status: {
@@ -198,7 +210,7 @@ const styles = StyleSheet.create({
     },
     location: {
         fontFamily: 'Ubuntu_300Light',
-        fontSize: 15,
+        fontSize: 12,
     }, 
     boxText: {
         width:'97%', 

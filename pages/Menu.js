@@ -34,11 +34,11 @@ function Menu () {
                         <Text style={styles.menu}> Verifications </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.btn_menu}>
-                        <MaterialIcons style={styles.icon} name="monetization-on" size={20} color="#2C6FC7" />
+                        <MaterialIcons style={styles.icon} name="monetization-on" size={22} color="#2C6FC7" />
                         <Text style={styles.menu}> Fees </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.btn_logout}>
-                        <MaterialIcons style={styles.icon} name="monetization-on" size={20} color="#2C6FC7" />
+                        <MaterialIcons style={styles.icon} name="logout" size={20} color="#2C6FC7" />
                         <Text style={styles.logout}> Logout </Text>
                     </TouchableOpacity>
                 </View>
