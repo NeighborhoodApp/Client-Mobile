@@ -47,6 +47,15 @@ function Login({ navigation }) {
         await AsyncStorage.setItem('userlogedin', jsonValue);
         navigation.replace('PickLocation');
         console.log('Welcome,' + data.fullname);
+        const option = {
+          url: 'real-estates',
+          stage: 'getRealEstates',
+          method: 'get',
+          body: null,
+          headers: null,
+          type: 'SET_REAL_ESTATES',
+        };
+        dispatch(callServer(option));
       } catch (error) {
         const msg = errorHandler(error);
         console.log(msg);
