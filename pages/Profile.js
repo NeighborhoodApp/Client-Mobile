@@ -4,6 +4,7 @@ import { Avatar } from 'react-native-paper';
 import { useFonts, Ubuntu_300Light,Ubuntu_500Medium } from '@expo-google-fonts/ubuntu'
 import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat'
 import { FontAwesome, Fontisto, Feather, Entypo, FontAwesome5, AntDesign } from '@expo/vector-icons';
+import AppLoading from 'expo-app-loading';
 
 
 function Profile({navigation}) {    
@@ -14,6 +15,9 @@ function Profile({navigation}) {
     function toNotification(){
         navigation.navigate('Notification')
     }
+  
+    if(!loaded) <AppLoading />
+  
     return (
         <View style={styles.container}>
             {/* >>>>>> PROFILE PAGE <<<<<<< */}

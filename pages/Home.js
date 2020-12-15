@@ -11,26 +11,18 @@ function Home({ navigation }) {
   useEffect(() => {
     const getUser = async () => {
       const value = await AsyncStorage.getItem('userlogedin');
-      const json = JSON.parse(value)
+      const json = JSON.parse(value);
       setUser(json);
-
       if (json) {
         if (!json.RealEstateId) {
-          const option = {
-            url: 'real-estates',
-            stage: 'getRealEstates',
-            method: 'get',
-            body: null,
-            headers: null,
-            type: 'SET_REAL_ESTATES',
-          };
-          dispatch(callServer(option))
           navigation.replace('PickLocation');
+        } else if (json.status === 'Inactive') {
+          navigation.replace('Waiting');
         } else {
-          navigation.navigate('Waiting')
+          navigation.replace('Discover');
         }
       } else {
-        navigation.navigate('Login');
+        navigation.navigate('GetStarted');
       }
     };
     getUser();
