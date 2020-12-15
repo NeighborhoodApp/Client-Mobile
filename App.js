@@ -20,7 +20,7 @@ export default function App() {
   return (
     <NavigationContainer>
        <Provider store={store}>
-        <Stack.Navigator>
+        <Stack.Navigator initialRouteName='Profile'>
           <Stack.Screen name="Home" component={Home} options={{
             title: 'Discover',
             headerRight: () => (
@@ -54,7 +54,7 @@ export default function App() {
           <Stack.Screen name="Discover" component={Discover} />
           <Stack.Screen name="Profile" component={Profile} 
           options={{
-            headerTitle: ()=> (<View style={styles.row}><Text style={styles.title}>Profile / Create Fees</Text><MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0"/></View>),
+            headerTitle: ()=> (<View style={styles.row}><Text style={styles.title}>Profile</Text><MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0"/></View>),
             headerLeft: null,
             headerStyle: {
               backgroundColor: '#161C2B',
