@@ -8,7 +8,7 @@ import {
   DrawerItemList,
   DrawerItem,
 } from '@react-navigation/drawer';
-import { Home, GetStarted, JoinUs, Login, Waiting, Discover, Profile, Notification, Menu } from './pages';
+import { Home, GetStarted, JoinUs, Login, Waiting, Discover, Profile, Verification, Menu, PickLocation } from './pages';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Avatar } from 'react-native-paper';
 import { Provider } from 'react-redux';
@@ -66,7 +66,22 @@ export default function App() {
               color:  '#fff',
               }
             }} />
-          <Stack.Screen name="Notification" component={Notification} />
+          <Stack.Screen name="Verification" component={Verification}
+          options={{
+            headerTitle: ()=> (<View style={styles.row}><Text style={styles.title}>Verfication</Text><MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0"/></View>),
+            headerLeft: null,
+            headerStyle: {
+              backgroundColor: '#161C2B',
+              height: 100,
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: { 
+              alignSelf: 'center',
+              color:  '#fff',
+              }
+            }} 
+          />
+          <Stack.Screen name="PickLocation" component={PickLocation} options={{headerShown: false}}/>
           <Stack.Screen name="Menu" component={Menu} />
         </Stack.Navigator>
       </Provider>

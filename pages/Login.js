@@ -26,10 +26,6 @@ function Login({ navigation }) {
     navigation.replace('JoinUs');
   }
 
-  const toWaiting = () => {
-    navigation.navigate('Waiting');
-  }
-
   const handleInput = (text, name) => {
     const value = {
       ...payload,
@@ -49,7 +45,7 @@ function Login({ navigation }) {
         console.log(data);
         const jsonValue = JSON.stringify(data);
         await AsyncStorage.setItem('userlogedin', jsonValue);
-        navigation.replace('Waiting');
+        navigation.replace('PickLocation');
         console.log('Welcome,' + data.fullname);
       } catch (error) {
         const msg = errorHandler(error);
