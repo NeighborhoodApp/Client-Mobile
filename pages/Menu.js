@@ -1,16 +1,18 @@
-import React  from 'react'
+import React from 'react'
+import AppLoading from 'expo-app-loading';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { useFonts, Roboto_500Medium } from '@expo-google-fonts/roboto'
 import { MaterialIcons, Fontisto, FontAwesome5, FontAwesome } from '@expo/vector-icons';
 
-function Menu () {    
+function Menu() {
     const [loaded] = useFonts({
-        Roboto_500Medium 
+        Roboto_500Medium
     });
+    if (!loaded) return <AppLoading />;
 
     return (
         <View style={styles.box}><Text></Text>
-            <View style={styles.container}>  
+            <View style={styles.container}>
                 <Text style={styles.account}>Account</Text>
                 <View style={styles.column}>
                     <TouchableOpacity style={styles.btn_menu}>
@@ -26,7 +28,7 @@ function Menu () {
                         <Text style={styles.menu}> Neighbours </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.btn_menu}>
-                        <FontAwesome style={{marginLeft:'8.5%'}} name="user" size={23} color="#2C6FC7" />
+                        <FontAwesome style={{ marginLeft: '8.5%' }} name="user" size={23} color="#2C6FC7" />
                         <Text style={styles.menu}> Profile </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.btn_menu}>
@@ -34,11 +36,11 @@ function Menu () {
                         <Text style={styles.menu}> Verifications </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.btn_menu}>
-                        <MaterialIcons style={styles.icon} name="monetization-on" size={20} color="#2C6FC7" />
+                        <MaterialIcons style={styles.icon} name="monetization-on" size={22} color="#2C6FC7" />
                         <Text style={styles.menu}> Fees </Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.btn_logout}>
-                        <MaterialIcons style={styles.icon} name="monetization-on" size={20} color="#2C6FC7" />
+                        <MaterialIcons style={styles.icon} name="logout" size={20} color="#2C6FC7" />
                         <Text style={styles.logout}> Logout </Text>
                     </TouchableOpacity>
                 </View>
@@ -53,7 +55,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#161C2B',
         width: '100%',
         height: '100%',
-        top:0
+        top: 0
     },
     container: {
         flex: 1,
@@ -78,14 +80,14 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: 30,
         left: 30
-    }, 
+    },
     btn_menu: {
         backgroundColor: '#fff',
         paddingVertical: 18,
         width: '100%',
         borderColor: '#707070',
         borderWidth: 0.18,
-        marginTop:1,
+        marginTop: 1,
         flexDirection: 'row'
     },
     menu: {
@@ -93,10 +95,10 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: '#404040',
         textAlign: 'left',
-        marginLeft:'8%'
+        marginLeft: '8%'
     },
-    icon : {
-        marginLeft:'7%',
+    icon: {
+        marginLeft: '7%',
     },
     btn_logout: {
         backgroundColor: '#fff',
@@ -104,9 +106,9 @@ const styles = StyleSheet.create({
         width: '100%',
         borderColor: '#707070',
         borderWidth: 0.1,
-        marginTop:1,
+        marginTop: 1,
         flexDirection: 'row',
-        marginTop:30,
+        marginTop: 30,
         borderBottomRightRadius: 10,
         borderBottomLeftRadius: 10,
     },
@@ -115,8 +117,8 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: '#404040',
         textAlign: 'left',
-        marginLeft:'8%'
+        marginLeft: '8%'
     },
 });
-  
+
 export default Menu

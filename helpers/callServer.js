@@ -19,8 +19,9 @@ export default function callServer(option) {
     try {
       if (option.headers) {
         const value = await AsyncStorage.getItem('userlogedin');
+        const json = JSON.parse(value);
         payloadAxios['headers'] = {
-          access_token: value.access_token,
+          access_token: json.access_token,
         };
       }
 

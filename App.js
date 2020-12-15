@@ -2,12 +2,6 @@ import React from 'react';
 import { Text, Image, TouchableOpacity, StyleSheet, Button, View } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
-import {
-  createDrawerNavigator,
-  DrawerContentScrollView,
-  DrawerItemList,
-  DrawerItem,
-} from '@react-navigation/drawer';
 import { Home, GetStarted, JoinUs, Login, Waiting, Discover, Profile, Verification, Menu, PickLocation } from './pages';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Avatar } from 'react-native-paper';
@@ -51,10 +45,28 @@ export default function App() {
           <Stack.Screen name="JoinUs" component={JoinUs} options={{headerShown: false}} />
           <Stack.Screen name="Login" component={Login} options={{headerShown: false}} />
           <Stack.Screen name="Waiting" component={Waiting} options={{headerShown: false}} />
-          <Stack.Screen name="Discover" component={Discover} />
+          <Stack.Screen name="Discover" component={Discover}  options={{
+            headerTitle: ()=> (<View style={styles.discoverRow}>
+                                  <Text style={styles.title}>Discover</Text>
+                                  <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0"/>
+                              </View>),
+            headerRight: ({ navigation }) => (<TouchableOpacity style={{marginRight: 30, borderWidth:3, borderColor:'white', borderRadius:50}} onPress={() => {navigation.navigate('Menu')}}>
+                                  <Avatar.Image size={48} source={{ uri: 'https://i.pinimg.com/474x/73/c3/e7/73c3e7cca66a885c53718d8f3688b02c.jpg',}}/>
+                                </TouchableOpacity> ),
+            headerLeft: null,
+            headerStyle: {
+              backgroundColor: '#161C2B',
+              height: 100,
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: { 
+              alignSelf: 'center',
+              color:  '#fff',
+              }
+            }} />
           <Stack.Screen name="Profile" component={Profile} 
           options={{
-            headerTitle: ()=> (<View style={styles.row}><Text style={styles.title}>Profile / Create Fees</Text><MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0"/></View>),
+            headerTitle: ()=> (<View style={styles.discoverRow}><Text style={styles.title}>Profile / Create Fees</Text><MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0"/></View>),
             headerLeft: null,
             headerStyle: {
               backgroundColor: '#161C2B',
@@ -131,6 +143,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignSelf: 'center',
+  },
+  discoverRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignSelf: 'flex-start',
+    marginLeft:10
   },
   title: {
     fontSize: 23,
