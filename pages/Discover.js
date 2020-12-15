@@ -8,8 +8,7 @@ import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { Card } from 'react-native-paper';
 import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
 import BottomNavigator from '../components/BottomNavigator'
-// import * as ImagePicker from 'expo-image-picker';
-import ImagePicker from 'react-native-image-picker'
+import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
 import axios from 'axios'
@@ -28,14 +27,14 @@ function Discover({ navigation }) {
 
   // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
   useEffect(() => {
-    // (async () => {
-    //   if (Platform.OS !== 'web') {
-    //     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    //     if (status !== 'granted') {
-    //       alert('Sorry, we need camera roll permissions to make this work!');
-    //     }
-    //   }
-    // })();
+    (async () => {
+      if (Platform.OS !== 'web') {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          alert('Sorry, we need camera roll permissions to make this work!');
+        }
+      }
+    })();
 
     const fetchTimeline = () => {
       const option = {
@@ -59,46 +58,35 @@ function Discover({ navigation }) {
     fetchTimeline()
   }, [navigation])
 
-  // const pickImage = async () => {
-  //   let result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.All,
-  //     allowsEditing: true,
-  //     aspect: [4, 3],
-  //     quality: 1,
-  //   });
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
 
-  //   console.log(result);
-  //   const data = new FormData()
-  //   data.append('file', result.uri)
-  //   if (!result.cancelled) {
-  //     setImage(result.uri);
-  //     axios({
-  //       method: 'post',
-  //       url: 'http://192.168.1.12:3000/upload',
-  //       data: data,
-  //       header: {
-  //         'Content-Type': 'multipart/form-data'
-  //       }
-  //     })
-  //     .then(({data}) => {
-  //       console.log(data, 'tes');
-  //     })
-  //     .catch(err => {
-  //       console.log(err);
-  //     })
-  //   }
-  // };
-
-  const imageHandler = () => {
-    const options = {
-      noData: true
+    console.log(result);
+    const data = new FormData()
+    data.append('file', result.uri)
+    if (!result.cancelled) {
+      setImage(result.uri);
+      axios({
+        method: 'post',
+        url: 'http://192.168.1.12:3000/upload',
+        data: data,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      .then(({data}) => {
+        console.log(data, 'tes');
+      })
+      .catch(err => {
+        console.log(err);
+      })
     }
-    ImagePicker.launchImageLibrary({}, response => {
-     
-        console.log(response);
-      
-    })
-  }
+  };
 
   const [selectedValue, setSelectedValue] = useState("public");
 
@@ -141,7 +129,7 @@ function Discover({ navigation }) {
                   }}
                 />
                 {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
-                <TouchableOpacity onPress={() => imageHandler()}><Text style={styles.addPhotos}><MaterialIcons name="add-a-photo" size={14} color="#707070" />  Photo</Text></TouchableOpacity>
+                <TouchableOpacity onPress={pickImage}><Text style={styles.addPhotos}><MaterialIcons name="add-a-photo" size={14} color="#707070" />  Photo</Text></TouchableOpacity>
                 {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
               </View>
             </View>
