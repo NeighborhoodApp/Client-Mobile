@@ -37,6 +37,26 @@ function PickLocation () {
                 onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
                 // onChangeItem={item => selectedValue({ selectedValue: item.value })}
             />
+
+            <Text style={styles.firstLine}> Complex </Text>
+            <DropDownPicker
+                items={[
+                    {label: 'USA', value: 'usa', icon: () => <Icon name="flag" size={18} color="#900" />, hidden: true},
+                    {label: 'UK', value: 'uk', icon: () => <Icon name="flag" size={18} color="#900" />},
+                    {label: 'France', value: 'france', icon: () => <Icon name="flag" size={18} color="#900" />},
+                ]}
+                searchable={true}
+                searchablePlaceholder="Search for an item"
+                defaultValue={selectedValue}
+                containerStyle={{height: 40, width: '80%', justifyContent: 'center', alignSelf: 'center'}}
+                style={{backgroundColor: '#fafafa'}}
+                itemStyle={{
+                    justifyContent: 'flex-start'
+                }}
+                dropDownStyle={{backgroundColor: '#fafafa'}}
+                onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+                // onChangeItem={item => selectedValue({ selectedValue: item.value })}
+            />
         </View>
         <View style={styles.footer}>
             <View style={styles.row} >
@@ -94,7 +114,8 @@ const styles = StyleSheet.create({
         fontSize: 22,
         color: 'white',
         textAlign: 'center',
-        marginBottom: 30
+        marginBottom: 30,
+        marginTop:40
     },
     secondLine: {
         marginTop: 30,
