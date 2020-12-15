@@ -4,6 +4,7 @@ import { useFonts, Ubuntu_300Light, Ubuntu_500Medium, Ubuntu_700Bold } from '@ex
 import { Montserrat_500Medium } from '@expo-google-fonts/montserrat';
 import { AntDesign } from '@expo/vector-icons'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AppLoading from 'expo-app-loading';
 
 const defaultValue = {
   address: '',
@@ -12,13 +13,17 @@ const defaultValue = {
   id: '',
 };
 
-function Waiting() {
+export default function Waiting({ navigation }) {
   let [loaded] = useFonts({
     Ubuntu_300Light,
     Ubuntu_500Medium,
     Ubuntu_700Bold,
     Montserrat_500Medium,
   });
+
+  const toDiscover = () => {
+    navigation.navigate('Discover');
+  };;
 
   const [user, setUser] = useState(defaultValue);
 
@@ -31,6 +36,7 @@ function Waiting() {
   }, []);
 
   console.log(user);
+  if (!loaded) return <AppLoading />;
 
   return (
     <View style={styles.container}>
@@ -38,19 +44,21 @@ function Waiting() {
       <View style={styles.box}>
         <Text style={styles.firstLine}> Hi, {user.fullname}! </Text>
         <Text style={styles.secondLine}>
-          {/* <Text style={styles.secondLine}> Please wait... {"\n"} until your account {"\n"} is verified.</Text> */}
-          {' '}
+          {/* <Text style={styles.secondLine}> Please wait... {"\n"} until your account {"\n"} is verified.</Text> */}{' '}
           Please wait... {'\n'} until your account {'\n'} is verified.
         </Text>
       </View>
       <View style={styles.footer}>
         <View style={styles.row} onPress={toDiscover}>
-          <Text style={styles.next} onPress={toDiscover}> Next </Text> 
-              <TouchableOpacity style={styles.btn_next}>
-                <AntDesign name="right" size={16} color="black" onPress={toDiscover}/>
-              </TouchableOpacity>
-            </View>
+          <Text style={styles.next} onPress={toDiscover}>
+            {' '}
+            Next{' '}
+          </Text>
+          <TouchableOpacity style={styles.btn_next}>
+            <AntDesign name="right" size={16} color="black" onPress={toDiscover} />
+          </TouchableOpacity>
         </View>
+      </View>
     </View>
   );
 }
@@ -122,5 +130,3 @@ const styles = StyleSheet.create({
     bottom: 5
   }
 });
-
-export default Waiting;

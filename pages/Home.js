@@ -1,19 +1,36 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
+import { useDispatch } from 'react-redux';
+import callServer from '../helpers/callServer';
 
 function Home({ navigation }) {
   const [user, setUser] = useState(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const getUser = async () => {
       const value = await AsyncStorage.getItem('userlogedin');
-      // setUser(JSON.parse(value));
+      const json = JSON.parse(value)
+      setUser(json);
 
-      if (value) {
-        navigation.replace('Waiting');
+      if (json) {
+        if (!json.RealEstateId) {
+          const option = {
+            url: 'real-estates',
+            stage: 'getRealEstates',
+            method: 'get',
+            body: null,
+            headers: null,
+            type: 'SET_REAL_ESTATES',
+          };
+          dispatch(callServer(option))
+          navigation.replace('PickLocation');
+        } else {
+          navigation.navigate('Waiting')
+        }
       } else {
-        navigation.navigate('PickLocation');
+        navigation.navigate('Login');
       }
     };
     getUser();
