@@ -5,14 +5,21 @@ import { Montserrat_500Medium } from '@expo-google-fonts/montserrat';
 import { AntDesign } from '@expo/vector-icons'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppLoading from 'expo-app-loading';
+import { useDispatch, useSelector } from 'react-redux';
+import callServer from '../helpers/callServer';
 
 const defaultValue = {
   address: '',
   email: '',
   fullname: '',
   id: '',
+  status: 'Inactive'
 };
 
+let dataJson;
+let isLoaded = false;
+
+let msg = "Please wait...\n until your account \n is verified.";
 export default function Waiting({ navigation }) {
   let [loaded] = useFonts({
     Ubuntu_300Light,
@@ -21,21 +28,52 @@ export default function Waiting({ navigation }) {
     Montserrat_500Medium,
   });
 
+  const dispatch = useDispatch();
+
   const toDiscover = () => {
     navigation.navigate('Discover');
   };;
 
   const [user, setUser] = useState(defaultValue);
+  const [message, setMessage] = useState(defaultValue);
+  const { user: userRedux, loading, error, stage } = useSelector(state => state.reducerUser);
 
   useEffect(() => {
     const getUser = async () => {
-      const value = await AsyncStorage.getItem('userlogedin');
-      setUser(JSON.parse(value));
+      dataJson = await AsyncStorage.getItem('userlogedin');
+      setUser(JSON.parse(dataJson));
+      fetchUser(dataJson);
     };
     getUser();
   }, []);
 
-  console.log(user);
+  // console.log(userRedux, 'userRedux');
+
+  const fetchUser = (dataJson) => {
+    const data = JSON.parse(dataJson);
+    const option = {
+      url: 'users/' + data.id,
+      stage: 'getUsers',
+      method: 'get',
+      body: null,
+      headers: null, // true
+      type: 'SET_USER',
+    };
+    dispatch(callServer(option));
+  };
+
+  console.log(!isLoaded && userRedux, '!isLoaded && userRedux');
+  if (userRedux) {
+    console.log(userRedux.status, 'user redux');
+    if (userRedux.status === 'Active') {
+      msg = 'Your account is verified\n Click next to connect \n Whith your neighbour.';
+    }
+  }
+
+  const getMessage = () => {
+    let msg = "Your account is verified\n Click next to connect \n Whith your neighbour.";
+  }
+
   if (!loaded) return <AppLoading />;
 
   return (
@@ -45,20 +83,23 @@ export default function Waiting({ navigation }) {
         <Text style={styles.firstLine}> Hi, {user.fullname}! </Text>
         <Text style={styles.secondLine}>
           {/* <Text style={styles.secondLine}> Please wait... {"\n"} until your account {"\n"} is verified.</Text> */}{' '}
-          Please wait... {'\n'} until your account {'\n'} is verified.
+          {/* Please wait... {'\n'} until your account {'\n'} is verified. */}
+          {msg}
         </Text>
       </View>
-      <View style={styles.footer}>
-        <View style={styles.row} onPress={toDiscover}>
-          <Text style={styles.next} onPress={toDiscover}>
-            {' '}
+      {userRedux.status ? userRedux.status === 'Inactive' ? null :
+        (<View style={styles.footer}>
+          <View style={styles.row} onPress={toDiscover}>
+            <Text style={styles.next} onPress={toDiscover}>
+              {' '}
             Next{' '}
-          </Text>
-          <TouchableOpacity style={styles.btn_next}>
-            <AntDesign name="right" size={16} color="black" onPress={toDiscover} />
-          </TouchableOpacity>
-        </View>
-      </View>
+            </Text>
+            <TouchableOpacity style={styles.btn_next}>
+              <AntDesign name="right" size={16} color="black" onPress={toDiscover} />
+            </TouchableOpacity>
+          </View>
+        </View> ): null
+        }
     </View>
   );
 }

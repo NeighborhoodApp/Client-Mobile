@@ -15,6 +15,9 @@ export default function reducer(state = initState, action) {
       }
       return { ...state, users: action.payload, stage: action.stage, error: null };
     case 'SET_USER':
+      if (action.payload.foundUser) {
+        return { ...state, user: action.payload.foundUser, stage: action.stage, error: null };
+      }
       return { ...state, user: action.payload, stage: action.stage, error: null };
     case 'UPDATE_USER':
       const updatedUser = state.users.filter((user) => user.id !== action.id);

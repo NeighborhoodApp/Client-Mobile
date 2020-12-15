@@ -41,8 +41,9 @@ function PickLocation({ navigation }) {
     addComplex(selectedEstates);
     const updatedUser = {
       ...userLogedIn,
-      RealEstateId: selectedEstates,
+      RealEstateId: selectedEstates
     };
+    console.log(updatedUser);
     setUserLogedIn(updatedUser);
   }, [selectedEstates]);
 
