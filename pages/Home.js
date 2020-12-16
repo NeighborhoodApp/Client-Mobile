@@ -5,40 +5,33 @@ import { registerPushNotification } from '../helpers/PushNotification';
 import { verifyUser } from '../helpers/verify';
 
 let json = null;
-function Home({ navigation }) {
-  const [user, setUser] = useState(null);
+export default function Home({ navigation }) {
   const [expoPushToken, setExpoPushToken] = useState('');
 
-  // useEffect(() => {
-  //   const test = async () => {
-  //     const token = await registerPushNotification();
-  //     setExpoPushToken(token);
-  //   };
-  //   test();
-  // }, []);
-
-  // useEffect(() => {
-  //   verifyUser(expoPushToken).then((data) => console.log('data.....', data));
-  // }, [expoPushToken]);
-
   useEffect(() => {
-    const getUser = async () => {
+    const preload = async () => {
       const value = await AsyncStorage.getItem('userlogedin');
       json = JSON.parse(value);
-      setUser(json);
-      goJoin();
+      if (value) {
+        const token = await registerPushNotification();
+        await verifyUser(token);
+        setExpoPushToken(token);
+      }
+      goJoin(json);
     };
-    getUser();
+    preload();
   }, []);
 
-  const goJoin = () => {
+  console.log('expooooo', expoPushToken);
+
+  const goJoin = (user) => {
     if (json) {
       if (!json.RealEstateId) {
         navigation.replace('PickLocation');
       } else if (json.status === 'Inactive') {
         navigation.replace('Waiting');
       } else {
-        navigation.replace('GetStarted');
+        navigation.replace('Discover');
       }
     } else {
       navigation.navigate('GetStarted');
@@ -46,8 +39,8 @@ function Home({ navigation }) {
   };
   return (
     <View style={styles.container}>
-      <Text>Iki halaman Home Cyok</Text>
-      <Button title="JOIN US PAGE" onPress={goJoin}></Button>
+      <Text>Loading.....</Text>
+      {/* <Button title="JOIN US PAGE" onPress={goJoin}></Button> */}
     </View>
   );
 }
@@ -60,5 +53,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
-export default Home;

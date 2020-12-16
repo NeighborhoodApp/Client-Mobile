@@ -13,16 +13,8 @@ function Discover() {
     Poppins_600SemiBold,
   });
   const [selectedValue, setSelectedValue] = useState('public');
-  const [expoPushToken, setExpoPushToken] = useState('');
 
-  // useEffect(() => {
-  //   registerPushNotification().then((token) => setExpoPushToken(token));
-  // }, []);
-
-  // useEffect(() => {
-  //   verifyUser(expoPushToken);
-  // }, [expoPushToken]);
-
+  
   if (!loaded) return <AppLoading />;
 
   return (
