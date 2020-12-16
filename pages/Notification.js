@@ -5,6 +5,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, Button, Platform } from 'react-native';
 import { sendNotification, registerPushNotification } from '../helpers/PushNotification';
 
+
+// ! Untuk halaman notifikasi
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -22,12 +24,14 @@ export default function NotificationPage() {
   useEffect(() => {
     registerPushNotification().then((token) => setExpoPushToken(token));
 
+    // ! Untuk halaman notifikasi
     // This listener is fired whenever a notification is received while the app is foregrounded
     notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
       setNotification(notification);
     });
 
-    // This listener is fired whenever a user taps on or interacts with a notification 
+    // ! Untuk halaman notifikasi
+    // This listener is fired whenever a user taps on or interacts with a notification
     // (works when app is foregrounded, backgrounded, or killed)
     responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
       console.log(response);

@@ -1,16 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Picker } from 'react-native';
 import { Avatar } from 'react-native-paper';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
 import { FontAwesome } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
+import { registerPushNotification } from '../helpers/PushNotification';
+import { verifyUser } from '../helpers/verify';
 
 function Discover() {
   let [loaded] = useFonts({
     Poppins_600SemiBold,
   });
   const [selectedValue, setSelectedValue] = useState('public');
+  const [expoPushToken, setExpoPushToken] = useState('');
+
+  // useEffect(() => {
+  //   registerPushNotification().then((token) => setExpoPushToken(token));
+  // }, []);
+
+  // useEffect(() => {
+  //   verifyUser(expoPushToken);
+  // }, [expoPushToken]);
 
   if (!loaded) return <AppLoading />;
 
