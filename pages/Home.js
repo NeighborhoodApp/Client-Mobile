@@ -13,7 +13,7 @@ function Home({ navigation }) {
       if (value) {
         navigation.replace('Waiting');
       } else {
-        navigation.navigate('Discover');
+        navigation.navigate('EventCalendar');
       }
     };
     getUser();
@@ -24,7 +24,7 @@ function Home({ navigation }) {
     if (user) {
       navigation.replace('JoinUs');
     } else {
-      navigation.navigate('Discover');
+      navigation.navigate('EventCalendar');
     }
   }
   return (

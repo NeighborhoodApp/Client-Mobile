@@ -9,6 +9,7 @@ import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
 import BottomNavigator from '../components/BottomNavigator'
 import * as ImagePicker from 'expo-image-picker';
 
+
 function Discover ({ navigation }) {   
     let [loaded] = useFonts({
         Poppins_600SemiBold, Ubuntu_300Light
