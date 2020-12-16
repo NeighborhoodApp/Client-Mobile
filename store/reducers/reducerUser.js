@@ -1,6 +1,6 @@
 const initState = {
   users: [],
-  user: {},
+  user: {}, // user Now Loginned
   error: null,
   loading: false,
   stage: null, // create, update, delete, edit, customize welcome
@@ -30,10 +30,12 @@ export default function reducer(state = initState, action) {
       return { ...state, result: action.payload, stage: action.stage, error: null, users: updatedUser };
 
     case 'SET_USERS_LOADING':
+      return { ...state, loading: action.payload };
     case 'SET_USER_LOADING':
     case 'UPDATE_USER_LOADING':
       return { ...state, loading: action.payload, stage: null };
     case 'SET_USERS_ERROR':
+      return { ...state, stage: action.stage, error: action.payload };
     case 'SET_USER_ERROR':
     case 'UPDATE_USER_ERROR':
       return { ...state, stage: action.stage, error: action.payload };
