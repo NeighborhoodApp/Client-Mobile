@@ -26,7 +26,7 @@ const defaultVal = {
 }
 
 function Discover({ navigation }) {
-  const { timelines, error, stage } = useSelector((state) => state.reducerTimeline);
+  const { timelines, error, stage, loading } = useSelector((state) => state.reducerTimeline);
   const [user, setUser] = useState(null);
   const [selectedValue, setSelectedValue] = useState("public");
   const [payload, setPayload] = useState(defaultVal);
@@ -148,7 +148,7 @@ function Discover({ navigation }) {
       fetchTimeline()
       setImage(null)
       setFormData(null)
-      setPayload({description: '', privacy: 'public'})
+      setPayload({ description: '', privacy: 'public' })
     } catch (error) {
       console.log(error)
     }
@@ -165,8 +165,14 @@ function Discover({ navigation }) {
     setPayload(value);
   };
 
-  if (!loaded) return <AppLoading />;
-  if (!timelines.length || !user) return <Text>Loading</Text>
+  const changePage = (id) => {
+    navigation.navigate('Comment', {
+      id
+    })
+  }
+
+  if (!loaded || !user) return <AppLoading />;
+  if (loading) return <AppLoading />;
 
   return (
     <SafeAreaView style={styles.bg}>
@@ -183,6 +189,8 @@ function Discover({ navigation }) {
             />
             <View style={styles.boxProfile}>
               <Text style={styles.name}>{user.fullname}</Text>
+              <Text style={styles.location}>{user.address}</Text>
+
               <View style={{ flexDirection: 'row', width: '60%' }}>
                 <DropDownPicker
                   items={[
@@ -212,7 +220,7 @@ function Discover({ navigation }) {
           <View style={styles.boxCard}>
             {image && <Card style={styles.cardStatus}><Card.Cover source={{ uri: image }} /></Card>}
             <View style={styles.boxStatus}>
-              <TextInput defaultValue={payload.description} onChangeText={(text) => handleInput(text, 'description')} style={styles.inputStatus} placeholder="What’s on your mind?" placeholderTextColor="white" />
+              <TextInput multiline defaultValue={payload.description} onChangeText={(text) => handleInput(text, 'description')} style={styles.inputStatus} placeholder="What’s on your mind?" placeholderTextColor="white" />
             </View>
           </View>
         </View>
@@ -229,7 +237,7 @@ function Discover({ navigation }) {
                   />
                   <View style={styles.boxProfile}>
                     <Text style={styles.name}>{el.User.fullname}</Text>
-                    <Text styles={styles.location}>{el.User.Complex.name}</Text>
+                    <Text styles={styles.location}>{el.User.address}</Text>
                   </View>
                 </View>
                 <View style={styles.hr} />
@@ -244,7 +252,9 @@ function Discover({ navigation }) {
                     </Card>
                   }
 
-                  <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}</Text>
+                  <TouchableOpacity onPress={() => changePage(el.id)}>
+                    <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}</Text>
+                  </TouchableOpacity>
                 </View>
                 <View style={styles.hr} />
               </View>
@@ -367,7 +377,7 @@ const styles = StyleSheet.create({
     marginTop: 5
   },
   inputStatus: {
-    width: '100%',
+    width: '90%',
     marginTop: 15,
     marginBottom: 15,
     fontSize: 18,

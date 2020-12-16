@@ -25,9 +25,11 @@ export default function callServer(option) {
           coordinate: json.coordinate
         };
       }
-      // console.log('wxios fetch call server', payloadAxios);
+      console.log('wxios fetch call server', payloadAxios);
       dispatch({ type: option.type + '_LOADING', payload: true });
       const { data } = await axios(payloadAxios);
+      console.log('from server', data);
+      // console.log(option);
       // console.log('from server', data);
 
       console.log(option);
