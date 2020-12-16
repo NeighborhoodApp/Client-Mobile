@@ -10,7 +10,7 @@ export default function callServer(option) {
     url: option.url,
     method: option.method || 'GET',
   };
-
+  
   if (option.body) {
     payloadAxios['data'] = option.body;
   }
@@ -24,10 +24,10 @@ export default function callServer(option) {
         };
       }
 
-      // console.log('wxios fetch call server', payloadAxios);
+      console.log('wxios fetch call server', payloadAxios);
       dispatch({ type: option.type + '_LOADING', payload: true });
       const { data } = await axios(payloadAxios);
-      // console.log('from server', data);
+      console.log('from server', data);
 
       dispatch({
         type: option.type,
@@ -35,7 +35,7 @@ export default function callServer(option) {
         payload: option.id ? option.id : option.deletedId ? option.deletedId : data,
       });
     } catch (error) {
-      // console.log('axios', error.response || error.message);
+      console.log('axios', error.response || error.message);
       dispatch({
         type: option.type + '_ERROR',
         stage: option.stage || null,

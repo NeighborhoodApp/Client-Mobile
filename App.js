@@ -8,7 +8,7 @@ import {
   DrawerItemList,
   DrawerItem,
 } from '@react-navigation/drawer';
-import { Home, GetStarted, JoinUs, Login, Waiting, Discover, Profile, Verification, Menu, PickLocation } from './pages';
+import { Home, GetStarted, JoinUs, Login, Waiting, Discover, Profile, Verification, Menu, PickLocation, Fees } from './pages';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Avatar } from 'react-native-paper';
 import { Provider } from 'react-redux';
@@ -20,7 +20,7 @@ export default function App() {
   return (
     <NavigationContainer>
        <Provider store={store}>
-        <Stack.Navigator>
+        <Stack.Navigator initialRouteName='Fees'>
           <Stack.Screen name="Home" component={Home} options={{
             title: 'Discover',
             headerRight: () => (
@@ -55,6 +55,20 @@ export default function App() {
           <Stack.Screen name="Profile" component={Profile} 
           options={{
             headerTitle: ()=> (<View style={styles.row}><Text style={styles.title}>Profile</Text><MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0"/></View>),
+            headerLeft: null,
+            headerStyle: {
+              backgroundColor: '#161C2B',
+              height: 100,
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: { 
+              alignSelf: 'center',
+              color:  '#fff',
+              }
+            }} />
+          <Stack.Screen name="Fees" component={Fees} 
+          options={{
+            headerTitle: ()=> (<View style={styles.row}><Text style={styles.title}>Fees</Text><MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0"/></View>),
             headerLeft: null,
             headerStyle: {
               backgroundColor: '#161C2B',
