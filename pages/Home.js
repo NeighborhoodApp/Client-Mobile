@@ -1,41 +1,49 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
-import { useDispatch } from 'react-redux';
-import callServer from '../helpers/callServer';
+import { registerPushNotification } from '../helpers/PushNotification';
+import { verifyUser } from '../helpers/verify';
 
+let json = null;
 function Home({ navigation }) {
   const [user, setUser] = useState(null);
-  const dispatch = useDispatch();
+  const [expoPushToken, setExpoPushToken] = useState('');
+
+  // useEffect(() => {
+  //   const test = async () => {
+  //     const token = await registerPushNotification();
+  //     setExpoPushToken(token);
+  //   };
+  //   test();
+  // }, []);
+
+  // useEffect(() => {
+  //   verifyUser(expoPushToken).then((data) => console.log('data.....', data));
+  // }, [expoPushToken]);
 
   useEffect(() => {
     const getUser = async () => {
       const value = await AsyncStorage.getItem('userlogedin');
-      const json = JSON.parse(value);
+      json = JSON.parse(value);
       setUser(json);
-      if (json) {
-        if (!json.RealEstateId) {
-          navigation.replace('PickLocation');
-        } else if (json.status === 'Inactive') {
-          navigation.replace('Waiting');
-        } else {
-          navigation.replace('Discover');
-        }
-      } else {
-        navigation.navigate('GetStarted');
-      }
+      goJoin();
     };
     getUser();
   }, []);
 
   const goJoin = () => {
-    console.log(user)
-    if (user) {
-      navigation.replace('JoinUs');
+    if (json) {
+      if (!json.RealEstateId) {
+        navigation.replace('PickLocation');
+      } else if (json.status === 'Inactive') {
+        navigation.replace('Waiting');
+      } else {
+        navigation.replace('GetStarted');
+      }
     } else {
-      navigation.navigate('PickLocation');
+      navigation.navigate('GetStarted');
     }
-  }
+  };
   return (
     <View style={styles.container}>
       <Text>Iki halaman Home Cyok</Text>

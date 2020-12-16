@@ -44,6 +44,8 @@ function Login({ navigation }) {
           data: { ...payload },
         });
         console.log('UserLogedIn', data);
+        const newName = data.fullname.split('#');
+        data.fullname = newName[0];
         const jsonValue = JSON.stringify(data);
         await AsyncStorage.setItem('userlogedin', jsonValue);
         if (!data.RealEstateId) {
