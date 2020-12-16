@@ -157,6 +157,8 @@ function PickLocation({ navigation }) {
         const msg = errorHandler(error);
         console.log(msg);
       }
+    }
+  }
       
   console.log(render, stageUser, errUser, result);
   if (stageUser === 'updateUsers') {
@@ -332,4 +334,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PickLocation;
+export default PickLocation
