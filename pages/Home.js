@@ -14,7 +14,6 @@ function Home({ navigation }) {
       json = JSON.parse(value);
       setUser(json);
       goJoin();
-      
     };
     getUser();
   }, []);
@@ -31,7 +30,7 @@ function Home({ navigation }) {
     } else {
       navigation.navigate('GetStarted');
     }
-  }
+  };
   return (
     <View style={styles.container}>
       <Text>Iki halaman Home Cyok</Text>

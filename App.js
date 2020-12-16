@@ -2,7 +2,6 @@ import React from 'react';
 import { Text, Image, TouchableOpacity, StyleSheet, Button, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { Home, GetStarted, JoinUs, Login, Waiting, Discover, Profile, Verification, Menu, PickLocation } from './pages';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Avatar } from 'react-native-paper';

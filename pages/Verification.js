@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useFonts, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import { Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import AppLoading from 'expo-app-loading';
@@ -15,29 +15,35 @@ function Verification() {
     Ubuntu_500Medium,
   });
 
-  const [admin, setAdmin] = useState();
+  const [admin, setAdmin] = useState({});
   const { users, loading, stage, error } = useSelector((state) => state.reducerUser);
 
-  const filteredUsers = users.filter((user) => user.ComplexId === 1 && user.RoleId !== 2 && user.status === 'Inactive');
+  const filteredUsers = users.filter(
+    (user) => user.ComplexId === admin.ComplexId && user.RoleId !== 2 && user.status === 'Inactive',
+  );
 
   const dispatch = useDispatch();
 
-  const handleDecline = (id) => {
-    const updateUser = (id) => {
+  const handleDecline = (user) => {
+    const updateUser = (user) => {
       const option = {
-        url: `users/${id}`,
+        url: `users/${user.id}`,
         stage: 'updateUser',
-        method: 'patch',
+        method: 'put',
         body: {
-          status: 'Declined',
+          fullname: `${user.fullname}#declined`,
+          address: user.address,
+          RoleId: user.RoleId,
+          RealEstateId: null,
+          ComplexId: null,
         },
         headers: true,
         type: 'UPDATE_USER',
-        id: id,
+        id: user.id,
       };
       dispatch(callServer(option));
     };
-    updateUser(id);
+    updateUser(user);
   };
 
   const handleConfirm = (id) => {

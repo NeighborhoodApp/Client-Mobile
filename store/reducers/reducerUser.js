@@ -11,7 +11,12 @@ export default function reducer(state = initState, action) {
   switch (action.type) {
     case 'SET_USERS':
       if (action.payload.allUsers) {
-        return { ...state, users: action.payload.allUsers, stage: action.stage, error: null };
+        return {
+          ...state,
+          users: action.payload.allUsers,
+          stage: action.stage,
+          error: null,
+        };
       }
       return { ...state, users: action.payload, stage: action.stage, error: null };
     case 'SET_USER':
@@ -20,8 +25,10 @@ export default function reducer(state = initState, action) {
       }
       return { ...state, user: action.payload, stage: action.stage, error: null };
     case 'UPDATE_USER':
-      const updatedUser = state.users.filter((user) => user.id !== action.id);
+      console.log(action);
+      const updatedUser = state.users.filter((user) => user.id !== action.payload);
       return { ...state, result: action.payload, stage: action.stage, error: null, users: updatedUser };
+
     case 'SET_USERS_LOADING':
     case 'SET_USER_LOADING':
     case 'UPDATE_USER_LOADING':
