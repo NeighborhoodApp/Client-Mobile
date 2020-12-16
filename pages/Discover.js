@@ -32,14 +32,12 @@ function Discover({ navigation }) {
   const [payload, setPayload] = useState(defaultVal);
   const [formData, setFormData] = useState(null);
   const dispatch = useDispatch();
+  const [image, setImage] = useState(null);
 
   let [loaded] = useFonts({
     Poppins_600SemiBold, Ubuntu_300Light
   });
-  
-  const [selectedValue, setSelectedValue] = useState('public');
 
-  const [image, setImage] = useState(null);
 
   // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
 
