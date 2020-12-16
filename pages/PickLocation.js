@@ -29,6 +29,7 @@ function PickLocation({ navigation }) {
     Ubuntu_700Bold,
     Montserrat_500Medium,
   });
+
   const dispatch = useDispatch();
 
   const [selectedEstates, setSelectedEstates] = useState(null);
@@ -62,8 +63,13 @@ function PickLocation({ navigation }) {
   }, [selectedComplexes]);
 
   useEffect(() => {
-    fetchEstates();
-    getUser();
+    const load = async () => {
+      const value = await AsyncStorage.getItem('userlogedin');
+      const json = JSON.parse(value);
+      setUserLogedIn(json);
+      fetchEstates();
+    }
+    load();
   }, []);
 
   useEffect(() => {
@@ -82,16 +88,16 @@ function PickLocation({ navigation }) {
     dispatch(callServer(option));
   };
   
-  const getUser = async () => {
-    try {
-      const value = await AsyncStorage.getItem('userlogedin');
-      const json = JSON.parse(value);
-      setUserLogedIn(json);
-      // console.log('user logedIn', json);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const getUser = async () => {
+  //   try {
+  //     const value = await AsyncStorage.getItem('userlogedin');
+  //     const json = JSON.parse(value);
+  //     setUserLogedIn(json);
+  //     // console.log('user logedIn', json);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const addItem = () => {
     const activeEstates = [];

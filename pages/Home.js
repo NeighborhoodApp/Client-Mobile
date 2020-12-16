@@ -22,8 +22,6 @@ export default function Home({ navigation }) {
     preload();
   }, []);
 
-  console.log('expooooo', expoPushToken);
-
   const goJoin = (user) => {
     if (json) {
       if (!json.RealEstateId) {
@@ -37,6 +35,7 @@ export default function Home({ navigation }) {
       navigation.navigate('GetStarted');
     }
   };
+
   return (
     <View style={styles.container}>
       <Text>Loading.....</Text>
