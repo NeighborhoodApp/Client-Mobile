@@ -1,26 +1,41 @@
-import React  from 'react'
+import React, { useEffect }  from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity} from 'react-native'
 import { Avatar } from 'react-native-paper';
 import { useFonts, Ubuntu_300Light,Ubuntu_500Medium } from '@expo-google-fonts/ubuntu'
 import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat'
-import { FontAwesome, Fontisto, Feather, Entypo, FontAwesome5, AntDesign } from '@expo/vector-icons';
+import { FontAwesome, Fontisto, Feather, Entypo, FontAwesome5, AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
-
+import { useDispatch, useSelector } from 'react-redux';
+import callServer from '../helpers/callServer'
 
 function Profile({navigation}) {    
     let [loaded] = useFonts({
         Ubuntu_300Light, Montserrat_600SemiBold, Ubuntu_500Medium
     });
+    const dispatch = useDispatch()
+    const { loading, user, stage } = useSelector(s => s.reducerUser) // Problem Combine Reducer
 
     function toNotification(){
         navigation.navigate('Notification')
     }
   
-    if(!loaded) <AppLoading />
-  
+    useEffect(_=> {
+      dispatch(callServer({
+        url: 'users/5',
+        method: 'get',
+        type: 'SET_USER',
+        headers: true
+      }))
+    }, [])
+
+    if (!loaded) return <AppLoading />
+
+    if (loading) return <AppLoading />
+      
     return (
         <View style={styles.container}>
             {/* >>>>>> PROFILE PAGE <<<<<<< */}
+            { console.log(user, '<<<<<<<<< ini user') }
             <View style={styles.images}>
             <Avatar.Image
                 size={100}
@@ -34,27 +49,29 @@ function Profile({navigation}) {
                 <View stle = {styles.bg}></View>
                 <View style={styles.input}>
                     <FontAwesome name="user" size={20} color="white" style={{marginLeft:10}}/>
-                    <TextInput style={styles.Textinput} placeholder="Full Name" placeholderTextColor="#FFF"/>
+                    <Text style={styles.Textinput} placeholder="Full Name" placeholderTextColor="#FFF">{user.foundUser.fullname} </Text>
                 </View>
                 <View style={styles.hr} />
                 <View style={styles.input}>
                     <Fontisto name="email" size={20} color="white" style={{marginLeft:5}}/>
-                    <TextInput style={styles.Textinput} placeholder="Email" placeholderTextColor="#FFF"/>
-                </View>
-                <View style={styles.hr} />
-                <View style={styles.input}>
-                    <Feather name="lock" size={20} color="white" style={{marginLeft:5}} />
-                    <TextInput style={styles.Textinput} placeholder="Password" placeholderTextColor="#FFF" secureTextEntry={true}/>
+                    <Text style={styles.Textinput} placeholder="Email" placeholderTextColor="#FFF">{user.foundUser.email} </Text>
                 </View>
                 <View style={styles.hr} />
                 <View style={styles.input}>
                     <Entypo name="location" size={20} color="white" style={{marginLeft:6}}/>
-                    <TextInput style={styles.Textinput} placeholder="Address" placeholderTextColor="#FFF" />
+                    <Text style={styles.Textinput} placeholder="Address" placeholderTextColor="#FFF" >{user.foundUser.address} </Text>
                 </View>
-                <View style={styles.hr}/>
+                <View style={styles.input}>
+                    <MaterialCommunityIcons name="home-group" size={20} color="white" style={{marginLeft: 6}} />
+                    <Text style={styles.Textinput} placeholder="Address" placeholderTextColor="#FFF" >{user.foundUser.RealEstate.name} </Text>
+                </View>
+                <View style={styles.input}>
+                    <Entypo name="address" size={20} color="white" style={{marginLeft:6}}/>
+                    <Text style={styles.Textinput} placeholder="Address" placeholderTextColor="#FFF" >{user.foundUser.Complex.name} </Text>
+                </View>
 
                 {/* >>>>>> FEES PAGE <<<<<<< */}
-                <View style={styles.input}>
+                {/* <View style={styles.input}>
                     <FontAwesome name="pencil-square-o" size={20} color="white" style={{marginLeft:6}} />
                     <TextInput style={styles.Textinput} placeholder="Title" placeholderTextColor="#FFF" />
                 </View>
@@ -68,11 +85,11 @@ function Profile({navigation}) {
                     <AntDesign name="clockcircle" size={19} color="white" style={{marginLeft:6}} />
                     <TextInput style={styles.Textinput} placeholder="Due Date " placeholderTextColor="#FFF" />
                 </View>
-                <View style={styles.hr}/>
+                <View style={styles.hr}/> */}
                 {/* >>>>>> BUTTON FOR CREATE FEES <<<<<<< */}
-                <TouchableOpacity style={styles.btn}>
+                {/* <TouchableOpacity style={styles.btn}>
                     <Text style={styles.submit} onPress={toNotification} > SUBMIT </Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 
             </View>
         </View>

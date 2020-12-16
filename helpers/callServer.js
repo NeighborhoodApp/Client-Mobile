@@ -19,15 +19,17 @@ export default function callServer(option) {
     try {
       if (option.headers) {
         const value = await AsyncStorage.getItem('userlogedin');
-        const value_after = JSON.parse(value);
+        const json = JSON.parse(value);
         payloadAxios['headers'] = {
-          access_token: value_after.access_token,
+          access_token: json.access_token,
+          coordinate: json.coordinate
         };
       }
       // console.log('wxios fetch call server', payloadAxios);
       dispatch({ type: option.type + '_LOADING', payload: true });
       const { data } = await axios(payloadAxios);
       // console.log('from server', data);
+
       console.log(option);
       dispatch({
         type: option.type,
