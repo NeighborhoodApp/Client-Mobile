@@ -81,7 +81,7 @@ function PickLocation({ navigation }) {
     };
     dispatch(callServer(option));
   };
-  
+
   const getUser = async () => {
     try {
       const value = await AsyncStorage.getItem('userlogedin');
@@ -157,7 +157,9 @@ function PickLocation({ navigation }) {
         const msg = errorHandler(error);
         console.log(msg);
       }
-      
+    }
+  };
+
   console.log(render, stageUser, errUser, result);
   if (stageUser === 'updateUsers') {
     console.log('hreeeeeee');
@@ -179,7 +181,7 @@ function PickLocation({ navigation }) {
         saveUser();
       });
     }
-  };
+  }
 
   const handleChange = (itemValue) => {
     setSelectedEstates(itemValue);
