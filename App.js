@@ -7,6 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Avatar } from 'react-native-paper';
 import { Provider } from 'react-redux';
 import store from './store';
+import NotificationPage from './pages/Notification';
 
 const Stack = createStackNavigator();
 
@@ -15,6 +16,7 @@ export default function App() {
     <NavigationContainer>
       <Provider store={store}>
         <Stack.Navigator>
+          <Stack.Screen name="NotificationPage" component={NotificationPage} options={{ headerShown: true }} />
           <Stack.Screen
             name="Home"
             component={Home}
