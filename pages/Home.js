@@ -25,7 +25,7 @@ function Home({ navigation }) {
       } else if (json.status === 'Inactive') {
         navigation.replace('Waiting');
       } else {
-        navigation.replace('Discover');
+        navigation.replace('AddEvent');
       }
     } else {
       navigation.navigate('GetStarted');

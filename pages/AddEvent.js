@@ -1,17 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { Avatar } from 'react-native-paper';
 import { useFonts, Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat';
 import { FontAwesome, Fontisto, Feather, Entypo, FontAwesome5, AntDesign } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import SvgUri from 'expo-svg-uri';
 
-function Profile({ navigation }) {
+export default function AddEvent({ navigation }) {
   const [loaded] = useFonts({
     Ubuntu_300Light,
     Montserrat_600SemiBold,
     Ubuntu_500Medium,
   });
+
+  const [user, setUser] = useState({});
+
+  console.log(user);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const value = await AsyncStorage.getItem('userlogedin');
+      const json = JSON.parse(value);
+      setUser(json);
+    };
+    getUser();
+  }, []);
 
   function toNotification() {
     navigation.navigate('Notification');
@@ -23,11 +38,10 @@ function Profile({ navigation }) {
     <View style={styles.container}>
       {/* >>>>>> PROFILE PAGE <<<<<<< */}
       <View style={styles.images}>
-        <Avatar.Image
-          size={100}
-          source={{
-            uri: 'https://i.pinimg.com/474x/73/c3/e7/73c3e7cca66a885c53718d8f3688b02c.jpg',
-          }}
+        <SvgUri
+          width="100"
+          height="100"
+          source={{ uri: `https://avatars.dicebear.com/api/human/:${user.fullname}.svg` }}
         />
       </View>
       <View style={styles.box}>
@@ -38,8 +52,8 @@ function Profile({ navigation }) {
         </View>
         <View style={styles.hr} />
         <View style={styles.input}>
-          <Fontisto name="email" size={20} color="white" style={{ marginLeft: 5 }} />
-          <TextInput style={styles.Textinput} placeholder="Email" placeholderTextColor="#FFF" />
+          <Fontisto name="prescription" size={20} color="white" style={{ marginLeft: 5 }} />
+          <TextInput style={styles.Textinput} placeholder="Description" placeholderTextColor="#FFF" />
         </View>
         <View style={styles.hr} />
         <View style={styles.input}>
@@ -145,5 +159,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-
-export default Profile;

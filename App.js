@@ -7,6 +7,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Avatar } from 'react-native-paper';
 import { Provider } from 'react-redux';
 import store from './store';
+import NotificationPage from './pages/Notification';
+import AddEvent from './pages/AddEvent';
 
 const Stack = createStackNavigator();
 
@@ -71,6 +73,28 @@ export default function App() {
               },
             }}
           />
+          <Stack.Screen
+            name="AddEvent"
+            component={AddEvent}
+            options={{
+              headerTitle: () => (
+                <View style={styles.row}>
+                  <Text style={styles.title}>Add Event</Text>
+                  <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
+                </View>
+              ),
+              headerLeft: null,
+              headerStyle: {
+                backgroundColor: '#161C2B',
+                height: 100,
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                alignSelf: 'center',
+                color: '#fff',
+              },
+            }}
+          />
 
           <Stack.Screen name="PickLocation" component={PickLocation} options={{ headerShown: false }} />
           <Stack.Screen
@@ -117,6 +141,7 @@ export default function App() {
               },
             }}
           />
+          <Stack.Screen name="NotificationPage" component={NotificationPage} options={{ headerShown: true }} />
         </Stack.Navigator>
       </Provider>
     </NavigationContainer>
