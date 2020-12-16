@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, Image, TouchableOpacity, StyleSheet, Button, View } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
-import { Home, GetStarted, JoinUs, Login, Waiting, Discover, Profile, Verification, Menu, PickLocation } from './pages';
+import { Home, GetStarted, JoinUs, Login, Waiting, Discover, Profile, Verification, Menu, PickLocation, Comment } from './pages';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Avatar } from 'react-native-paper';
 import { Provider } from 'react-redux';
@@ -51,6 +51,21 @@ export default function App() {
                                   <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0"/>
                               </View>),
             headerLeft: null,
+            headerStyle: {
+              backgroundColor: '#161C2B',
+              height: 100,
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: { 
+              alignSelf: 'center',
+              color:  '#fff',
+              }
+            }} />
+          <Stack.Screen name="Comment" component={Comment} options={{
+            headerTitle: ()=> (<View style={styles.discoverRow}>
+                                  <Text style={styles.title}>Comment</Text>
+                                  <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0"/>
+                              </View>),
             headerStyle: {
               backgroundColor: '#161C2B',
               height: 100,

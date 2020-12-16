@@ -131,7 +131,7 @@ function Discover({ navigation }) {
       fetchTimeline()
       setImage(null)
       setFormData(null)
-      setPayload({description: '', privacy: 'public'})
+      setPayload({ description: '', privacy: 'public' })
     } catch (error) {
       console.log(error)
     }
@@ -148,8 +148,14 @@ function Discover({ navigation }) {
     setPayload(value);
   };
 
+  const changePage = (id) => {
+    navigation.navigate('Comment', {
+      id
+    })
+  }
+
   if (!loaded) return <AppLoading />;
-  if (!timelines.length || !user) return <Text>Loading</Text>
+  // if (!timelines.length || !user) return <Text>Loading</Text>
 
   return (
     <SafeAreaView style={styles.bg}>
@@ -166,6 +172,8 @@ function Discover({ navigation }) {
             />
             <View style={styles.boxProfile}>
               <Text style={styles.name}>{user.fullname}</Text>
+              <Text style={styles.location}>{user.address}</Text>
+
               <View style={{ flexDirection: 'row', width: '60%' }}>
                 <DropDownPicker
                   items={[
@@ -212,7 +220,7 @@ function Discover({ navigation }) {
                   />
                   <View style={styles.boxProfile}>
                     <Text style={styles.name}>{el.User.fullname}</Text>
-                    <Text styles={styles.location}>{el.User.Complex.name}</Text>
+                    <Text styles={styles.location}>{el.User.address}</Text>
                   </View>
                 </View>
                 <View style={styles.hr} />
@@ -227,7 +235,9 @@ function Discover({ navigation }) {
                     </Card>
                   }
 
-                  <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}</Text>
+                  <TouchableOpacity onPress={() => changePage(el.id)}>
+                    <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}</Text>
+                  </TouchableOpacity>
                 </View>
                 <View style={styles.hr} />
               </View>
