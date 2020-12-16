@@ -153,11 +153,31 @@ function PickLocation({ navigation }) {
             },
           ],
         );
-
       } catch (error) {
         const msg = errorHandler(error);
         console.log(msg);
       }
+      
+  console.log(render, stageUser, errUser, result);
+  if (stageUser === 'updateUsers') {
+    console.log('hreeeeeee');
+    if (errUser) {
+      const msg = errorHandler(errUser);
+      console.log('error', msg);
+    } else {
+      console.log('result', result.msg);
+      setTimeout(() => {
+        const saveUser = async () => {
+          try {
+            const jsonValue = JSON.stringify(userLogedIn);
+            await AsyncStorage.setItem('userlogedin', jsonValue);
+            navigation.replace('Waiting');
+          } catch (error) {
+            console.log(error);
+          }
+        };
+        saveUser();
+      });
     }
   };
 
