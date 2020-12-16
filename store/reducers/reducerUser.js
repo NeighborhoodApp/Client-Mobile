@@ -1,6 +1,6 @@
 const initState = {
   users: [],
-  user: {}, // user Now Loginned
+  user: null, // user Now Loginned
   error: null,
   loading: false,
   stage: null, // create, update, delete, edit, customize welcome
@@ -28,6 +28,8 @@ export default function reducer(state = initState, action) {
       console.log(action);
       const updatedUser = state.users.filter((user) => user.id !== action.payload);
       return { ...state, result: action.payload, stage: action.stage, error: null, users: updatedUser };
+    case 'REMOVE_USER':
+      return { ...state, user: null, stage: null, error: null };
 
     case 'SET_USERS_LOADING':
       return { ...state, loading: action.payload };
@@ -35,7 +37,7 @@ export default function reducer(state = initState, action) {
     case 'UPDATE_USER_LOADING':
       return { ...state, loading: action.payload, stage: null };
     case 'SET_USERS_ERROR':
-        return { ...state, stage: action.stage, error: action.payload };
+      return { ...state, stage: action.stage, error: action.payload };
     case 'SET_USER_ERROR':
     case 'UPDATE_USER_ERROR':
       return { ...state, stage: action.stage, error: action.payload };

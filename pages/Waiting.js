@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import { useFonts, Ubuntu_300Light, Ubuntu_500Medium, Ubuntu_700Bold } from '@expo-google-fonts/ubuntu';
 import { Montserrat_500Medium } from '@expo-google-fonts/montserrat';
 import { AntDesign } from '@expo/vector-icons'; 
@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppLoading from 'expo-app-loading';
 import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
-import { actionRemoveRealEstate } from '../store/actions/action';
+import { actionRemoveRealEstate, actionRemoveUser } from '../store/actions/action';
 
 const defaultValue = {
   address: '',
@@ -17,12 +17,8 @@ const defaultValue = {
   status: 'Inactive'
 };
 
-let dataJson = {};
-let splitName = [];
 let statusUser = null;
-let render = 1;
-let hasLoad = false;
-
+let tempUser = null;
 export default function Waiting({ navigation }) {
   let [loaded] = useFonts({
     Ubuntu_300Light,
@@ -30,8 +26,53 @@ export default function Waiting({ navigation }) {
     Ubuntu_700Bold,
     Montserrat_500Medium,
   });
-  render++;
+
   const dispatch = useDispatch();
+
+  const [user, setUser] = useState(defaultValue);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [message, setMessage] = useState({
+    type: '',
+    content: '.',
+  });
+
+  // ! Pertama
+  useEffect(() => {
+    const preload = async () => {
+      setMessage({
+        type: 'default',
+        content: 'Please wait...\n until your account \n is verified.',
+      });
+      setHasLoaded(false);
+      dispatch(actionRemoveUser());
+      let rawData = await AsyncStorage.getItem('userlogedin');
+      let dataJson = JSON.parse(rawData); 
+
+      if (dataJson) {
+        const option = {
+          url: 'users/' + dataJson.id,
+          stage: 'null',
+          method: 'get',
+          body: null,
+          headers: null, // true
+          type: 'SET_USER',
+        };
+        dispatch(callServer(option));
+      } else {
+        Alert.alert('Session Expired', `Please, login first!`, [
+          // { text: "Don't leave", style: 'cancel', onPress: () => {} },
+          {
+            text: 'Ok',
+            style: 'destructive',
+            onPress: () => navigation.replace('Login'),
+          },
+        ]);
+      }
+    };
+    preload();
+  }, []);
+
+  const { user: userRedux, loading, error, stage } = useSelector((state) => state.reducerUser);
 
   const toDiscover = () => {
     navigation.replace('Discover');
@@ -48,120 +89,53 @@ export default function Waiting({ navigation }) {
       toDiscover();
     }
   };
-
-  const [user, setUser] = useState(defaultValue);
-  const [message, setMessage] = useState(null);
-  const { user: userRedux, loading, error, stage } = useSelector((state) => state.reducerUser);
-
-  // ! Pertama
-  useEffect(() => {
-    hasLoad = false;
-    setMessage({ type: 'inactive', content: 'Please wait...\n until your account \n is verified.' });
-    const getUser = async () => {
+  
+  // ! Kedua
+  if (!hasLoaded && userRedux) {
+    setHasLoaded(true);
+    const prosesData = async () => {
+      const { RoleId, address, email, RealEstateId, ComplexId, expoPushToken, fullname, id, status } = userRedux;
+      const payload = { RoleId, address, email, RealEstateId, ComplexId, expoPushToken, fullname, id, status };
       try {
-        dataJson = await AsyncStorage.getItem('userlogedin');
-        dataJson = JSON.parse(dataJson);
-        setUser(dataJson);
-        dispatch(actionRemoveRealEstate());
-        fetchUser(dataJson);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getUser();
-    console.log('useEffect 1');
-  }, []);
+        payload.coordinate = userRedux.RealEstate.coordinate;
+        const json = JSON.parse(JSON.stringify(userRedux));
+        const splitName = json.fullname.split('#');
+        payload.fullname = splitName[0];
 
-  useEffect(() => {
-    console.log('useEffect 2');
-    if (!hasLoad) {
-      if (userRedux) {
-        const name = userRedux.fullname;
-        if (name) {
-          console.log('useEffect 2 Name', name);
-          const splitName = name.split('#');
-          if (splitName[1] === 'declined') {
-            hasLoad = true;
-            updateUser(splitName[0]);
-            updateStorange();
-            setMessage({
-              type: 'declined',
-              content: 'Your Request is decline \n Click next to Repickup \n Your valid location!',
-            });
-          } else if (statusUser === 'active') {
-            setMessage({
-              type: 'verify',
-              content: 'Your account is verified\n Click next to connect \n with your neighbour.',
-            });
-          } else if (statusUser === 'inactive') {
-            setMessage({
-              type: 'inactive',
-              content: 'Please wait...\n until your account \n is verified.',
-            });
-          }
+        // console.log(userRedux, 'User REdux.........')
+        if (splitName[1] === 'declined') {
+          payload.RealEstateId = null;
+          payload.ComplexId = null;
+          setMessage({
+            fullname,
+            type: 'declined',
+            content: 'Your Request is decline \n Click next to Repickup \n Your valid location!',
+          });
+        } else if (status === 'active') {
+          setMessage({
+            fullname,
+            type: 'verify',
+            content: 'Your account is verified\n Click next to connect \n with your neighbour.',
+          });
+        } else if (status === 'inactive') {
+          setMessage({
+            fullname,
+            type: 'inactive',
+            content: 'Please wait...\n until your account \n is verified.',
+          });
         }
+        setUser(payload);
+        const jstrify = JSON.stringify(payload);
+        await AsyncStorage.setItem('userlogedin', jstrify);
+      } catch (error) {
+        console.log(error)
       }
+      
     }
-  }, [loading]);
-
-  const fetchUser = (dataJson) => {
-    const option = {
-      url: 'users/' + dataJson.id,
-      stage: 'null',
-      method: 'get',
-      body: null,
-      headers: null, // true
-      type: 'SET_USER',
-    };
-    dispatch(callServer(option));
-  };
-
-  const updateUser = (name) => {
-    const payload = {
-      fullname: name,
-      address: dataJson.address,
-      RoleId: dataJson.RoleId,
-      RealEstateId: null,
-      ComplexId: null,
-    };
-
-    const option = {
-      url: 'users/' + dataJson.id,
-      stage: 'getUsers',
-      method: 'PUT',
-      body: payload,
-      headers: null, // true
-      type: 'UPDATE_USER',
-    };
-    dispatch(callServer(option));
-  };
-
-  const updateStorange = async () => {
-    const rawData = await AsyncStorage.getItem('userlogedin');
-    const data = JSON.parse(rawData);
-    const newUser = {
-      ...data,
-      RealEstateId: null,
-      ComplexId: null,
-    };
-    try {
-      const jsonValue = JSON.stringify(newUser);
-      await AsyncStorage.setItem('userlogedin', jsonValue);
-      const rawData = await AsyncStorage.getItem('userlogedin');
-      console.log(rawData, 'rawData');
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  if (!hasLoad && !stage === 'getUsers') {
-    console.log(render);
-    hasLoad = true;
-    const { id, fullname, address, RoleId, RealEstateId, ComplexId, status } = userRedux;
-    splitName = fullname.split('#');
-    statusUser = status.toLowerCase();
-    console.log(splitName, 'splitName');
+    prosesData();
   }
+
+  console.log(message, '................................')
 
   if (!loaded) return <AppLoading />;
 
@@ -171,7 +145,7 @@ export default function Waiting({ navigation }) {
       {/* <Text style={styles.firstLine}> {statusUser}, {user.fullname}! </Text> */}
       <Image style={styles.waiting} source={require('../assets/waiting.png')} />
       <View style={styles.box}>
-        <Text style={styles.firstLine}> Hi, {splitName[0]}! </Text>
+        <Text style={styles.firstLine}> Hi, {user.fullname}! </Text>
         <Text style={styles.secondLine}>
           {/* <Text style={styles.secondLine}> Please wait... {"\n"} until your account {"\n"} is verified.</Text> */}{' '}
           {/* Status User {statusUser + ' ' + splitName[1] + ' '} Split Name */}

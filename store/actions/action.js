@@ -5,3 +5,7 @@ export const actionRemoveStageError = () => {
 export const actionRemoveRealEstate = () => {
   return { type: 'REMOVE_REAL_ESTATE', payload: null };
 };
+export const actionRemoveUser = () => {
+  return { type: 'REMOVE_USER', payload: null };
+};
+;

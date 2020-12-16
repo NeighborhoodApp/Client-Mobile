@@ -109,13 +109,15 @@ function PickLocation({ navigation }) {
 
   const prosesApproval = async () => {
     if (userLogedIn) {
+      const newName = userLogedIn.fullname.split('#');
       const updatedUser = {
         ...userLogedIn,
         RealEstateId: selectedEstates,
         ComplexId: selectedComplexes,
+        fullname: newName[0],
       };
       const { fullname, address, RoleId, RealEstateId, ComplexId } = updatedUser;
-      const payload = { fullname, address, RoleId, RealEstateId, ComplexId };
+      const payload = { fullname: newName[0], address, RoleId, RealEstateId, ComplexId };
       console.log(RealEstateId, ComplexId, 'RealEstateId && ComplexId');
       if (RealEstateId && ComplexId) {
         console.log('payload', payload);
@@ -128,11 +130,11 @@ function PickLocation({ navigation }) {
               access_token: userLogedIn.access_token,
             },
           });
-          const jsonValue = JSON.stringify(userLogedIn);
+          const jsonValue = JSON.stringify(updatedUser);
           await AsyncStorage.setItem('userlogedin', jsonValue);
           Alert.alert(
             'Register Success',
-            `Hi, ${userLogedIn.fullname}, Your account has submited for approval.\nPlease wait until your account is verified!`,
+            `Hi, ${updatedUser.fullname}, Your account has submited for approval.\nPlease wait until your account is verified!`,
             [
               // { text: "Don't leave", style: 'cancel', onPress: () => {} },
               {
@@ -147,7 +149,7 @@ function PickLocation({ navigation }) {
           console.log(msg);
         }
       } else {
-        Alert.alert('Register Failed', `Hi, ${userLogedIn.fullname}, Please select Real Estate and Complex!`, [
+        Alert.alert('Register Failed', `Hi, ${updatedUser.fullname}, Please select Real Estate and Complex!`, [
           // { text: "Don't leave", style: 'cancel', onPress: () => {} },
           {
             text: 'Ok',

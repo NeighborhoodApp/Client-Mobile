@@ -28,9 +28,9 @@ export default function Home({ navigation }) {
     try {
       const value = await AsyncStorage.getItem('userlogedin');
       const json = JSON.parse(value);
-      let response;
+
       console.log(json, 'json');
-      if (json) {
+      if (value) {
         const { data } = await axios({
           url: 'users/verify/' + json.id,
           method: 'PUT',
@@ -41,10 +41,11 @@ export default function Home({ navigation }) {
             access_token: json.access_token,
           },
         });
-        console.log(response);
-        for (const key in response.data.user) {
-          if (response.data.user.hasOwnProperty(key)) {
-            json[key] = response.data.user[key];
+        for (const key in data.user) {
+          if (data.user.hasOwnProperty(key)) {
+            if (key !== 'status') {
+              json[key] = data.user[key];
+            }
           }
         }
         json.expoPushToken = expoPushToken;
