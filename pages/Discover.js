@@ -37,6 +37,8 @@ function Discover({ navigation }) {
     Poppins_600SemiBold, Ubuntu_300Light
   });
   
+  const [selectedValue, setSelectedValue] = useState('public');
+
   const [image, setImage] = useState(null);
 
   // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
