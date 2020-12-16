@@ -15,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Login({ navigation }) {
   const [payload, setPayload] = useState(defaultVal);
+  const [errMessage, setErrMessage] = useState('');
 
   let [loaded] = useFonts({
     Ubuntu_300Light,
@@ -43,10 +44,12 @@ function Login({ navigation }) {
           data: payload,
         });
         console.log('UserLogedIn', data);
+        
         const newName = data.fullname.split('#');
         data.fullname = newName[0];
         const jsonValue = JSON.stringify(data);
         await AsyncStorage.setItem('userlogedin', jsonValue);
+
         if (!data.RealEstateId) {
           navigation.replace('PickLocation');
         } else if (data.status === 'Inactive') {
@@ -58,6 +61,7 @@ function Login({ navigation }) {
       } catch (error) {
         const msg = errorHandler(error);
         console.log(msg);
+        setErrMessage(msg)
       }
     } else {
       console.log('All field required!')
@@ -91,10 +95,13 @@ function Login({ navigation }) {
             secureTextEntry={true}
           />
         </View>
+
         <View style={styles.hr} />
-        <TouchableOpacity
-          onPress={() => prosesLogin()}
-          style={styles.btn}>
+        {errMessage ?
+          <Text style={styles.errortext}>{errMessage}</Text> : null
+        }
+
+        <TouchableOpacity onPress={() => prosesLogin()} style={styles.btn}>
           <Text style={styles.btn_Text}> SUBMIT </Text>
         </TouchableOpacity>
         <View style={styles.footer}>
@@ -172,6 +179,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Ubuntu_300Light',
     color: 'white',
     fontSize: 14,
+  },
+  errortext: {
+    position: "relative",
+    fontFamily: 'Ubuntu_300Light',
+    color: 'white',
+    fontSize: 14,
+    color: 'red',
   },
   footer_login: {
     fontFamily: 'Ubuntu_500Medium',

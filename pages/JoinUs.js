@@ -17,6 +17,7 @@ const defaultVal = {
 
 function JoinUs({ navigation }) {
   const [payload, setPayload] = useState(defaultVal);
+  const [errMessage, seterrMessage] = useState('');
 
   const [loaded] = useFonts({
     Ubuntu_300Light,
@@ -46,18 +47,17 @@ function JoinUs({ navigation }) {
         });
         const jsonValue = JSON.stringify(data);
         await AsyncStorage.setItem('userlogedin', jsonValue);
-<<<<<<< HEAD
+
         navigation.replace('Login');
-=======
->>>>>>> 594175e6d9955d1114fde817fdb5ddff63525517
+
         console.log('Welcome,' + data.fullname);
         navigation.replace('Login');
       } catch (error) {
         const msg = errorHandler(error);
-        console.log(msg);
+        seterrMessage(msg);
       }
     } else {
-      console.log('All field required!');
+      seterrMessage('All field required!');
     }
   };
 
@@ -110,6 +110,8 @@ function JoinUs({ navigation }) {
           />
         </View>
         <View style={styles.hr} />
+
+        {errMessage ? <Text style={styles.errortext}>{errMessage}</Text> : null}
         <TouchableOpacity onPress={() => prosesJoin()} style={styles.btn}>
           <Text style={styles.btn_Text}> SUBMIT </Text>
         </TouchableOpacity>
@@ -179,6 +181,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: 'white',
     textAlign: 'center',
+  },
+  errortext: {
+    position: 'relative',
+    fontFamily: 'Ubuntu_300Light',
+    color: 'white',
+    fontSize: 14,
+    color: 'red',
   },
   footer: {
     marginTop: 25,

@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppLoading from 'expo-app-loading';
 import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
+import { actionRemoveRealEstate } from '../store/actions/action';
 
 const defaultValue = {
   address: '',
@@ -40,26 +41,28 @@ export default function Waiting({ navigation }) {
     navigation.replace('PickLocation');
   };
 
-  const toNext = ((status, isdeclined) => {
-    if (message.type === 'declined') { 
+  const toNext = (status, isdeclined) => {
+    if (message.type === 'declined') {
       toPickLocation();
     } else if (message.type === 'verify') {
       toDiscover();
     }
-  });
+  };
 
   const [user, setUser] = useState(defaultValue);
   const [message, setMessage] = useState(null);
   const { user: userRedux, loading, error, stage } = useSelector((state) => state.reducerUser);
 
+  // ! Pertama
   useEffect(() => {
     hasLoad = false;
-    setMessage({ type: 'inactive', content: 'Please wait...\n until your account \n is verified.'});
+    setMessage({ type: 'inactive', content: 'Please wait...\n until your account \n is verified.' });
     const getUser = async () => {
       try {
         dataJson = await AsyncStorage.getItem('userlogedin');
         dataJson = JSON.parse(dataJson);
         setUser(dataJson);
+        dispatch(actionRemoveRealEstate());
         fetchUser(dataJson);
       } catch (error) {
         console.log(error);
@@ -135,11 +138,11 @@ export default function Waiting({ navigation }) {
 
   const updateStorange = async () => {
     const rawData = await AsyncStorage.getItem('userlogedin');
-    const data = JSON.parse(rawData)
+    const data = JSON.parse(rawData);
     const newUser = {
       ...data,
       RealEstateId: null,
-      ComplexId: null
+      ComplexId: null,
     };
     try {
       const jsonValue = JSON.stringify(newUser);
@@ -168,14 +171,14 @@ export default function Waiting({ navigation }) {
       {/* <Text style={styles.firstLine}> {statusUser}, {user.fullname}! </Text> */}
       <Image style={styles.waiting} source={require('../assets/waiting.png')} />
       <View style={styles.box}>
-        <Text style={styles.firstLine}> Hi, {user.fullname}! </Text>
+        <Text style={styles.firstLine}> Hi, {splitName[0]}! </Text>
         <Text style={styles.secondLine}>
           {/* <Text style={styles.secondLine}> Please wait... {"\n"} until your account {"\n"} is verified.</Text> */}{' '}
           {/* Status User {statusUser + ' ' + splitName[1] + ' '} Split Name */}
           {message.content}
         </Text>
       </View>
-      {(message.type === 'declined' || message.type === 'verify') ? (
+      {message.type === 'declined' || message.type === 'verify' ? (
         <View style={styles.footer}>
           <View style={styles.row} onPress={() => toNext()}>
             <Text style={styles.next} onPress={() => toNext()}>
