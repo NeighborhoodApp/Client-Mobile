@@ -1,13 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Avatar } from 'react-native-paper';
 import { useFonts, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import { Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import AppLoading from 'expo-app-loading';
 import SvgUri from 'expo-svg-uri';
-import Avatars from '@dicebear/avatars';
-import sprites from '@dicebear/avatars-avataaars-sprites';
-import { useDispatch, useSelector } from 'react-redux';
 
 function VerificationList(props) {
   const [loaded] = useFonts({
@@ -16,22 +12,14 @@ function VerificationList(props) {
     Ubuntu_500Medium,
   });
 
-  const { user, loading, error, stage } = useSelector((state) => state.reducerUser);
-
-  const dispatch = useDispatch();
-
   if (!loaded) return <AppLoading />;
-
-  let options = {};
-  let avatars = new Avatars(sprites, options);
-  let svg = avatars.create(props.user.fullname);
 
   return (
     <View style={styles.row}>
       <SvgUri
         width="55"
         height="55"
-        source={{ uri: `https://avatars.dicebear.com/api/bottts/${props.user.fullname}.svg` }}
+        source={{ uri: `https://avatars.dicebear.com/api/human/:${props.user.fullname}.svg` }}
       />
       <View style={styles.column}>
         <Text style={styles.name}>{props.user.fullname}</Text>
@@ -41,7 +29,7 @@ function VerificationList(props) {
         <TouchableOpacity onPress={() => props.handleConfirm(props.user.id)} style={styles.btn_confirm}>
           <Text style={styles.confirm}> Confirm </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => props.handleDecline(props.user.id)} style={styles.btn_delete}>
+        <TouchableOpacity onPress={() => props.handleDecline(props.user)} style={styles.btn_delete}>
           <Text style={styles.delete}> Decline </Text>
         </TouchableOpacity>
       </View>
