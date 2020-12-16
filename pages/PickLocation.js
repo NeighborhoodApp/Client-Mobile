@@ -12,6 +12,7 @@ import { cos } from 'react-native-reanimated';
 import errorHandler from '../helpers/errorHandler';
 import { axios } from '../helpers/Axios';
 import customAlert from '../helpers/alert';
+import { actionRemoveRealEstate } from '../store/actions/action';
 
 let i = 1;
 const defaultVal = [
@@ -42,41 +43,29 @@ function PickLocation({ navigation }) {
   const { result, error: errUser, stage: stageUser } = useSelector((state) => state.reducerUser);
 
   useEffect(() => {
-    if (selectedEstates) {
-      addComplex(selectedEstates);
-      const updatedUser = {
-        ...userLogedIn,
-        RealEstateId: selectedEstates,
-      };
-      setUserLogedIn(updatedUser);
-    }
-  }, [selectedEstates]);
-
-  useEffect(() => {
-    if (selectedComplexes) {
-      const updatedUser = {
-        ...userLogedIn,
-        ComplexId: selectedComplexes,
-      };
-      setUserLogedIn(updatedUser);
-    }
-  }, [selectedComplexes]);
-
-  useEffect(() => {
     const load = async () => {
       const value = await AsyncStorage.getItem('userlogedin');
       const json = JSON.parse(value);
       setUserLogedIn(json);
-      fetchEstates();
+      dispatch(actionRemoveRealEstate())
+      fetchRealEstate();
     }
     load();
   }, []);
 
   useEffect(() => {
-    addItem();
+    if (selectedEstates) {
+      addComplex(selectedEstates);
+    }
+  }, [selectedEstates]);
+
+  useEffect(() => {
+    if (realEstates) {
+      addItem();
+    }
   }, [realEstates]);
 
-  const fetchEstates = () => {
+  const fetchRealEstate = () => {
     const option = {
       url: 'real-estates',
       stage: 'getRealEstates',
@@ -87,17 +76,6 @@ function PickLocation({ navigation }) {
     };
     dispatch(callServer(option));
   };
-  
-  // const getUser = async () => {
-  //   try {
-  //     const value = await AsyncStorage.getItem('userlogedin');
-  //     const json = JSON.parse(value);
-  //     setUserLogedIn(json);
-  //     // console.log('user logedIn', json);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 
   const addItem = () => {
     const activeEstates = [];
@@ -114,7 +92,6 @@ function PickLocation({ navigation }) {
 
   const addComplex = (id) => {
     if (id && typeof id === 'number') {
-      // console.log('hereeeeeeee');
       const activeComplexs = [];
       const [currentComplex] = realEstates.filter((el) => el.id === id);
       currentComplex.Complexes.forEach((el) => {
@@ -125,84 +102,79 @@ function PickLocation({ navigation }) {
             icon: () => <Icon name="flag" size={18} color="#900" />,
           });
       });
-      // console.log(activeComplexs);
       setSelectedComplexes(null);
       setItemsComplexs(activeComplexs);
     }
   };
 
   const prosesApproval = async () => {
-    const { fullname, address, RoleId, RealEstateId, ComplexId } = userLogedIn;
-    const payload = { fullname, address, RoleId, RealEstateId, ComplexId };
-    if (RealEstateId && ComplexId) {
-      console.log('payload', payload);
-      try {
-        await axios({
-          url: 'users/' + userLogedIn.id,
-          method: 'PUT',
-          data: payload,
-          headers: {
-            access_token: userLogedIn.access_token,
-          },
-        });
-        const jsonValue = JSON.stringify(userLogedIn);
-        await AsyncStorage.setItem('userlogedin', jsonValue);
-        Alert.alert(
-          'Register Success',
-          `Hi, ${userLogedIn.fullname}, Your account has submited for approval.\nPlease wait until your account is verified!`,
-          [
-            // { text: "Don't leave", style: 'cancel', onPress: () => {} },
-            {
-              text: 'Ok',
-              style: 'destructive',
-              onPress: () => navigation.replace('Waiting'),
+    if (userLogedIn) {
+      const updatedUser = {
+        ...userLogedIn,
+        RealEstateId: selectedEstates,
+        ComplexId: selectedComplexes,
+      };
+      const { fullname, address, RoleId, RealEstateId, ComplexId } = updatedUser;
+      const payload = { fullname, address, RoleId, RealEstateId, ComplexId };
+      console.log(RealEstateId, ComplexId, 'RealEstateId && ComplexId');
+      if (RealEstateId && ComplexId) {
+        console.log('payload', payload);
+        try {
+          await axios({
+            url: 'users/' + userLogedIn.id,
+            method: 'PUT',
+            data: payload,
+            headers: {
+              access_token: userLogedIn.access_token,
             },
-          ],
-        );
-      } catch (error) {
-        const msg = errorHandler(error);
-        console.log(msg);
+          });
+          const jsonValue = JSON.stringify(userLogedIn);
+          await AsyncStorage.setItem('userlogedin', jsonValue);
+          Alert.alert(
+            'Register Success',
+            `Hi, ${userLogedIn.fullname}, Your account has submited for approval.\nPlease wait until your account is verified!`,
+            [
+              // { text: "Don't leave", style: 'cancel', onPress: () => {} },
+              {
+                text: 'Ok',
+                style: 'destructive',
+                onPress: () => navigation.replace('Waiting'),
+              },
+            ],
+          );
+        } catch (error) {
+          const msg = errorHandler(error);
+          console.log(msg);
+        }
+      } else {
+        Alert.alert('Register Failed', `Hi, ${userLogedIn.fullname}, Please select Real Estate and Complex!`, [
+          // { text: "Don't leave", style: 'cancel', onPress: () => {} },
+          {
+            text: 'Ok',
+            style: 'destructive',
+            // onPress: () => navigation.replace('Waiting'),
+          },
+        ]);
       }
+    } else {
+       Alert.alert('Please Login', `Please login firts or register!`, [
+         // { text: "Don't leave", style: 'cancel', onPress: () => {} },
+         {
+           text: 'Ok',
+           style: 'destructive',
+           onPress: () => navigation.replace('Login'),
+         },
+       ]);
     }
   }
       
-  console.log(render, stageUser, errUser, result);
-  if (stageUser === 'updateUsers') {
-    console.log('hreeeeeee');
-    if (errUser) {
-      const msg = errorHandler(errUser);
-      console.log('error', msg);
-    } else {
-      console.log('result', result.msg);
-      setTimeout(() => {
-        const saveUser = async () => {
-          try {
-            const jsonValue = JSON.stringify(userLogedIn);
-            await AsyncStorage.setItem('userlogedin', jsonValue);
-            navigation.replace('Waiting');
-          } catch (error) {
-            console.log(error);
-          }
-        };
-        saveUser();
-      });
-    }
-  };
+  // console.log(render, stageUser, errUser, result);
 
   const handleChange = (itemValue) => {
     setSelectedEstates(itemValue);
-    // console.log('handleChangeValue', itemValue);
   };
-
-  // if (!isLoaded && realEstates.length > 0) {
-  //   addItem();
-  //   isLoaded = true;
-  // }
-
+  
   if (!loaded) return <AppLoading />;
-
-  // console.log(render, items.length, realEstates.length, userLogedIn);
-  render++;
 
   return (
     <View style={styles.container}>
@@ -225,7 +197,7 @@ function PickLocation({ navigation }) {
               justifyContent: 'flex-start',
             }}
             dropDownStyle={{ backgroundColor: '#fafafa' }}
-            onValueChange={(itemValue, itemIndex) => handleChange(itemValue)}
+            // onValueChange={(itemValue, itemIndex) => handleChange(itemValue)}
             onChangeItem={(item) => setSelectedEstates(item.value)}
           />
         )}
@@ -324,6 +296,10 @@ const styles = StyleSheet.create({
     bottom: 5,
   },
   btn: {
+    alignSelf: 'center',
+    marginLeft: -30,
+    position: 'absolute',
+    bottom: 30,
     elevation: 8,
     backgroundColor: '#5CB409',
     borderRadius: 6,
