@@ -11,16 +11,15 @@ import AppLoading from 'expo-app-loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import callServer from '../helpers/callServer';
 import BottomNavigator from '../components/BottomNavigator'
-window.navigator.userAgent = 'react-native'
-import io from 'socket.io-client/dist/socket.io'
+import axios from 'axios'
 
 function Discover({ route, navigation }) {
   const [socket, setSocket] = useState()
-  const { comments, error, stage } = useSelector((state) => state.reducerComment);
+  const { comments, error, stage, loading } = useSelector((state) => state.reducerComment);
   const dispatch = useDispatch();
   const [user, setUser] = useState(null);
   const [com, setCom] = useState('')
-  const [state, setState] = useState([])
+  const [state, setState] = useState('')
   const [chat, setChat] = useState([])
   const { id } = route.params
   let [loaded] = useFonts({
@@ -42,9 +41,6 @@ function Discover({ route, navigation }) {
   // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
   useEffect(() => {
     const tes = async () => {
-      setSocket(io('http://192.168.1.12:3000', {
-        transports: ['websocket'], jsonp: false
-      }))
       const value = await AsyncStorage.getItem('userlogedin');
       const json = JSON.parse(value);
       setUser(json);
@@ -55,25 +51,35 @@ function Discover({ route, navigation }) {
           </TouchableOpacity>
         ),
       })
-      console.log(socket)
-      socket.emit('join', id);
-      console.log('log')
-      socket.on('comment', ({ comment }) => {
-        console.log(comment)
-        setState([...state, comment])
-        fetchComment()
-      })
+      fetchComment()
     }
 
     tes()
     return () => {
       console.log('out')
-      socket.emit('dc', id)
     }
   }, [navigation])
 
+  const inputHandler = (e) => {
+    setState(e)
+  }
+
+  const submitHandler = async () => {
+    await axios({
+      method: 'post',
+      url: `http://192.168.1.12:3000/comment/${id}`,
+      data: {
+        comment: state
+      },
+      headers: {
+        access_token: user.access_token
+      }
+    })
+    setState('')
+  }
 
   if (!loaded) return <AppLoading />;
+  if (loading) return <AppLoading />
   return (
     <SafeAreaView style={styles.bg}>
       <ScrollView
@@ -82,7 +88,6 @@ function Discover({ route, navigation }) {
       >
         {/* >>>>>>>>>>>>> BATAS SUCI <<<<<<<<<<<<< */}
         <View style={styles.box}>
-          {/* <View style={styles.hr} /> */}
           <View style={styles.row}>
             <Avatar.Image size={55}
               source={{
@@ -111,9 +116,9 @@ function Discover({ route, navigation }) {
         </View>
         {/* INI COMMENT */}
         {
-          comments.Comments.map(el => {
+          comments.Comments.map((el, index) => {
             return (
-              <View key={`comment${id}`} style={styles.rowComment}>
+              <View key={`comment${index}`} style={styles.rowComment}>
                 <Avatar.Image size={35}
                   source={{
                     uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
@@ -135,8 +140,11 @@ function Discover({ route, navigation }) {
             }}
           />
           <View style={styles.boxStatus}>
-            <TextInput style={styles.inputStatus} placeholder="add a comment" placeholderTextColor="#625261" />
+            <TextInput defaultValue={state} onChangeText={(e) => inputHandler(e)} style={styles.inputStatus} placeholder="add a comment" placeholderTextColor="#625261" multiline />
           </View>
+          <TouchableOpacity style={{ alignSelf: 'center' }} onPress={submitHandler}>
+            <FontAwesome name="paper-plane" size={20} color="#2FBBF0" />
+          </TouchableOpacity>
         </View>
 
       </ScrollView>
@@ -209,11 +217,11 @@ const styles = StyleSheet.create({
     marginTop: '1%',
     marginBottom: '1%',
     alignSelf: 'flex-start',
-    paddingHorizontal: 50
+    paddingHorizontal: 30
   },
   boxProfile: {
     flexDirection: 'column',
-    marginHorizontal: 30,
+    marginHorizontal: 15,
     marginBottom: 5,
   },
   column: {
@@ -259,9 +267,9 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   inputStatus: {
-    width: '100%',
-    marginTop: 5,
-    marginBottom: 5,
+    width: '90%',
+    marginTop: 10,
+    marginBottom: 10,
     fontSize: 14,
     color: '#625261',
     marginLeft: 15,
@@ -270,10 +278,10 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   boxStatus: {
-    width: '80%',
+    width: '75%',
     backgroundColor: '#e6e6e6',
     borderRadius: 20,
-    marginLeft: 30
+    marginHorizontal: 15
     // borderWidth: 0.5
   },
   boxCard: {

@@ -1,9 +1,15 @@
-import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native'
+
+import React, { useEffect, useState } from 'react';
+
+import { View, Text, StyleSheet, Picker, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native'
 import { Avatar } from 'react-native-paper';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
 import AppLoading from 'expo-app-loading';
+
+// import { registerPushNotification } from '../helpers/PushNotification';
+// import { verifyUser } from '../helpers/verify';
+
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { Card } from 'react-native-paper';
 import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
@@ -20,7 +26,7 @@ const defaultVal = {
 }
 
 function Discover({ navigation }) {
-  const { timelines, error, stage } = useSelector((state) => state.reducerTimeline);
+  const { timelines, error, stage, loading } = useSelector((state) => state.reducerTimeline);
   const [user, setUser] = useState(null);
   const [selectedValue, setSelectedValue] = useState("public");
   const [payload, setPayload] = useState(defaultVal);
@@ -30,7 +36,18 @@ function Discover({ navigation }) {
   let [loaded] = useFonts({
     Poppins_600SemiBold, Ubuntu_300Light
   });
-  // >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<<
+  
+//   const [selectedValue, setSelectedValue] = useState('public');
+//   const [expoPushToken, setExpoPushToken] = useState('');
+
+  // useEffect(() => {
+  //   registerPushNotification().then((token) => setExpoPushToken(token));
+  // }, []);
+
+  // useEffect(() => {
+  //   verifyUser(expoPushToken);
+  // }, [expoPushToken]);
+  
   const [image, setImage] = useState(null);
 
   // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
@@ -154,8 +171,8 @@ function Discover({ navigation }) {
     })
   }
 
-  if (!loaded) return <AppLoading />;
-  // if (!timelines.length || !user) return <Text>Loading</Text>
+  if (!loaded || !user) return <AppLoading />;
+  if (loading) return <AppLoading />;
 
   return (
     <SafeAreaView style={styles.bg}>
@@ -203,7 +220,7 @@ function Discover({ navigation }) {
           <View style={styles.boxCard}>
             {image && <Card style={styles.cardStatus}><Card.Cover source={{ uri: image }} /></Card>}
             <View style={styles.boxStatus}>
-              <TextInput defaultValue={payload.description} onChangeText={(text) => handleInput(text, 'description')} style={styles.inputStatus} placeholder="What’s on your mind?" placeholderTextColor="white" />
+              <TextInput multiline defaultValue={payload.description} onChangeText={(text) => handleInput(text, 'description')} style={styles.inputStatus} placeholder="What’s on your mind?" placeholderTextColor="white" />
             </View>
           </View>
         </View>
@@ -360,7 +377,7 @@ const styles = StyleSheet.create({
     marginTop: 5
   },
   inputStatus: {
-    width: '100%',
+    width: '90%',
     marginTop: 15,
     marginBottom: 15,
     fontSize: 18,

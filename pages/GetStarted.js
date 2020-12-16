@@ -1,7 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import { useFonts, Montserrat_600SemiBold, Montserrat_500Medium } from '@expo-google-fonts/montserrat';
+// Notification
+import { registerPushNotification } from '../helpers/PushNotification';
+import { useDispatch } from 'react-redux';
+import callServer from '../helpers/callServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { axios } from '../helpers/Axios';
+import { verifyUser } from '../helpers/verify';
 
 function GetStarted({ navigation }) {
   let [loaded] = useFonts({
@@ -9,16 +16,15 @@ function GetStarted({ navigation }) {
     Montserrat_500Medium,
   });
 
-  //     Alert.alert('Discard changes?', 'You have unsaved changes. Are you sure to discard them and leave the screen?', [
-  //       { text: "Don't leave", style: 'cancel', onPress: () => {} },
-  //       {
-  //         text: 'Discard',
-  //         style: 'destructive',
-  //         // If the user confirmed, then we dispatch the action we blocked earlier
-  //         // This will continue the action that had triggered the removal of the screen
-  //         onPress: () => navigation.dispatch(e.data.action),
-  //       },
-  //     ]);
+  const [expoPushToken, setExpoPushToken] = useState('');
+
+  // useEffect(() => {
+  //   registerPushNotification().then((token) => setExpoPushToken(token));
+  // }, []);
+
+  // useEffect(() => {
+  //   verifyUser(expoPushToken);
+  // }, [expoPushToken]);
 
   function goJoin() {
     navigation.replace('Login');

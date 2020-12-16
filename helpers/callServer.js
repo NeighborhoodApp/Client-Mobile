@@ -3,7 +3,7 @@ import { axios } from './Axios';
 
 /**
  *
- * @param {url, stage, method, body, headers, type} option
+ * @param {url, stage, method, body, headers, type, id} option
  */
 export default function callServer(option) {
   const payloadAxios = {
@@ -14,7 +14,7 @@ export default function callServer(option) {
   if (option.body) {
     payloadAxios['data'] = option.body;
   }
-  
+
   return async (dispatch) => {
     try {
       if (option.headers) {
@@ -25,17 +25,18 @@ export default function callServer(option) {
           coordinate: json.coordinate
         };
       }
-
       console.log('wxios fetch call server', payloadAxios);
       dispatch({ type: option.type + '_LOADING', payload: true });
       const { data } = await axios(payloadAxios);
-      // console.log('from server', data);
+      console.log('from server', data);
+      // console.log(option);
       dispatch({
         type: option.type,
         stage: option.stage || null,
         payload: option.id ? option.id : option.deletedId ? option.deletedId : data,
       });
     } catch (error) {
+      console.log(error);
       // console.log('axios', error.response || error.message);
       dispatch({
         type: option.type + '_ERROR',
