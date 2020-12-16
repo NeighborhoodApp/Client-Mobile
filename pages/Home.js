@@ -1,12 +1,25 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
-import { useDispatch } from 'react-redux';
-import callServer from '../helpers/callServer';
+import { registerPushNotification } from '../helpers/PushNotification';
+import { verifyUser } from '../helpers/verify';
 
 let json = null;
 function Home({ navigation }) {
   const [user, setUser] = useState(null);
+  const [expoPushToken, setExpoPushToken] = useState('');
+
+  // useEffect(() => {
+  //   const test = async () => {
+  //     const token = await registerPushNotification();
+  //     setExpoPushToken(token);
+  //   };
+  //   test();
+  // }, []);
+
+  // useEffect(() => {
+  //   verifyUser(expoPushToken).then((data) => console.log('data.....', data));
+  // }, [expoPushToken]);
 
   useEffect(() => {
     const getUser = async () => {
@@ -25,7 +38,7 @@ function Home({ navigation }) {
       } else if (json.status === 'Inactive') {
         navigation.replace('Waiting');
       } else {
-        navigation.replace('Discover');
+        navigation.replace('GetStarted');
       }
     } else {
       navigation.navigate('GetStarted');

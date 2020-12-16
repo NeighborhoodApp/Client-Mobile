@@ -1,9 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+
+import { View, Text, StyleSheet, Picker, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native';
 import { Avatar } from 'react-native-paper';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
+
+// import { registerPushNotification } from '../helpers/PushNotification';
+// import { verifyUser } from '../helpers/verify';
+
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { Card } from 'react-native-paper';
 import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
@@ -31,6 +36,19 @@ function Discover({ navigation }) {
     Poppins_600SemiBold,
     Ubuntu_300Light,
   });
+
+  //   const [selectedValue, setSelectedValue] = useState('public');
+  //   const [expoPushToken, setExpoPushToken] = useState('');
+
+  // useEffect(() => {
+  //   registerPushNotification().then((token) => setExpoPushToken(token));
+  // }, []);
+
+  // useEffect(() => {
+  //   verifyUser(expoPushToken);
+  // }, [expoPushToken]);
+
+  const [image, setImage] = useState(null);
 
   const [image, setImage] = useState(null);
 
