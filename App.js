@@ -1,7 +1,8 @@
 import React from 'react';
-import { Text, Image, TouchableOpacity, StyleSheet, Button, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+
+import { Text, Image, TouchableOpacity, StyleSheet, Button, View } from 'react-native'
+import { NavigationContainer } from '@react-navigation/native'
+import { createStackNavigator } from '@react-navigation/stack'
 import { Home, GetStarted, JoinUs, Login, Waiting, Discover, Profile, Verification, Menu, PickLocation } from './pages';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Avatar } from 'react-native-paper';
@@ -151,6 +152,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignSelf: 'center',
+  },
+  discoverRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignSelf: 'flex-start',
+    marginLeft:10
   },
   title: {
     fontSize: 23,
