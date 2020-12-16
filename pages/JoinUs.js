@@ -46,8 +46,12 @@ function JoinUs({ navigation }) {
         });
         const jsonValue = JSON.stringify(data);
         await AsyncStorage.setItem('userlogedin', jsonValue);
-        navigation.dispatch('Login');
+<<<<<<< HEAD
+        navigation.replace('Login');
+=======
+>>>>>>> 594175e6d9955d1114fde817fdb5ddff63525517
         console.log('Welcome,' + data.fullname);
+        navigation.replace('Login');
       } catch (error) {
         const msg = errorHandler(error);
         console.log(msg);

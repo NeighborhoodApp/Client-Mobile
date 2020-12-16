@@ -24,13 +24,11 @@ export const storeObject = async (key, obj) => {
   }
 };
 
-// export const getData = async () => {
-//   try {
-//     const value = await AsyncStorage.getItem('@storage_Key');
-//     if (value !== null) {
-//       // value previously stored
-//     }
-//   } catch (e) {
-//     // error reading value
-//   }
-// };
+export const getDataUser = async () => {
+  try {
+    const value = await AsyncStorage.getItem('userlogedin');
+    const user = JSON.parse(value);
+  } catch (e) {
+    console.log(e);
+  }
+};
