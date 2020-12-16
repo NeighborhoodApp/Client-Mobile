@@ -13,7 +13,7 @@ const defaultVal = {
   email: '',
   password: '',
   address: '',
-}
+};
 
 function JoinUs({ navigation }) {
   const [payload, setPayload] = useState(defaultVal);
