@@ -27,6 +27,7 @@ export default function callServer(option) {
       // console.log('wxios fetch call server', payloadAxios);
       dispatch({ type: option.type + '_LOADING', payload: true });
       const { data } = await axios(payloadAxios);
+      // console.log('from server', data);
       console.log(option);
       dispatch({
         type: option.type,
@@ -34,6 +35,7 @@ export default function callServer(option) {
         payload: option.id ? option.id : option.deletedId ? option.deletedId : data,
       });
     } catch (error) {
+      console.log(error);
       // console.log('axios', error.response || error.message);
       dispatch({
         type: option.type + '_ERROR',
