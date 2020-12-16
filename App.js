@@ -1,7 +1,13 @@
 import React from 'react';
+<<<<<<< HEAD
+import { Text, Image, TouchableOpacity, StyleSheet, Button, View } from 'react-native'
+import { NavigationContainer } from '@react-navigation/native'
+import { createStackNavigator } from '@react-navigation/stack'
+=======
 import { Text, Image, TouchableOpacity, StyleSheet, Button, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+>>>>>>> 594175e6d9955d1114fde817fdb5ddff63525517
 import { Home, GetStarted, JoinUs, Login, Waiting, Discover, Profile, Verification, Menu, PickLocation } from './pages';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Avatar } from 'react-native-paper';
@@ -16,6 +22,82 @@ export default function App() {
     <NavigationContainer>
       <Provider store={store}>
         <Stack.Navigator>
+<<<<<<< HEAD
+          <Stack.Screen name="Home" component={Home} options={{
+            title: 'Discover',
+            headerRight: () => (
+              <TouchableOpacity>
+              <Avatar.Image
+              size={40}
+              source={{
+                uri:
+                  'https://i.pinimg.com/474x/73/c3/e7/73c3e7cca66a885c53718d8f3688b02c.jpg',
+              }}
+            />
+            </TouchableOpacity>
+            ),
+            headerStyle: {
+              backgroundColor: '#161C2B',
+              height: 100,
+            },
+            headerTitleContainerStyle: {
+              paddingStart: 20,
+            },
+            // headerLeft: null,
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}/>
+          <Stack.Screen name="GetStarted" component={GetStarted} options={{headerShown: false}}/>
+          <Stack.Screen name="JoinUs" component={JoinUs} options={{headerShown: false}} />
+          <Stack.Screen name="Login" component={Login} options={{headerShown: false}} />
+          <Stack.Screen name="Waiting" component={Waiting} options={{headerShown: false}} />
+          <Stack.Screen name="Discover" component={Discover}  options={{
+            headerTitle: ()=> (<View style={styles.discoverRow}>
+                                  <Text style={styles.title}>Discover</Text>
+                                  <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0"/>
+                              </View>),
+            headerLeft: null,
+            headerStyle: {
+              backgroundColor: '#161C2B',
+              height: 100,
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: { 
+              alignSelf: 'center',
+              color:  '#fff',
+              }
+            }} />
+          <Stack.Screen name="Profile" component={Profile} 
+          options={{
+            headerTitle: ()=> (<View style={styles.discoverRow}><Text style={styles.title}>Profile / Create Fees</Text><MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0"/></View>),
+            headerLeft: null,
+            headerStyle: {
+              backgroundColor: '#161C2B',
+              height: 100,
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: { 
+              alignSelf: 'center',
+              color:  '#fff',
+              }
+            }} />
+          <Stack.Screen name="Verification" component={Verification}
+          options={{
+            headerTitle: ()=> (<View style={styles.row}><Text style={styles.title}>Verfication</Text><MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0"/></View>),
+            headerLeft: null,
+            headerStyle: {
+              backgroundColor: '#161C2B',
+              height: 100,
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: { 
+              alignSelf: 'center',
+              color:  '#fff',
+              }
+            }} 
+=======
           <Stack.Screen name="NotificationPage" component={NotificationPage} options={{ headerShown: true }} />
           <Stack.Screen
             name="Home"
@@ -118,6 +200,7 @@ export default function App() {
                 color: '#fff',
               },
             }}
+>>>>>>> 594175e6d9955d1114fde817fdb5ddff63525517
           />
         </Stack.Navigator>
       </Provider>
@@ -151,6 +234,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignSelf: 'center',
+  },
+  discoverRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignSelf: 'flex-start',
+    marginLeft:10
   },
   title: {
     fontSize: 23,
