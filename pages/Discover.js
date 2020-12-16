@@ -11,23 +11,48 @@ import BottomNavigator from '../components/BottomNavigator'
 import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'
+
+const defaultVal = {
+  description: '',
+  privacy: 'public',
+}
 
 function Discover({ navigation }) {
   const { timelines, error, stage } = useSelector((state) => state.reducerTimeline);
-
+  const [user, setUser] = useState(null);
+  const [selectedValue, setSelectedValue] = useState("public");
+  const [payload, setPayload] = useState(defaultVal);
+  const [formData, setFormData] = useState(null);
   const dispatch = useDispatch();
 
   let [loaded] = useFonts({
     Poppins_600SemiBold, Ubuntu_300Light
   });
-
   // >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<<
   const [image, setImage] = useState(null);
 
   // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
+
+  const fetchTimeline = () => {
+    const option = {
+      url: 'timeline',
+      stage: 'getTimelines',
+      method: 'get',
+      body: null,
+      headers: true,
+      type: 'SET_TIMELINES',
+    };
+    dispatch(callServer(option));
+  };
+
   useEffect(() => {
     (async () => {
+      const value = await AsyncStorage.getItem('userlogedin');
+      const json = JSON.parse(value);
+      setUser(json);
+
       if (Platform.OS !== 'web') {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
@@ -35,18 +60,6 @@ function Discover({ navigation }) {
         }
       }
     })();
-
-    const fetchTimeline = () => {
-      const option = {
-        url: 'timeline',
-        stage: 'getTimelines',
-        method: 'get',
-        body: null,
-        headers: true,
-        type: 'SET_TIMELINES',
-      };
-      dispatch(callServer(option));
-    };
 
     navigation.setOptions({
       headerRight: () => (
@@ -66,32 +79,77 @@ function Discover({ navigation }) {
       quality: 1,
     });
 
-    console.log(result);
-    const data = new FormData()
-    data.append('file', result.uri)
     if (!result.cancelled) {
       setImage(result.uri);
-      axios({
-        method: 'post',
-        url: 'http://192.168.1.12:3000/upload',
-        data: data,
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-      .then(({data}) => {
-        console.log(data, 'tes');
-      })
-      .catch(err => {
-        console.log(err);
-      })
+      let localUri = result.uri;
+      let filename = localUri.split('/').pop();
+
+      // Infer the type of the image
+      let match = /\.(\w+)$/.exec(filename);
+      let type = match ? `image/${match[1]}` : `image`;
+
+      const data = new FormData()
+      data.append('file', { uri: localUri, name: filename, type });
+
+      data.append('file', result.uri)
+
+      setFormData(data)
     }
   };
 
-  const [selectedValue, setSelectedValue] = useState("public");
+  const submitHandler = async () => {
+    console.log('press');
+    let uri
+    try {
+      if (payload.description && formData) {
+        console.log(formData);
+        const { data } = await axios({
+          method: 'post',
+          url: 'http://192.168.1.12:3000/upload',
+          data: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        uri = data
+      }
+
+      if (payload.description) {
+        await axios({
+          method: 'post',
+          url: 'http://192.168.1.12:3000/timeline',
+          data: {
+            description: payload.description,
+            image: uri,
+            privacy: payload.privacy
+          },
+          headers: {
+            access_token: user.access_token
+          }
+        })
+      }
+      fetchTimeline()
+      setImage(null)
+      setFormData(null)
+      setPayload({description: '', privacy: 'public'})
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleInput = (text, name) => {
+    if (name === 'privacy' && !text) {
+      text = 'public'
+    }
+    const value = {
+      ...payload,
+      [name]: text,
+    };
+    setPayload(value);
+  };
 
   if (!loaded) return <AppLoading />;
-  if (!timelines.length) return <Text>Loading</Text>
+  if (!timelines.length || !user) return <Text>Loading</Text>
 
   return (
     <SafeAreaView style={styles.bg}>
@@ -107,12 +165,12 @@ function Discover({ navigation }) {
               }}
             />
             <View style={styles.boxProfile}>
-              <Text style={styles.name}>Bambang Gentolet</Text>
+              <Text style={styles.name}>{user.fullname}</Text>
               <View style={{ flexDirection: 'row', width: '60%' }}>
                 <DropDownPicker
                   items={[
                     { label: 'Public', value: 'public', hidden: true },
-                    { label: 'Tetonggo', value: 'tetonggo' },
+                    { label: 'Tetonggo', value: 'member' },
                   ]}
                   defaultValue={selectedValue}
                   containerStyle={{ height: 29, width: '70%', alignSelf: 'flex-start', marginTop: 4 }}
@@ -121,7 +179,7 @@ function Discover({ navigation }) {
                     justifyContent: 'flex-start'
                   }}
                   dropDownStyle={{ backgroundColor: '#fafafa' }}
-                  onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+                  onChangeItem={(item) => handleInput(item.value, 'privacy')}
                   labelStyle={{
                     fontSize: 13,
                     textAlign: 'left',
@@ -137,7 +195,7 @@ function Discover({ navigation }) {
           <View style={styles.boxCard}>
             {image && <Card style={styles.cardStatus}><Card.Cover source={{ uri: image }} /></Card>}
             <View style={styles.boxStatus}>
-              <TextInput style={styles.inputStatus} placeholder="What’s on your mind?" placeholderTextColor="white" />
+              <TextInput defaultValue={payload.description} onChangeText={(text) => handleInput(text, 'description')} style={styles.inputStatus} placeholder="What’s on your mind?" placeholderTextColor="white" />
             </View>
           </View>
         </View>
@@ -163,7 +221,7 @@ function Discover({ navigation }) {
                     <Text style={styles.status}>{el.description}</Text>
                   </View>
                   {
-                    el.image &&
+                    el.image !== '' &&
                     <Card style={styles.card}>
                       <Card.Cover source={{ uri: el.image }} />
                     </Card>
@@ -176,59 +234,8 @@ function Discover({ navigation }) {
             )
           })
         }
-        {/* >>>>>>>>>>>>> BATAS SUCI <<<<<<<<<<<<< */}
-        {/* <View style={styles.box}>
-          <View style={styles.hr} />
-          <View style={styles.row}>
-            <Avatar.Image size={39}
-              source={{
-                uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-              }}
-            />
-            <View style={styles.boxProfile}>
-              <Text style={styles.name}>Bambang Gentolet</Text>
-              <Text styles={styles.location}>Komplek Bojongkenyot</Text>
-            </View>
-          </View>
-          <View style={styles.hr} />
-          <View style={styles.boxCard}>
-            <View style={styles.boxText}>
-              <Text style={styles.status}>Ada yang liat kucing aku ngga ya? Aku sedih sekali udah cari kemana-mana ga ketemu</Text>
-            </View>
-            <Card style={styles.card}>
-              <Card.Cover source={{ uri: 'https://mk0punsjokesui4twax7.kinstacdn.com/wp-content/uploads/2020/05/cute-cat.jpg' }} />
-            </Card>
-            <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> 2</Text>
-          </View> */}
-        {/* <View style={styles.hr} /> */}
-        {/* </View>
-        <View style={styles.box}>
-          <View style={styles.hr} />
-          <View style={styles.row}>
-            <Avatar.Image size={39}
-              source={{
-                uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-              }}
-            />
-            <View style={styles.boxProfile}>
-              <Text style={styles.name}>Bambang Gentolet</Text>
-              <Text styles={styles.location}>Komplek Bojongkenyot</Text>
-            </View>
-          </View>
-          <View style={styles.hr} />
-          <View style={styles.boxCard}>
-            <View style={styles.boxText}>
-              <Text style={styles.status}>Ada yang liat kucing aku ngga ya? Aku sedih sekali udah cari kemana-mana ga ketemu</Text>
-            </View>
-            <Card style={styles.card}>
-              <Card.Cover source={{ uri: 'https://mk0punsjokesui4twax7.kinstacdn.com/wp-content/uploads/2020/05/cute-cat.jpg' }} />
-            </Card>
-            <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> 2</Text>
-          </View>
-          <View style={styles.hr} />
-        </View> */}
       </ScrollView>
-      <BottomNavigator></BottomNavigator>
+      <BottomNavigator submitHandler={submitHandler}></BottomNavigator>
     </SafeAreaView >
   )
 }
@@ -357,6 +364,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5
   },
   cardStatus: {
+    zIndex: -999,
     marginBottom: 10,
     justifyContent: 'flex-start',
     width: '94%',

@@ -11,6 +11,9 @@ export default function reducer(state = initState, action) {
   switch (action.type) {
     case 'SET_TIMELINES':
       return { ...state, timelines: action.payload, stage: action.stage, error: null };
+    // case 'SET_TIMELINE': 
+    //   let newData = state.timelines.concat(action.payload)
+      // return { ...state, timelines: newData, stage: action.stage, error: null };
     // case 'SET_USER':
     //   if (action.payload.foundUser) {
     //     return { ...state, user: action.payload.foundUser, stage: action.stage, error: null };
