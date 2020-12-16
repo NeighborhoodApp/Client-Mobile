@@ -8,7 +8,8 @@ import { Avatar } from 'react-native-paper';
 import { Provider } from 'react-redux';
 import store from './store';
 import NotificationPage from './pages/Notification';
-import AddEvent from './pages/AddEvent';
+import CreateEvent from './pages/CreateEvent';
+// import EventCalendar from './pages/EventCalendar';
 
 const Stack = createStackNavigator();
 
@@ -17,107 +18,6 @@ export default function App() {
     <NavigationContainer>
       <Provider store={store}>
         <Stack.Navigator>
-          <Stack.Screen
-            name="Home"
-            component={Home}
-            options={{
-              title: 'Discover',
-              headerRight: () => (
-                <TouchableOpacity>
-                  <Avatar.Image
-                    size={40}
-                    source={{
-                      uri: 'https://i.pinimg.com/474x/73/c3/e7/73c3e7cca66a885c53718d8f3688b02c.jpg',
-                    }}
-                  />
-                </TouchableOpacity>
-              ),
-              headerStyle: {
-                backgroundColor: '#161C2B',
-                height: 100,
-              },
-              headerTitleContainerStyle: {
-                paddingStart: 20,
-              },
-              // headerLeft: null,
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-            }}
-          />
-          <Stack.Screen name="GetStarted" component={GetStarted} options={{ headerShown: false }} />
-          <Stack.Screen name="JoinUs" component={JoinUs} options={{ headerShown: false }} />
-          <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
-          <Stack.Screen name="Waiting" component={Waiting} options={{ headerShown: false }} />
-          <Stack.Screen
-            name="Discover"
-            component={Discover}
-            options={{
-              headerTitle: () => (
-                <View style={styles.discoverRow}>
-                  <Text style={styles.title}>Discover</Text>
-                  <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
-                </View>
-              ),
-              headerLeft: null,
-              headerStyle: {
-                backgroundColor: '#161C2B',
-                height: 100,
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                alignSelf: 'center',
-                color: '#fff',
-              },
-            }}
-          />
-          <Stack.Screen
-            name="Profile"
-            component={Profile}
-            options={{
-              headerTitle: () => (
-                <View style={styles.discoverRow}>
-                  <Text style={styles.title}>Profile / Create Fees</Text>
-                  <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
-                </View>
-              ),
-              headerLeft: null,
-              headerStyle: {
-                backgroundColor: '#161C2B',
-                height: 100,
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                alignSelf: 'center',
-                color: '#fff',
-              },
-            }}
-          />
-          <Stack.Screen
-            name="Verification"
-            component={Verification}
-            options={{
-              headerTitle: () => (
-                <View style={styles.row}>
-                  <Text style={styles.title}>Verfication</Text>
-                  <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
-                </View>
-              ),
-              headerLeft: null,
-              headerStyle: {
-                backgroundColor: '#161C2B',
-                height: 100,
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                alignSelf: 'center',
-                color: '#fff',
-              },
-            }}
-          />
-          <Stack.Screen name="NotificationPage" component={NotificationPage} options={{ headerShown: true }} />
-
           <Stack.Screen
             name="Home"
             component={Home}
@@ -175,8 +75,8 @@ export default function App() {
             }}
           />
           <Stack.Screen
-            name="AddEvent"
-            component={AddEvent}
+            name="CreateEvent"
+            component={CreateEvent}
             options={{
               headerTitle: () => (
                 <View style={styles.row}>
@@ -196,7 +96,28 @@ export default function App() {
               },
             }}
           />
-
+          {/* <Stack.Screen
+            name="EventCalendar"
+            component={EventCalendar}
+            options={{
+              headerTitle: () => (
+                <View style={styles.row}>
+                  <Text style={styles.title}>Event Calendar</Text>
+                  <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
+                </View>
+              ),
+              headerLeft: null,
+              headerStyle: {
+                backgroundColor: '#161C2B',
+                height: 100,
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                alignSelf: 'center',
+                color: '#fff',
+              },
+            }}
+          /> */}
           <Stack.Screen name="PickLocation" component={PickLocation} options={{ headerShown: false }} />
           <Stack.Screen
             name="Menu"

@@ -31,10 +31,8 @@ function Discover({ navigation }) {
     Poppins_600SemiBold,
     Ubuntu_300Light,
   });
-  // >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<<
-  const [image, setImage] = useState(null);
 
-  // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
+  const [image, setImage] = useState(null);
 
   const fetchTimeline = () => {
     const option = {

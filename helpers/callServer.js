@@ -19,26 +19,16 @@ export default function callServer(option) {
     try {
       if (option.headers) {
         const value = await AsyncStorage.getItem('userlogedin');
-<<<<<<< HEAD
-        const json = JSON.parse(value);
-        payloadAxios['headers'] = {
-          access_token: json.access_token,
-          coordinate: json.coordinate
-=======
         const value_after = JSON.parse(value);
         payloadAxios['headers'] = {
           access_token: value_after.access_token,
->>>>>>> 594175e6d9955d1114fde817fdb5ddff63525517
         };
       }
       // console.log('wxios fetch call server', payloadAxios);
       dispatch({ type: option.type + '_LOADING', payload: true });
       const { data } = await axios(payloadAxios);
       // console.log('from server', data);
-<<<<<<< HEAD
-=======
       console.log(option);
->>>>>>> 594175e6d9955d1114fde817fdb5ddff63525517
       dispatch({
         type: option.type,
         stage: option.stage || null,
