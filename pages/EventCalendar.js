@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
-// import { View, Text, StyleSheet, TouchableOpacity, Alert} from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Alert} from 'react-native'
 import SvgUri from "expo-svg-uri";
-import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+// import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import Modal from 'react-native-modal';
 import { TextInput } from 'react-native-paper';
 // import {Card, Avatar} from 'react-native-paper';
@@ -48,32 +48,13 @@ const EventCalendar: React.FC = ({ navigation }) => {
         return (
           <TouchableOpacity
             style={[styles.item, {height: item.height}]}
-            onPress={() => Alert.alert(item.name)}
+            onPress={() => navigation.navigate('CreateEvent')}
           >
             <Text>{item.name}</Text>
           </TouchableOpacity>
         );
     }
 
-    // const renderItem = (item) => {
-    //     return (
-    //       <TouchableOpacity style={{marginRight: 10, marginTop: 17}}>
-    //         <Card>
-    //           <Card.Content>
-    //             <View
-    //               style={{
-    //                 flexDirection: 'row',
-    //                 justifyContent: 'space-between',
-    //                 alignItems: 'center',
-    //               }}>
-    //               <Text>{item.name}</Text>
-    //               <Avatar.Text label="J" />
-    //             </View>
-    //           </Card.Content>
-    //         </Card>
-    //       </TouchableOpacity>
-    //     );
-    // };
 
     const renderEmptyDate = (item) => {
         return (
@@ -100,9 +81,6 @@ const EventCalendar: React.FC = ({ navigation }) => {
             renderEmptyDate={renderEmptyDate}
             markedDates={{
                 '2020-12-16': {selected: true, selectedDayTextColor: 'blue',},
-                '2020-12-17': {marked: true},
-                // '2020-12-18': {marked: true, dotColor: 'red', activeOpacity: 0},
-                // '2020-12-19': {disabled: true, disableTouchEvent: true}
             }}
             rowHasChanged={rowHasChanged}
       />

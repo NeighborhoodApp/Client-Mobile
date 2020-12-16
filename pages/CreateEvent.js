@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius:15,
         borderTopLeftRadius:10,
         position:"absolute",
-        top:0,
+        top:20,
         alignItems:'center'
     },
     button1: {
