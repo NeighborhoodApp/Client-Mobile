@@ -1,37 +1,75 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { axios } from '../helpers/Axios';
+import callServer from '../helpers/callServer';
 import { registerPushNotification } from '../helpers/PushNotification';
-import { verifyUser } from '../helpers/verify';
+// import { verifyUser } from '../helpers/verify';
 
 let json = null;
-function Home({ navigation }) {
-  const [user, setUser] = useState(null);
+export default function Home({ navigation }) {
   const [expoPushToken, setExpoPushToken] = useState('');
-
-  // useEffect(() => {
-  //   const test = async () => {
-  //     const token = await registerPushNotification();
-  //     setExpoPushToken(token);
-  //   };
-  //   test();
-  // }, []);
-
-  // useEffect(() => {
-  //   verifyUser(expoPushToken).then((data) => console.log('data.....', data));
-  // }, [expoPushToken]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const getUser = async () => {
-      const value = await AsyncStorage.getItem('userlogedin');
+    const preload = async () => {
+      // const value = await AsyncStorage.getItem('userlogedin');
+      const value = await AsyncStorage.removeItem('userlogedin');
       json = JSON.parse(value);
-      setUser(json);
-      goJoin();
+      if (value) {
+        const token = await registerPushNotification();
+        const option = {
+          url: 'users',
+          stage: 'getRealEstates',
+          method: 'get',
+          body: null,
+          headers: true, // true
+          type: 'SET_USERS',
+        };
+        dispatch(callServer(option));
+        await verifyUser(token);
+        setExpoPushToken(token);
+      }
+      goJoin(json);
     };
-    getUser();
+    preload();
   }, []);
 
-  const goJoin = () => {
+  const verifyUser = async (expoPushToken) => {
+    try {
+      const value = await AsyncStorage.getItem('userlogedin');
+      const json = JSON.parse(value);
+
+      console.log(json, 'json');
+      if (value) {
+        const { data } = await axios({
+          url: 'users/verify/' + json.id,
+          method: 'PUT',
+          data: {
+            expoPushToken: expoPushToken,
+          },
+          headers: {
+            access_token: json.access_token,
+          },
+        });
+        for (const key in data.user) {
+          if (data.user.hasOwnProperty(key)) {
+            if (key !== 'status') {
+              json[key] = data.user[key];
+            }
+          }
+        }
+        json.expoPushToken = expoPushToken;
+        await AsyncStorage.setItem('userlogedin', JSON.stringify(json));
+      }
+    } catch (error) {
+      await AsyncStorage.removeItem('userlogedin');
+      navigation.replace('GetStarted');
+    }
+  };
+
+  const goJoin = (user) => {
     if (json) {
       if (!json.RealEstateId) {
         navigation.replace('PickLocation');
@@ -41,13 +79,14 @@ function Home({ navigation }) {
         navigation.replace('GetStarted');
       }
     } else {
-      navigation.navigate('GetStarted');
+      navigation.replace('GetStarted');
     }
   };
+
   return (
     <View style={styles.container}>
-      <Text>Iki halaman Home Cyok</Text>
-      <Button title="JOIN US PAGE" onPress={goJoin}></Button>
+      <Text>Loading.....</Text>
+      {/* <Button title="JOIN US PAGE" onPress={goJoin}></Button> */}
     </View>
   );
 }
@@ -60,5 +99,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
-export default Home;

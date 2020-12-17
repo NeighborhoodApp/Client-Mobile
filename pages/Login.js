@@ -7,6 +7,8 @@ import { Fontisto, Feather } from '@expo/vector-icons';
 import errorHandler from '../helpers/errorHandler';
 import { axios } from '../helpers/Axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import callServer from '../helpers/callServer';
+import { useDispatch } from 'react-redux';
 
   const defaultVal = {
     email: '',
@@ -15,12 +17,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Login({ navigation }) {
   const [payload, setPayload] = useState(defaultVal);
+  const [errMessage, setErrMessage] = useState('');
 
   let [loaded] = useFonts({
     Ubuntu_300Light,
     Montserrat_600SemiBold,
     Ubuntu_500Medium,
   });
+
+  const dispatch = useDispatch();
 
   const toJoin = () => {
     navigation.replace('JoinUs');
@@ -43,10 +48,25 @@ function Login({ navigation }) {
           data: payload,
         });
         console.log('UserLogedIn', data);
-        const newName = data.fullname.split('#');
-        data.fullname = newName[0];
-        const jsonValue = JSON.stringify(data);
-        await AsyncStorage.setItem('userlogedin', jsonValue);
+        if (data.id) {
+
+          const newName = data.fullname.split('#');
+          data.fullname = newName[0];
+
+          const option = {
+            url: 'users',
+            stage: 'getRealEstates',
+            method: 'get',
+            body: null,
+            headers: true, // true
+            type: 'SET_USERS',
+          };
+          // console.log(data, 'data login ..........');
+          dispatch(callServer(option));
+          const jsonValue = JSON.stringify(data);
+          await AsyncStorage.setItem('userlogedin', jsonValue);
+        }
+
         if (!data.RealEstateId) {
           navigation.replace('PickLocation');
         } else if (data.status === 'Inactive') {
@@ -58,6 +78,7 @@ function Login({ navigation }) {
       } catch (error) {
         const msg = errorHandler(error);
         console.log(msg);
+        setErrMessage(msg)
       }
     } else {
       console.log('All field required!')
@@ -91,10 +112,13 @@ function Login({ navigation }) {
             secureTextEntry={true}
           />
         </View>
+
         <View style={styles.hr} />
-        <TouchableOpacity
-          onPress={() => prosesLogin()}
-          style={styles.btn}>
+        {errMessage ?
+          <Text style={styles.errortext}>{errMessage}</Text> : null
+        }
+
+        <TouchableOpacity onPress={() => prosesLogin()} style={styles.btn}>
           <Text style={styles.btn_Text}> SUBMIT </Text>
         </TouchableOpacity>
         <View style={styles.footer}>
@@ -172,6 +196,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Ubuntu_300Light',
     color: 'white',
     fontSize: 14,
+  },
+  errortext: {
+    position: "relative",
+    fontFamily: 'Ubuntu_300Light',
+    color: 'white',
+    fontSize: 14,
+    color: 'red',
   },
   footer_login: {
     fontFamily: 'Ubuntu_500Medium',

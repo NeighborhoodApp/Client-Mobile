@@ -23,6 +23,7 @@ import store from './store';
 import NotificationPage from './pages/Notification';
 import CreateEvent from './pages/CreateEvent';
 import CreateFee from './pages/CreateFee';
+import EventCalendar from './pages/EventCalendar';
 
 const Stack = createStackNavigator();
 
@@ -174,7 +175,7 @@ export default function App() {
               },
             }}
           />
-          {/* <Stack.Screen
+          <Stack.Screen
             name="EventCalendar"
             component={EventCalendar}
             options={{
@@ -195,7 +196,7 @@ export default function App() {
                 color: '#fff',
               },
             }}
-          /> */}
+          />
           <Stack.Screen name="PickLocation" component={PickLocation} options={{ headerShown: false }} />
           <Stack.Screen
             name="Menu"

@@ -2,13 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import { useFonts, Montserrat_600SemiBold, Montserrat_500Medium } from '@expo-google-fonts/montserrat';
-// Notification
-import { registerPushNotification } from '../helpers/PushNotification';
-import { useDispatch } from 'react-redux';
-import callServer from '../helpers/callServer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { axios } from '../helpers/Axios';
-import { verifyUser } from '../helpers/verify';
+// Notification
 
 function GetStarted({ navigation }) {
   let [loaded] = useFonts({
@@ -17,17 +12,23 @@ function GetStarted({ navigation }) {
   });
 
   const [expoPushToken, setExpoPushToken] = useState('');
+  const [user, setUser] = useState(null);
 
-  // useEffect(() => {
-  //   registerPushNotification().then((token) => setExpoPushToken(token));
-  // }, []);
-
-  // useEffect(() => {
-  //   verifyUser(expoPushToken);
-  // }, [expoPushToken]);
+  useEffect(() => {
+    const getStorange = async () => {
+      const value = await AsyncStorage.getItem('userlogedin');
+      const json = JSON.parse(value);
+      setUser(json);
+    };
+    getStorange();
+  }, []);
 
   function goJoin() {
-    navigation.replace('Login');
+    if (user) {
+      navigation.replace('Discover');
+    } else {
+      navigation.replace('Login');
+    }
   }
 
   if (!loaded) {

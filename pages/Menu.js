@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useFonts, Roboto_500Medium } from '@expo-google-fonts/roboto';
-import { MaterialIcons, Fontisto, FontAwesome5, FontAwesome } from '@expo/vector-icons';
+import { MaterialIcons, Fontisto, FontAwesome5, Ionicons, FontAwesome } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -10,8 +10,19 @@ function Menu({ navigation }) {
     Roboto_500Medium,
   });
 
+  const [user, setUser] = useState({ RoleId: 3 });
+
+  useEffect(() => {
+    const getUser = async () => {
+      const user = await AsyncStorage.getItem('userlogedin');
+      const rawData = JSON.parse(user);
+      setUser(rawData);
+    };
+    getUser();
+  }, []);
+
   const logout = async () => {
-    const loggingOut = await AsyncStorage.removeItem('userlogedin');
+    await AsyncStorage.removeItem('userlogedin');
     navigation.replace('Home');
   };
 
@@ -35,20 +46,25 @@ function Menu({ navigation }) {
             <FontAwesome5 style={styles.icon} name="users" size={18} color="#2C6FC7" />
             <Text style={styles.menu}> Neighbours </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btn_menu}>
+          <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('Profile')}>
             <FontAwesome style={{ marginLeft: '8.5%' }} name="user" size={23} color="#2C6FC7" />
-            <Text style={styles.menu}> Profile </Text>
+            <Text style={styles.menu}>Profile </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.replace('Verification')}>
-            <FontAwesome5 style={styles.icon} name="house-user" size={20} color="#2C6FC7" />
-            <Text style={styles.menu}> Verifications </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('CreateFee')}>
-            <MaterialIcons style={styles.icon} name="monetization-on" size={20} color="#2C6FC7" />
-            <Text style={styles.menu}> Create Fee </Text>
-          </TouchableOpacity>
+          {!user ? null : user.RoleId !== 2 ? null : (
+            <>
+              <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.replace('Verification')}>
+                <FontAwesome5 style={styles.icon} name="house-user" size={20} color="#2C6FC7" />
+                <Text style={styles.menu}>Verifications </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('CreateFee')}>
+                <MaterialIcons style={styles.icon} name="monetization-on" size={20} color="#2C6FC7" />
+                <Text style={styles.menu}> Create Fee </Text>
+              </TouchableOpacity>
+            </>
+          )}
           <TouchableOpacity style={styles.btn_logout} onPress={() => logout()}>
-            <MaterialIcons style={styles.icon} name="monetization-on" size={20} color="#2C6FC7" />
+            <Ionicons style={styles.icon} name="power-outline" size={20} color="#2C6FC7" />
+
             <Text style={styles.logout}> Logout </Text>
           </TouchableOpacity>
         </View>
