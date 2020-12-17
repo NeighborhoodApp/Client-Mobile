@@ -13,7 +13,7 @@ const defaultVal = {
   email: '',
   password: '',
   address: '',
-}
+};
 
 function JoinUs({ navigation }) {
   const [payload, setPayload] = useState(defaultVal);
@@ -46,7 +46,10 @@ function JoinUs({ navigation }) {
         });
         const jsonValue = JSON.stringify(data);
         await AsyncStorage.setItem('userlogedin', jsonValue);
+<<<<<<< HEAD
+=======
         // navigation.replace('Login');
+>>>>>>> 033c30818712b74ec604b80443afb0800656deaa
         console.log('Welcome,' + data.fullname);
         navigation.replace('Login');
       } catch (error) {

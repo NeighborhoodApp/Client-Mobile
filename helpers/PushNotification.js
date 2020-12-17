@@ -57,4 +57,4 @@ export const registerPushNotification = async () => {
   }
 
   return token;
-}
+};
