@@ -19,11 +19,13 @@ export default function callServer(option) {
     try {
       if (option.headers) {
         const value = await AsyncStorage.getItem('userlogedin');
-        const json = JSON.parse(value);
-        console.log('jsoonnn server ....', json, option.stage);
+        const objUser = JSON.parse(value);
+        const token = objUser ? objUser.access_token : null;
+        const coordinate = objUser ? objUser.coordinate : null;
+        console.log('jsoonnn server ....', typeof objUser, value, objUser, option.stage);
         payloadAxios['headers'] = {
-          access_token: json.access_token,
-          coordinate: json.coordinate,
+          access_token: token,
+          coordinate: coordinate,
         };
       }
       console.log('wxios fetch call server', payloadAxios);
@@ -44,7 +46,7 @@ export default function callServer(option) {
       dispatch({
         type: option.type + '_ERROR',
         stage: option.stage || null,
-        payload: error.response.data || { msg: 'Somthing error on fetch' },
+        payload: error.response || { msg: 'Somthing error on fetch' },
       });
     } finally {
       dispatch({ type: option.type + '_LOADING', payload: false });

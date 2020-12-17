@@ -173,7 +173,7 @@ function Discover({ navigation }) {
 
   if (!loaded) return <AppLoading />;
   if (!user) return <Text>Loading</Text>;
-
+  console.log(timelines, 'timelines......');
   return (
     <SafeAreaView style={styles.bg}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
@@ -275,9 +275,9 @@ function Discover({ navigation }) {
                 </View>
               );
             })
-          : null }
+          : null}
       </ScrollView>
-      <BottomNavigator submitHandler={submitHandler}></BottomNavigator>
+      <BottomNavigator navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
     </SafeAreaView>
   );
 }

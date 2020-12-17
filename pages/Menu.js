@@ -3,11 +3,17 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useFonts, Roboto_500Medium } from '@expo-google-fonts/roboto';
 import { MaterialIcons, Fontisto, FontAwesome5, FontAwesome } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function Menu() {
+function Menu({ navigation }) {
   const [loaded] = useFonts({
     Roboto_500Medium,
   });
+
+  const handleLogout = async () => {
+    await AsyncStorage.clear();
+    navigation.replace('Home')
+  };
 
   if (!loaded) return <AppLoading />;
 
@@ -41,7 +47,7 @@ function Menu() {
             <MaterialIcons style={styles.icon} name="monetization-on" size={20} color="#2C6FC7" />
             <Text style={styles.menu}> Create Fee </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btn_logout}>
+          <TouchableOpacity style={styles.btn_logout} onPress={() => handleLogout()}>
             <MaterialIcons style={styles.icon} name="monetization-on" size={20} color="#2C6FC7" />
             <Text style={styles.logout}> Logout </Text>
           </TouchableOpacity>

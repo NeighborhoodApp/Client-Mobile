@@ -57,7 +57,7 @@ export default function BottomNavigator(props) {
 				</View>
 
 				<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}>
-					<TouchableOpacity onPress={() => { navigation.navigate('Profile') }} style={{ marginBottom: 14 }}>
+					<TouchableOpacity onPress={() => { props.navigation.navigate('Profile') }} style={{ marginBottom: 14 }}>
 						<AntDesign name="user" size={24} color="black" />
 					</TouchableOpacity>
 				</View>
