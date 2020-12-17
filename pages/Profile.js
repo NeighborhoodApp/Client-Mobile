@@ -19,7 +19,7 @@ function Profile({ navigation }) {
     navigation.navigate('Notification');
   }
 
-  if (!loaded) <AppLoading />;
+  if (!loaded) return <AppLoading />;
 
   return (
     <View style={styles.container}>
