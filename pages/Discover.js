@@ -208,7 +208,7 @@ function Discover({ navigation }) {
 
   const longPres = (id) => {
     Alert.alert(
-      '',
+      'Delete timeline',
       'Are you sure ?',
       [
         {

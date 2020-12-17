@@ -124,7 +124,7 @@ function Discover({ route, navigation }) {
 
   const longPres = (id) => {
     Alert.alert(
-      '',
+      'Delete comment',
       'Are you sure ?',
       [
         {
