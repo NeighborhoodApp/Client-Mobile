@@ -41,18 +41,20 @@ function Discover({ route, navigation }) {
 
   // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
   useEffect(() => {
+    let temp
     setLoading(true)
     const tes = async () => {
       const value = await AsyncStorage.getItem('userlogedin');
       const json = JSON.parse(value);
+      temp = json.id
       setUser(json);
       navigation.setOptions({
         headerRight: () => (
           <TouchableOpacity style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }} onPress={() => { navigation.navigate('Menu') }}>
-            <SvgUri
-              width="35"
-              height="35"
-              source={{ uri: `https://avatars.dicebear.com/api/human/:${user ? user.fullname : 'random'}.svg` }}
+            <Avatar.Image size={39}
+              source={{
+                uri: `https://randomuser.me/api/portraits/men/${temp ? temp : null}.jpg`,
+              }}
             />
           </TouchableOpacity>
         ),
@@ -102,7 +104,7 @@ function Discover({ route, navigation }) {
         access_token: user.access_token
       }
     })
-    socket.emit('new comment', { comment: state, id: id, name: user.fullname });
+    socket.emit('new comment', { comment: state, id: id, name: user.id });
     setState('')
   }
 
@@ -151,10 +153,10 @@ function Discover({ route, navigation }) {
           {/* >>>>>>>>>>>>> BATAS SUCI <<<<<<<<<<<<< */}
           <View style={styles.box}>
             <View style={styles.row}>
-              <SvgUri
-                width="55"
-                height="55"
-                source={{ uri: `https://avatars.dicebear.com/api/human/:${comments.User.fullname}.svg` }}
+              <Avatar.Image size={39} style={{ marginTop: 5 }}
+                source={{
+                  uri: `https://randomuser.me/api/portraits/men/${comments.UserId}.jpg`,
+                }}
               />
               <View style={styles.boxProfile}>
                 <Text style={styles.name}>{comments.User.fullname}</Text>
@@ -181,10 +183,10 @@ function Discover({ route, navigation }) {
             comments.Comments.map((el, index) => {
               return (
                 <View key={`comment${index}`} style={styles.rowComment}>
-                  <SvgUri
-                    width="35"
-                    height="35"
-                    source={{ uri: `https://avatars.dicebear.com/api/human/:${el.User.fullname}.svg` }}
+                  <Avatar.Image size={39} style={{ marginTop: 5 }}
+                    source={{
+                      uri: `https://randomuser.me/api/portraits/men/${el.UserId}.jpg`,
+                    }}
                   />
                   <View style={styles.boxProfile}>
                     {
@@ -205,10 +207,10 @@ function Discover({ route, navigation }) {
             com.map((el, index) => {
               return (
                 <View key={`commentNew${index}`} style={styles.rowComment}>
-                  <SvgUri
-                    width="35"
-                    height="35"
-                    source={{ uri: `https://avatars.dicebear.com/api/human/:${el.name}.svg` }}
+                  <Avatar.Image size={39} style={{ marginTop: 5 }}
+                    source={{
+                      uri: `https://randomuser.me/api/portraits/men/${el.img}.jpg`,
+                    }}
                   />
                   <View style={styles.boxProfile}>
                     <Text style={styles.nameComment}>{el.name}</Text>
@@ -220,11 +222,11 @@ function Discover({ route, navigation }) {
           }
 
           <View style={styles.rowComment}>
-          <SvgUri
-                    width="35"
-                    height="35"
-                    source={{ uri: `https://avatars.dicebear.com/api/human/:${user.fullname}.svg` }}
-                  />
+            <Avatar.Image size={39} style={{ marginTop: 5 }}
+              source={{
+                uri: `https://randomuser.me/api/portraits/men/${user.id}.jpg`,
+              }}
+            />
             <View style={styles.boxStatus}>
               <TextInput defaultValue={state} onChangeText={(e) => inputHandler(e)} style={styles.inputStatus} placeholder="add a comment" placeholderTextColor="#625261" multiline />
             </View>

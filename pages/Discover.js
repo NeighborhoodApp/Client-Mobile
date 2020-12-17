@@ -27,7 +27,6 @@ const defaultVal = {
   privacy: 'public',
 }
 
-const hasLoaded = false;
 function Discover({ navigation }) {
   const { timelines, error, stage } = useSelector((state) => state.reducerTimeline);
   const [loading, setLoading] = useState(false)
@@ -70,10 +69,11 @@ function Discover({ navigation }) {
   };
 
   useEffect(() => {
-    setLoading(true)
+    let temp
     const opened = (async () => {
       const value = await AsyncStorage.getItem('userlogedin');
       const json = JSON.parse(value);
+      temp = json.id
       setUser(json);
 
       if (Platform.OS !== 'web') {
@@ -92,16 +92,14 @@ function Discover({ navigation }) {
             navigation.navigate('Menu');
           }}
         >
-          <SvgUri
-            width="35"
-            height="35"
+          <Avatar.Image size={39}
             source={{
-              uri: `https://avatars.dicebear.com/api/avataaars/${user ? user.fullname : 'random'}.svg?mood[]=happy`,
+              uri: `https://randomuser.me/api/portraits/men/${temp ? temp : null}.jpg`,
             }}
           />
         </TouchableOpacity>
       ),
-    });
+    })
 
     opened()
     fetchTimeline()
@@ -109,10 +107,6 @@ function Discover({ navigation }) {
       setLoading(false)
     }, 500);
   }, [comments])
-
-  useEffect(() => {
-    fetchTimeline();
-  }, [navigation]);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -145,7 +139,6 @@ function Discover({ navigation }) {
     let uri
     try {
       if (payload.description && formData) {
-        console.log(formData);
         const { data } = await axios({
           url: 'upload',
           method: 'post',
@@ -229,19 +222,20 @@ function Discover({ navigation }) {
   }
 
   if (loading) return <Loading />
-  if (!loaded || !stage) return <AppLoading />;
-
+  if (!loaded || !stage || !user) return <AppLoading />;
   return (
     <SafeAreaView style={styles.bg}>
       <View style={styles.bg1}>
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
+
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.contentContainer}
+        >
           <View style={styles.boxAwal}>
             <View style={styles.row}>
-              <SvgUri
-                width="55"
-                height="55"
+              <Avatar.Image size={39} style={{ marginTop: 5 }}
                 source={{
-                  uri: `https://avatars.dicebear.com/api/avataaars/${user ? user.fullname : 'random'}.svg?mood[]=happy`,
+                  uri: `https://randomuser.me/api/portraits/men/${user.id}.jpg`,
                 }}
               />
               <View style={styles.boxProfile}>
@@ -258,92 +252,79 @@ function Discover({ navigation }) {
                     containerStyle={{ height: 29, width: '70%', alignSelf: 'flex-start', marginTop: 4 }}
                     style={{ backgroundColor: '#fafafa' }}
                     itemStyle={{
-                      justifyContent: 'flex-start',
+                      justifyContent: 'flex-start'
                     }}
                     dropDownStyle={{ backgroundColor: '#fafafa' }}
                     onChangeItem={(item) => handleInput(item.value, 'privacy')}
                     labelStyle={{
                       fontSize: 13,
                       textAlign: 'left',
-                      color: '#000',
+                      color: '#000'
                     }}
                   />
                   {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
-                  <TouchableOpacity onPress={pickImage}>
-                    <Text style={styles.addPhotos}>
-                      <MaterialIcons name="add-a-photo" size={14} color="#707070" /> Photo
-                    </Text>
-                  </TouchableOpacity>
+                  <TouchableOpacity onPress={pickImage}><Text style={styles.addPhotos}><MaterialIcons name="add-a-photo" size={14} color="#707070" />  Photo</Text></TouchableOpacity>
                   {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
                 </View>
               </View>
             </View>
             <View style={styles.boxCard}>
-              {image && (
-                <Card style={styles.cardStatus}>
-                  <Card.Cover source={{ uri: image }} />
-                </Card>
-              )}
+              {image && <Card style={styles.cardStatus}><Card.Cover source={{ uri: image }} /></Card>}
               <View style={styles.boxStatus}>
-                <TextInput
-                  multiline
-                  defaultValue={payload.description}
-                  onChangeText={(text) => handleInput(text, 'description')}
-                  style={styles.inputStatus}
-                  placeholder="What’s on your mind?"
-                  placeholderTextColor="white"
-                />
+                <TextInput multiline defaultValue={payload.description} onChangeText={(text) => handleInput(text, 'description')} style={styles.inputStatus} placeholder="What’s on your mind?" placeholderTextColor="white" />
               </View>
             </View>
           </View>
-          {timelines.map((el, index) => {
-            if (el.privacy === 'public' || el.User.RealEstateId === user.RealEstateId) {
-              return (
-                <View key={`timeline${index}`} style={styles.box}>
-                  <View style={styles.hr} />
-                  <View style={styles.row}>
-                    <SvgUri
-                      width="55"
-                      height="55"
-                      source={{ uri: `https://avatars.dicebear.com/api/avataaars/${user ? user.fullname : 'random'}.svg?mood[]=happy` }}
-                    />
-                    <View style={styles.boxProfile}>
-                      {el.UserId === user.id ? (
-                        <TouchableOpacity onLongPress={() => longPres(el.id)}>
-                          <Text style={styles.name}>{el.User.fullname}</Text>
-                        </TouchableOpacity>
-                      ) : (
-                        <Text style={styles.name}>{el.User.fullname}</Text>
-                      )}
-                      <Text styles={styles.location}>{el.User.address}</Text>
+          {
+            timelines.map((el, index) => {
+              if (el.privacy === 'public' || el.User.RealEstateId === user.RealEstateId) {
+                return (
+                  <View key={`timeline${index}`} style={styles.box}>
+                    <View style={styles.hr} />
+                    <View style={styles.row}>
+                      <Avatar.Image size={39} style={{ marginTop: 5 }}
+                        source={{
+                          uri: `https://randomuser.me/api/portraits/men/${el.UserId}.jpg`,
+                        }}
+                      />
+                      <View style={styles.boxProfile}>
+
+                        {
+                          (el.UserId === user.id) ?
+                            <TouchableOpacity onLongPress={() => longPres(el.id)}>
+                              <Text style={styles.name}>{el.User.fullname}</Text>
+                            </TouchableOpacity> :
+                            <Text style={styles.name}>{el.User.fullname}</Text>
+                        }
+                        <Text styles={styles.location}>{el.User.address}</Text>
+                      </View>
                     </View>
-                  </View>
-                  <View style={styles.hr} />
-                  <View style={styles.boxCard}>
-                    <View style={styles.boxText}>
-                      <Text style={styles.status}>{el.description}</Text>
+                    <View style={styles.hr} />
+                    <View style={styles.boxCard}>
+                      <View style={styles.boxText}>
+                        <Text style={styles.status}>{el.description}</Text>
+                      </View>
+                      {
+                        el.image &&
+                        <Card style={styles.card}>
+                          <Card.Cover source={{ uri: el.image }} />
+                        </Card>
+                      }
+                      <TouchableOpacity onPress={() => changePage(el.id)}>
+                        <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}</Text>
+                      </TouchableOpacity>
                     </View>
-                    {el.image && (
-                      <Card style={styles.card}>
-                        <Card.Cover source={{ uri: el.image }} />
-                      </Card>
-                    )}
-                    <TouchableOpacity onPress={() => changePage(el.id)}>
-                      <Text style={styles.status}>
-                        <FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}
-                      </Text>
-                    </TouchableOpacity>
+                    <View style={styles.hr} />
                   </View>
-                  <View style={styles.hr} />
-                </View>
-              );
-            }
-          })}
+                )
+              }
+            })
+          }
         </ScrollView>
         <BottomNavigator navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
       </View>
-    </SafeAreaView>
-  );
+    </SafeAreaView >
+  )
 }
 
 const styles = StyleSheet.create({

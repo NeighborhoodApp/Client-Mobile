@@ -15,7 +15,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {axios} from '../helpers/Axios'
+import { axios } from '../helpers/Axios'
 import SvgUri from 'expo-svg-uri';
 
 const defaultVal = {
@@ -26,7 +26,7 @@ const defaultVal = {
 function Tetonggo({ navigation }) {
   const { users, user: userNow, error, stage, loading } = useSelector((state) => state.reducerUser);
   const [user, setUser] = useState(null);
-  const [selectedUser, setSelectedUser] = useState({  user: '', address: ''  });
+  const [selectedUser, setSelectedUser] = useState({ user: '', address: '' });
   const [selectedValue, setSelectedValue] = useState('public');
   const [payload, setPayload] = useState(defaultVal);
   const [formData, setFormData] = useState(null);
@@ -51,44 +51,27 @@ function Tetonggo({ navigation }) {
   //   dispatch(callServer(option));
   // };
 
-  console.log(users);
   useEffect(() => {
-    (async () => {
+    let temp
+    const tes = async () => {
       const value = await AsyncStorage.getItem('userlogedin');
       const json = JSON.parse(value);
+      temp = json.id
       setUser(json);
-
-      if (Platform.OS !== 'web') {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-          alert('Sorry, we need camera roll permissions to make this work!');
-        }
-      }
-    })();
-
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }}
-          onPress={() => {
-            navigation.navigate('Menu');
-          }}
-        >
-          <SvgUri
-            width="35"
-            height="35"
-            source={{ uri: `https://avatars.dicebear.com/api/human/:${user ? user.fullname : 'random'}.svg` }}
-          />
-        </TouchableOpacity>
-      ),
-    });
-    // fetchTimeline()
-    return () => {
-      dispatch({
-        type: 'UNMOUNT_TIMELINES',
-      });
-    };
-  }, [navigation]);
+      navigation.setOptions({
+        headerRight: () => (
+          <TouchableOpacity style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }} onPress={() => { navigation.navigate('Menu') }}>
+            <Avatar.Image size={39}
+              source={{
+                uri: `https://randomuser.me/api/portraits/men/${temp ? temp : null}.jpg`,
+              }}
+            />
+          </TouchableOpacity>
+        ),
+      })
+    }
+    tes()
+  }, [navigation])
 
   const submitHandler = async () => {
     console.log('press');
@@ -164,22 +147,22 @@ function Tetonggo({ navigation }) {
   console.log(user, 'userrrr.....');;
   if (!loaded) return <AppLoading />;
   // if (loading) return <AppLoading />;
-
+// console.log(newUser)
   return (
     <SafeAreaView style={styles.bg}>
       <View style={styles.border}></View>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
         <Text style={styles.account}>Account</Text>
-        { !newUser ? null : newUser.map((el, index) => {
+        {!newUser ? null : newUser.map((el, index) => {
           return (
             <View key={`timeline${index}`} style={styles.box}>
               <View style={styles.row}>
-                <SvgUri
-                  width="55"
-                  height="55"
-                  source={{ uri: `https://avatars.dicebear.com/api/avataaars/:${el.fullname}.svg?mood[]=happy` }}
+                <Avatar.Image size={39}
+                  source={{
+                    uri: `https://randomuser.me/api/portraits/men/${el.id}.jpg`,
+                  }}
                 />
-                
+
                 <View style={styles.boxProfile}>
                   <Text style={styles.name}>{el.fullname}</Text>
                   <Text styles={styles.location}>{el.address}</Text>
