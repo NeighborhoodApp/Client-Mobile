@@ -10,7 +10,7 @@ import { Provider } from 'react-redux';
 import store from './store';
 import NotificationPage from './pages/Notification';
 import CreateEvent from './pages/CreateEvent';
-// import EventCalendar from './pages/EventCalendar';
+import EventCalendar from './pages/EventCalendar';
 
 const Stack = createStackNavigator();
 
@@ -149,7 +149,7 @@ export default function App() {
             options={{
               headerTitle: () => (
                 <View style={styles.row}>
-                  <Text style={styles.title}>Verfication</Text>
+                  <Text style={styles.title}>Verification</Text>
                   <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
                 </View>
               ),

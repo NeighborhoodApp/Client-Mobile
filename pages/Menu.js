@@ -4,7 +4,7 @@ import { useFonts, Roboto_500Medium } from '@expo-google-fonts/roboto';
 import { MaterialIcons, Fontisto, FontAwesome5, FontAwesome } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
 
-function Menu() {
+function Menu({ navigation }) {
   const [loaded] = useFonts({
     Roboto_500Medium,
   });
@@ -21,9 +21,9 @@ function Menu() {
             <MaterialIcons style={styles.icon} name="notifications-active" size={22} color="#2C6FC7" />
             <Text style={styles.menu}> Notifications </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btn_menu}>
+          <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('CreateEvent')}>
             <Fontisto style={styles.icon} name="calendar" size={22} color="#2C6FC7" />
-            <Text style={styles.menu}> Events </Text>
+            <Text style={styles.menu}> Create Event </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.btn_menu}>
             <FontAwesome5 style={styles.icon} name="users" size={18} color="#2C6FC7" />
@@ -33,13 +33,13 @@ function Menu() {
             <FontAwesome style={{ marginLeft: '8.5%' }} name="user" size={23} color="#2C6FC7" />
             <Text style={styles.menu}> Profile </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btn_menu}>
+          <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('Verification')}>
             <FontAwesome5 style={styles.icon} name="house-user" size={20} color="#2C6FC7" />
             <Text style={styles.menu}> Verifications </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.btn_menu}>
             <MaterialIcons style={styles.icon} name="monetization-on" size={20} color="#2C6FC7" />
-            <Text style={styles.menu}> Fees </Text>
+            <Text style={styles.menu}> Create Fee </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.btn_logout}>
             <MaterialIcons style={styles.icon} name="monetization-on" size={20} color="#2C6FC7" />

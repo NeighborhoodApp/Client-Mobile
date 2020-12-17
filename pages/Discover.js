@@ -50,8 +50,6 @@ function Discover({ navigation }) {
 
   const [image, setImage] = useState(null);
 
-  const [image, setImage] = useState(null);
-
   const fetchTimeline = () => {
     const option = {
       url: 'timeline',

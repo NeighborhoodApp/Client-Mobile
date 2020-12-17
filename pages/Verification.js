@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
+    alignContent: 'space-between',
   },
   items: {
     position: 'absolute',

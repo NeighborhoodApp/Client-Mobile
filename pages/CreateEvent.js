@@ -1,45 +1,154 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // import { View, Text, StyleSheet } from 'react-native'
-import { Button, Text, View, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { Button, Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, Platform } from 'react-native';
 // import Modal from 'react-native-modal';
-import SvgUri from 'expo-svg-uri';
 import { TextInput } from 'react-native-paper';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useDispatch } from 'react-redux';
+import callServer from '../helpers/callServer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function CreateEvent() {
-  const [isFocused, setIsFocused] = useState('true');
+function CreateEvent({ navigation }) {
+  const [category, setCategory] = useState(null);
+  const [description, setDescription] = useState('');
+  const [name, setName] = useState('');
+  const [date, setDate] = useState(new Date());
+  const [mode, setMode] = useState('date');
+  const [show, setShow] = useState(false);
+  const [isFocused, setIsFocused] = useState(true);
+  const [isFocused1, setIsFocused1] = useState(true);
+  const [isFocused2, setIsFocused2] = useState(true);
+  const [user, setUser] = useState({});
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const value = await AsyncStorage.getItem('userlogedin');
+      const json = JSON.parse(value);
+      setUser(json);
+    };
+    getUser();
+  }, []);
+
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShow(Platform.OS === 'ios');
+    setDate(currentDate);
+  };
+
+  const showMode = (currentMode) => {
+    setShow(true);
+    setMode(currentMode);
+  };
+
+  const showDatepicker = () => {
+    showMode('date');
+  };
+
+  const showTimepicker = () => {
+    showMode('time');
+  };
+
   const setStyle = () => {
     setIsFocused(!isFocused);
+    setIsFocused1(isFocused);
+    setIsFocused2(isFocused);
+    setCategory(1);
   };
+  const setStyle1 = () => {
+    setIsFocused1(!isFocused1);
+    setIsFocused(isFocused1);
+    setIsFocused2(isFocused1);
+    setCategory(2);
+  };
+  const setStyle2 = () => {
+    setIsFocused2(!isFocused2);
+    setIsFocused1(isFocused2);
+    setIsFocused(isFocused2);
+    setCategory(3);
+  };
+
+  const handleInputDesc = (text) => {
+    setDescription(text);
+  };
+
+  const handleInputName = (text) => {
+    setName(text);
+  };
+
+  const handleAddEvent = () => {
+    const addEvent = () => {
+      const option = {
+        url: `event`,
+        stage: 'addEvent',
+        method: 'post',
+        body: {
+          name: name,
+          description: description,
+          CategoryId: category,
+          image: 'hello',
+          date: date,
+          RealEstateId: user.RealEstateId,
+        },
+        headers: true,
+        type: 'ADD_EVENT',
+      };
+      dispatch(callServer(option));
+    };
+    addEvent();
+    navigation.replace('Menu');
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.box}>
         <View style={{ height: 130, marginTop: 20, marginLeft: 20 }}>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-            <TouchableOpacity style={isFocused ? styles.button1 : styles.button2} onPress={setStyle}>
-              <SvgUri width="55" height="55" source={{ uri: `https://avatars.dicebear.com/api/human/:seed.svg` }} />
-              <Text style={isFocused ? styles.textBtn1 : styles.textBtn2}>Birthday</Text>
+            <TouchableOpacity
+              style={isFocused ? styles.button1 : styles.button2}
+              onPress={() => setStyle()}
+              disabled={!isFocused}
+            >
+              <Image
+                style={isFocused ? styles.image1 : styles.image2}
+                source={require('../assets/icon_events/e_rapat.png')}
+              />
+              <Text style={isFocused ? styles.textBtn1 : styles.textBtn2}>Arisan</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={isFocused ? styles.button1 : styles.button2} onPress={setStyle}>
-              <SvgUri width="55" height="55" source={{ uri: `https://avatars.dicebear.com/api/human/:seed.svg` }} />
-              <Text style={isFocused ? styles.textBtn1 : styles.textBtn2}>Olahraga</Text>
+
+            <TouchableOpacity
+              style={isFocused1 ? styles.button1 : styles.button2}
+              onPress={() => setStyle1()}
+              disabled={!isFocused1}
+            >
+              <Image
+                style={isFocused1 ? styles.image1 : styles.image2}
+                source={require('../assets/icon_events/e_pengajian.png')}
+              />
+              <Text style={isFocused1 ? styles.textBtn1 : styles.textBtn2}>Pengajian</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button1}>
-              <SvgUri width="55" height="55" source={{ uri: `https://avatars.dicebear.com/api/human/:seed.svg` }} />
-              <Text style={styles.textBtn1}>Rapat</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button1}>
-              <SvgUri width="55" height="55" source={{ uri: `https://avatars.dicebear.com/api/human/:seed.svg` }} />
-              <Text style={styles.textBtn1}>Others</Text>
+
+            <TouchableOpacity
+              style={isFocused2 ? styles.button1 : styles.button2}
+              onPress={() => setStyle2()}
+              disabled={!isFocused2}
+            >
+              <Image
+                style={isFocused2 ? styles.image1 : styles.image2}
+                source={require('../assets/icon_events/e_others.png')}
+              />
+              <Text style={isFocused2 ? styles.textBtn1 : styles.textBtn2}>Others</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>
         <Text style={{ alignSelf: 'flex-start', marginLeft: 30, fontWeight: '600', color: '#666E83', marginTop: 20 }}>
-          Tittle
+          Title
         </Text>
         <TextInput
           placeholder="Tetonggo Event"
           placeholderTextColor="black"
           style={{ height: '6%', width: '80%', backgroundColor: 'white', borderBottomColor: 'black' }}
+          onChangeText={(text) => handleInputName(text)}
         ></TextInput>
         <Text
           style={{
@@ -54,10 +163,41 @@ function CreateEvent() {
         >
           Date
         </Text>
-        <TextInput
+        {/* <TextInput
           placeholder="Date"
           style={{ height: '6%', width: '80%', backgroundColor: 'white', borderBottomColor: 'black' }}
-        ></TextInput>
+        ></TextInput> */}
+        <View>
+          <View>
+            <Button onPress={showDatepicker} title="Pick a Date" />
+          </View>
+          <View style={{ marginTop: 10 }}>
+            <Button onPress={showTimepicker} title="Pick a time" />
+          </View>
+          {show && (
+            <DateTimePicker
+              testID="dateTimePicker"
+              value={date}
+              mode={mode}
+              is24Hour={true}
+              display="default"
+              onChange={onChange}
+            />
+          )}
+          <Text
+            style={{
+              textAlign: 'left',
+              alignSelf: 'flex-start',
+              marginLeft: 30,
+              marginBottom: 10,
+              fontWeight: '600',
+              color: '#434853',
+              marginTop: 20,
+            }}
+          >
+            {date.toDateString()}
+          </Text>
+        </View>
         <Text
           style={{
             textAlign: 'left',
@@ -74,9 +214,11 @@ function CreateEvent() {
         <TextInput
           placeholder="Write a note here"
           style={{ height: '6%', width: '80%', backgroundColor: 'white', borderBottomColor: 'black' }}
+          onChangeText={(text) => handleInputDesc(text)}
         ></TextInput>
         <TouchableOpacity
           style={{ width: '70%', height: 40, backgroundColor: '#161C2B', paddingVertical: 10, marginTop: 30 }}
+          onPress={() => handleAddEvent()}
         >
           <Text style={{ alignSelf: 'center', fontWeight: 'bold', color: 'white' }}>SAVE</Text>
         </TouchableOpacity>
