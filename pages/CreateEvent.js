@@ -114,8 +114,8 @@ function CreateEvent({ navigation }) {
   const newUser = user ? users.filter((el) => el.RealEstateId === user.RealEstateId) : null;
 
   const sendNotify = async (data) => {
-    console.log(newUser.expoPushToken, 'newUser.expoPushToken');
-    const token = []
+    // console.log(newUser.expoPushToken, 'newUser.expoPushToken');
+    const token = [];
     for (let i = 0; i < newUser.length; i++) {
       if (newUser[i].expoPushToken && newUser[i].id !== user.id) {
         if (newUser[i].expoPushToken) {
@@ -123,7 +123,7 @@ function CreateEvent({ navigation }) {
         }
       }
     }
-    await sendNotification(token, 'data.name', 'data.description', {
+    await sendNotification(token, data.name, data.description, {
       from: { fullname: user.fullname, userid: user.id },
     });
   };
@@ -247,7 +247,7 @@ function CreateEvent({ navigation }) {
         ></TextInput>
         <TouchableOpacity
           style={{ width: 300, height: 40, backgroundColor: '#161C2B', paddingVertical: 10, marginTop: 30 }}
-          onPress={() => sendNotify()}
+          onPress={() => handleAddEvent()}
         >
           <Text style={{ alignSelf: 'center', fontWeight: 'bold', color: 'white' }}>SAVE</Text>
         </TouchableOpacity>
