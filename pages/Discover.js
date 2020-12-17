@@ -18,11 +18,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-<<<<<<< HEAD
-import { axios } from '../helpers/Axios';
-=======
 import {axios} from '../helpers/Axios'
->>>>>>> b95c4359b0c137c874938eb8aa26f3b63d5eada6
+import SvgUri from 'expo-svg-uri';
 
 const defaultVal = {
   description: '',
@@ -84,11 +81,21 @@ function Discover({ navigation }) {
 
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }} onPress={() => { navigation.navigate('Menu') }}>
-          <Avatar.Image size={48} source={{ uri: 'https://i.pinimg.com/474x/73/c3/e7/73c3e7cca66a885c53718d8f3688b02c.jpg', }} />
+        <TouchableOpacity
+          style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }}
+          onPress={() => {
+            navigation.navigate('Menu');
+          }}
+        >
+          <SvgUri
+            width="35"
+            height="35"
+            source={{ uri: `https://avatars.dicebear.com/api/human/:${user ? user.fullname : 'random' }.svg` }}
+          />
+          
         </TouchableOpacity>
       ),
-    })
+    });
     fetchTimeline()
     return () => {
       dispatch({
@@ -132,10 +139,6 @@ function Discover({ navigation }) {
         const { data } = await axios({
           url: 'upload',
           method: 'post',
-<<<<<<< HEAD
-          url: 'upload',
-=======
->>>>>>> b95c4359b0c137c874938eb8aa26f3b63d5eada6
           data: formData,
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -147,10 +150,6 @@ function Discover({ navigation }) {
         await axios({
           url: 'timeline',
           method: 'post',
-<<<<<<< HEAD
-          url: 'timeline',
-=======
->>>>>>> b95c4359b0c137c874938eb8aa26f3b63d5eada6
           data: {
             description: payload.description,
             image: uri,
@@ -161,17 +160,10 @@ function Discover({ navigation }) {
           }
         })
       }
-<<<<<<< HEAD
-      fetchTimeline();
-      setImage(null);
-      setFormData(null);
-      setPayload({ description: '', privacy: 'public' });
-=======
       fetchTimeline()
       setImage(null)
       setFormData(null)
       setPayload({ description: '', privacy: 'public' })
->>>>>>> b95c4359b0c137c874938eb8aa26f3b63d5eada6
     } catch (error) {
       console.log(error)
     }
@@ -188,11 +180,6 @@ function Discover({ navigation }) {
     setPayload(value);
   };
 
-<<<<<<< HEAD
-  if (!loaded) return <AppLoading />;
-  if (!user) return <Text>Loading</Text>;
-  console.log(timelines, 'timelines......');
-=======
   const changePage = (id) => {
     navigation.navigate('Comment', {
       id
@@ -202,19 +189,23 @@ function Discover({ navigation }) {
   if (!loaded || !user) return <AppLoading />;
   if (loading) return <AppLoading />;
 
->>>>>>> b95c4359b0c137c874938eb8aa26f3b63d5eada6
   return (
     <SafeAreaView style={styles.bg}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.contentContainer}
-      >
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
         <View style={styles.boxAwal}>
           <View style={styles.row}>
-            <Avatar.Image size={39} style={{ marginTop: 5 }}
+            {/* <Avatar.Image
+              size={39}
+              style={{ marginTop: 5 }}
               source={{
-                uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
+                uri:
+                  'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
               }}
+            /> */}
+            <SvgUri
+              width="55"
+              height="55"
+              source={{ uri: `https://avatars.dicebear.com/api/human/:${user.fullname}.svg` }}
             />
             <View style={styles.boxProfile}>
               <Text style={styles.name}>{user.fullname}</Text>
@@ -230,35 +221,35 @@ function Discover({ navigation }) {
                   containerStyle={{ height: 29, width: '70%', alignSelf: 'flex-start', marginTop: 4 }}
                   style={{ backgroundColor: '#fafafa' }}
                   itemStyle={{
-                    justifyContent: 'flex-start'
+                    justifyContent: 'flex-start',
                   }}
                   dropDownStyle={{ backgroundColor: '#fafafa' }}
                   onChangeItem={(item) => handleInput(item.value, 'privacy')}
                   labelStyle={{
                     fontSize: 13,
                     textAlign: 'left',
-                    color: '#000'
+                    color: '#000',
                   }}
                 />
                 {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
-<<<<<<< HEAD
-                <TouchableOpacity nullleOpacity onPress={pickImage}>
+                <TouchableOpacity onPress={pickImage}>
                   <Text style={styles.addPhotos}>
                     <MaterialIcons name="add-a-photo" size={14} color="#707070" /> Photo
                   </Text>
                 </TouchableOpacity>
-=======
-                <TouchableOpacity onPress={pickImage}><Text style={styles.addPhotos}><MaterialIcons name="add-a-photo" size={14} color="#707070" />  Photo</Text></TouchableOpacity>
->>>>>>> b95c4359b0c137c874938eb8aa26f3b63d5eada6
                 {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
               </View>
             </View>
           </View>
           <View style={styles.boxCard}>
-            {image && <Card style={styles.cardStatus}><Card.Cover source={{ uri: image }} /></Card>}
+            {image && (
+              <Card style={styles.cardStatus}>
+                <Card.Cover source={{ uri: image }} />
+              </Card>
+            )}
             <View style={styles.boxStatus}>
-<<<<<<< HEAD
               <TextInput
+                multiline
                 defaultValue={payload.description}
                 onChangeText={(text) => handleInput(text, 'description')}
                 style={styles.inputStatus}
@@ -268,90 +259,47 @@ function Discover({ navigation }) {
             </View>
           </View>
         </View>
-        {timelines.length > 0
-          ? timelines.map((el, index) => {
-              return (
-                <View key={`timeline${index}`} style={styles.box}>
-                  <View style={styles.hr} />
-                  <View style={styles.row}>
-                    <Avatar.Image
-                      size={39}
-                      source={{
-                        uri:
-                          'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-                      }}
-                    />
-                    <View style={styles.boxProfile}>
-                      <Text style={styles.name}>{el.User.fullname}</Text>
-                      <Text styles={styles.location}>{el.User.Complex.name}</Text>
-                    </View>
-=======
-              <TextInput multiline defaultValue={payload.description} onChangeText={(text) => handleInput(text, 'description')} style={styles.inputStatus} placeholder="What’s on your mind?" placeholderTextColor="white" />
-            </View>
-          </View>
-        </View>
-        {
-          timelines.map((el, index) => {
-            return (
-              <View key={`timeline${index}`} style={styles.box}>
-                <View style={styles.hr} />
-                <View style={styles.row}>
-                  <Avatar.Image size={39}
-                    source={{
-                      uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-                    }}
-                  />
-                  <View style={styles.boxProfile}>
-                    <Text style={styles.name}>{el.User.fullname}</Text>
-                    <Text styles={styles.location}>{el.User.address}</Text>
-                  </View>
-                </View>
-                <View style={styles.hr} />
-                <View style={styles.boxCard}>
-                  <View style={styles.boxText}>
-                    <Text style={styles.status}>{el.description}</Text>
->>>>>>> b95c4359b0c137c874938eb8aa26f3b63d5eada6
-                  </View>
-                  <View style={styles.hr} />
-                  <View style={styles.boxCard}>
-                    <View style={styles.boxText}>
-                      <Text style={styles.status}>{el.description}</Text>
-                    </View>
-                    {el.image !== '' && (
-                      <Card style={styles.card}>
-                        <Card.Cover source={{ uri: el.image }} />
-                      </Card>
-                    )}
+        {timelines.map((el, index) => {
+          return (
+            <View key={`timeline${index}`} style={styles.box}>
+              <View style={styles.hr} />
+              <View style={styles.row}>
 
-<<<<<<< HEAD
-                    <Text style={styles.status}>
-                      <FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}
-                    </Text>
-                  </View>
-                  <View style={styles.hr} />
+                <SvgUri
+                  width="55"
+                  height="55"
+                  source={{ uri: `https://avatars.dicebear.com/api/human/:${el.User.fullname}.svg` }}
+                />
+                <View style={styles.boxProfile}>
+                  <Text style={styles.name}>{el.User.fullname}</Text>
+                  <Text styles={styles.location}>{el.User.address}</Text>
                 </View>
-              );
-            })
-          : null}
+              </View>
+              <View style={styles.hr} />
+              <View style={styles.boxCard}>
+                <View style={styles.boxText}>
+                  <Text style={styles.status}>{el.description}</Text>
+                </View>
+                {el.image && (
+                  <Card style={styles.card}>
+                    <Card.Cover source={{ uri: el.image }} />
+                  </Card>
+                )}
+
+                <TouchableOpacity onPress={() => changePage(el.id)}>
+                  <Text style={styles.status}>
+                    <FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.hr} />
+            </View>
+          );
+        })}
       </ScrollView>
       <BottomNavigator navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
     </SafeAreaView>
   );
-=======
-                  <TouchableOpacity onPress={() => changePage(el.id)}>
-                    <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.hr} />
-              </View>
-            )
-          })
-        }
-      </ScrollView>
-      <BottomNavigator submitHandler={submitHandler}></BottomNavigator>
-    </SafeAreaView >
-  )
->>>>>>> b95c4359b0c137c874938eb8aa26f3b63d5eada6
 }
 
 const styles = StyleSheet.create({

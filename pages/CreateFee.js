@@ -108,7 +108,7 @@ function CreateEvent({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.box}>
-        <View style={{ height: 130, marginTop: 20, marginLeft: 20 }}>
+        {/* <View style={{ height: 130, marginTop: 20, marginLeft: 20 }}>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
             <TouchableOpacity
               style={isFocused ? styles.button1 : styles.button2}
@@ -146,7 +146,7 @@ function CreateEvent({ navigation }) {
               <Text style={isFocused2 ? styles.textBtn1 : styles.textBtn2}>Others</Text>
             </TouchableOpacity>
           </ScrollView>
-        </View>
+        </View> */}
         <Text style={{ alignSelf: 'flex-start', marginLeft: 30, fontWeight: '600', color: '#666E83', marginTop: 20 }}>
           Title
         </Text>

@@ -4,7 +4,6 @@ import { View, Text, StyleSheet, Button } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { axios } from '../helpers/Axios';
 import callServer from '../helpers/callServer';
-import errorHandler from '../helpers/errorHandler';
 import { registerPushNotification } from '../helpers/PushNotification';
 // import { verifyUser } from '../helpers/verify';
 
@@ -80,7 +79,7 @@ export default function Home({ navigation }) {
         navigation.replace('GetStarted');
       }
     } else {
-      navigation.navigate('GetStarted');
+      navigation.replace('GetStarted');
     }
   };
 
