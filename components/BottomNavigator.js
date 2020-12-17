@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Animated, Text, Alert } from 'react-native';
 import { FontAwesome, MaterialIcons, Ionicons, AntDesign } from '@expo/vector-icons';
 
-export default function BottomNavigator(props) {
+export default function BottomNavigator({ navigation, submitHandler }) {
 
 	return (
 		<>
@@ -13,8 +13,8 @@ export default function BottomNavigator(props) {
 					</View>
 				</TouchableWithoutFeedback> */}
 				<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-					<TouchableOpacity onPress={props.submitHandler}>
-						<FontAwesome name="plus" size={30} color="#2FBBF0" style={{marginTop: 10}} />
+					<TouchableOpacity onPress={submitHandler}>
+						<FontAwesome name="plus" size={30} color="#2FBBF0" style={{ marginTop: 10 }} />
 					</TouchableOpacity>
 				</View>
 			</View>
