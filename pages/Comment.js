@@ -11,13 +11,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import callServer from '../helpers/callServer';
 import BottomNavigator from '../components/BottomNavigator'
 import axios from 'axios'
-import {socket} from '../helpers/socket'
+import { socket } from '../helpers/socket'
 
 function Discover({ route, navigation }) {
   const { comments, error, stage, loading } = useSelector((state) => state.reducerComment);
   const dispatch = useDispatch();
   const [user, setUser] = useState(null);
-  const [com, setCom] = useState('')
+  const [com, setCom] = useState([])
   const [state, setState] = useState('')
   const [chat, setChat] = useState([])
   const { id } = route.params
@@ -53,9 +53,10 @@ function Discover({ route, navigation }) {
       fetchComment()
     }
     tes()
+    setCom(comments)
     socket.emit('join', id);
-    
-    socket.on('comment', ({comment}) => {
+
+    socket.on('comment', ({ comment }) => {
       console.log(comment)
       setCom([...com, comment])
     })
@@ -65,7 +66,7 @@ function Discover({ route, navigation }) {
     }
   }, [navigation])
 
-  
+
   const inputHandler = (e) => {
     setState(e)
   }
@@ -82,12 +83,13 @@ function Discover({ route, navigation }) {
     //   }
     // })
     // fetchComment()
-    socket.emit('new comment', {comment: state, id});
+    socket.emit('new comment', { comment: state, id });
     setState('')
   }
 
   if (!loaded) return <AppLoading />;
   if (!stage) return <AppLoading />
+
   return (
     <SafeAreaView style={styles.bg}>
       <ScrollView
