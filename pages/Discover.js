@@ -69,10 +69,11 @@ function Discover({ navigation }) {
   };
 
   useEffect(() => {
-    setLoading(true)
+    let temp
     const opened = (async () => {
       const value = await AsyncStorage.getItem('userlogedin');
       const json = JSON.parse(value);
+      temp = json.id
       setUser(json);
 
       if (Platform.OS !== 'web') {
@@ -91,12 +92,11 @@ function Discover({ navigation }) {
             navigation.navigate('Menu');
           }}
         >
-          <SvgUri
-            width="35"
-            height="35"
-            source={{ uri: `https://avatars.dicebear.com/api/human/:${user ? user.fullname : 'random'}.svg` }}
+          <Avatar.Image size={39}
+            source={{
+              uri: `https://randomuser.me/api/portraits/men/${temp ? temp : null}.jpg`,
+            }}
           />
-
         </TouchableOpacity>
       ),
     })
@@ -139,7 +139,6 @@ function Discover({ navigation }) {
     let uri
     try {
       if (payload.description && formData) {
-        console.log(formData);
         const { data } = await axios({
           url: 'upload',
           method: 'post',
@@ -223,8 +222,7 @@ function Discover({ navigation }) {
   }
 
   if (loading) return <Loading />
-  if (!loaded || !stage) return <AppLoading />;
-
+  if (!loaded || !stage || !user) return <AppLoading />;
   return (
     <SafeAreaView style={styles.bg}>
       <View style={styles.bg1}>
@@ -235,10 +233,10 @@ function Discover({ navigation }) {
         >
           <View style={styles.boxAwal}>
             <View style={styles.row}>
-              <SvgUri
-                width="55"
-                height="55"
-                source={{ uri: `https://avatars.dicebear.com/api/human/:${user.fullname}.svg` }}
+              <Avatar.Image size={39} style={{ marginTop: 5 }}
+                source={{
+                  uri: `https://randomuser.me/api/portraits/men/${user.id}.jpg`,
+                }}
               />
               <View style={styles.boxProfile}>
                 <Text style={styles.name}>{user.fullname}</Text>
@@ -284,10 +282,10 @@ function Discover({ navigation }) {
                   <View key={`timeline${index}`} style={styles.box}>
                     <View style={styles.hr} />
                     <View style={styles.row}>
-                      <SvgUri
-                        width="55"
-                        height="55"
-                        source={{ uri: `https://avatars.dicebear.com/api/human/:${el.User.fullname}.svg` }}
+                      <Avatar.Image size={39} style={{ marginTop: 5 }}
+                        source={{
+                          uri: `https://randomuser.me/api/portraits/men/${el.UserId}.jpg`,
+                        }}
                       />
                       <View style={styles.boxProfile}>
 

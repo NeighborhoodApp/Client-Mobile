@@ -31,10 +31,10 @@ export default function callServer(option) {
       console.log('wxios fetch call server', payloadAxios);
       dispatch({ type: option.type + '_LOADING', payload: true });
       const { data } = await axios(payloadAxios);
-      console.log('from server', data);
+      // console.log('from server', data);
       // console.log(option);
       // console.log('from server', data);
-      console.log(option);
+      // console.log(option);
       dispatch({
         type: option.type,
         stage: option.stage || null,

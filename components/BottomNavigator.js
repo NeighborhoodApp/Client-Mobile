@@ -4,7 +4,7 @@ import { FontAwesome, MaterialIcons, Ionicons, AntDesign } from '@expo/vector-ic
 
 export default function BottomNavigator({ currentPage, navigation, submitHandler }) {
   const getColor = (page) => {
-    let color = '#00000';
+    let color = 'black';
     if (currentPage === page) {
       return '#2FBBF0';
     }
