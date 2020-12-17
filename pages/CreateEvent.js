@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     marginTop: 5,
-    color: '#000',
+    color: 'black',
   },
   button2: {
     height: 110,

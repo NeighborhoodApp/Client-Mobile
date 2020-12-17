@@ -24,7 +24,7 @@ const defaultVal = {
 }
 
 function Tetonggo({ navigation }) {
-  const { timelines, error, stage, loading } = useSelector((state) => state.reducerTimeline);
+  const { users, error, stage, loading } = useSelector((state) => state.reducerUser);
   const [user, setUser] = useState(null);
   const [selectedValue, setSelectedValue] = useState("public");
   const [payload, setPayload] = useState(defaultVal);
@@ -38,18 +38,18 @@ function Tetonggo({ navigation }) {
   
   const [image, setImage] = useState(null);
 
-  const fetchTimeline = () => {
-    const option = {
-      url: 'timeline',
-      stage: 'getTimelines',
-      method: 'get',
-      body: null,
-      headers: true,
-      type: 'SET_TIMELINES',
-    };
-    dispatch(callServer(option));
-  };
-
+  // const fetchTimeline = () => {
+  //   const option = {
+  //     url: 'timeline',
+  //     stage: 'getTimelines',
+  //     method: 'get',
+  //     body: null,
+  //     headers: true,
+  //     type: 'SET_TIMELINES',
+  //   };
+  //   dispatch(callServer(option));
+  // };
+  console.log(users)
   useEffect(() => {
     (async () => {
       const value = await AsyncStorage.getItem('userlogedin');
@@ -81,7 +81,7 @@ function Tetonggo({ navigation }) {
         </TouchableOpacity>
       ),
     });
-    fetchTimeline()
+    // fetchTimeline()
     return () => {
       dispatch({
         type: 'UNMOUNT_TIMELINES'
