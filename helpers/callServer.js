@@ -30,6 +30,9 @@ export default function callServer(option) {
       const { data } = await axios(payloadAxios);
       console.log('from server', data);
       // console.log(option);
+      // console.log('from server', data);
+
+      console.log(option);
       dispatch({
         type: option.type,
         stage: option.stage || null,
