@@ -1,10 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import React, { useEffect }  from 'react'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity} from 'react-native'
 import { Avatar } from 'react-native-paper';
-import { useFonts, Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
-import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat';
-import { FontAwesome, Fontisto, Feather, Entypo, FontAwesome5, AntDesign } from '@expo/vector-icons';
+import { useFonts, Ubuntu_300Light,Ubuntu_500Medium } from '@expo-google-fonts/ubuntu'
+import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat'
+import { FontAwesome, Fontisto, Feather, Entypo, FontAwesome5, AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
+import { useDispatch, useSelector } from 'react-redux';
+import callServer from '../helpers/callServer'
 
 function Profile({ navigation }) {
   const [loaded] = useFonts({

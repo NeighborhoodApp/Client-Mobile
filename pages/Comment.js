@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native'
 import { Avatar } from 'react-native-paper';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { Card } from 'react-native-paper';
@@ -12,13 +11,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import callServer from '../helpers/callServer';
 import BottomNavigator from '../components/BottomNavigator'
 import axios from 'axios'
+import { socket } from '../helpers/socket'
 
 function Discover({ route, navigation }) {
-  const [socket, setSocket] = useState()
   const { comments, error, stage, loading } = useSelector((state) => state.reducerComment);
   const dispatch = useDispatch();
   const [user, setUser] = useState(null);
-  const [com, setCom] = useState('')
+  const [com, setCom] = useState([])
   const [state, setState] = useState('')
   const [chat, setChat] = useState([])
   const { id } = route.params
@@ -53,33 +52,44 @@ function Discover({ route, navigation }) {
       })
       fetchComment()
     }
-
     tes()
+    setCom(comments)
+    socket.emit('join', id);
+
+    socket.on('comment', ({ comment }) => {
+      console.log(comment)
+      setCom([...com, comment])
+    })
     return () => {
+      socket.emit('dc', id)
       console.log('out')
     }
   }, [navigation])
+
 
   const inputHandler = (e) => {
     setState(e)
   }
 
   const submitHandler = async () => {
-    await axios({
-      method: 'post',
-      url: `http://192.168.1.12:3000/comment/${id}`,
-      data: {
-        comment: state
-      },
-      headers: {
-        access_token: user.access_token
-      }
-    })
+    // await axios({
+    //   method: 'post',
+    //   url: `http://192.168.1.12:3000/comment/${id}`,
+    //   data: {
+    //     comment: state
+    //   },
+    //   headers: {
+    //     access_token: user.access_token
+    //   }
+    // })
+    // fetchComment()
+    socket.emit('new comment', { comment: state, id });
     setState('')
   }
 
   if (!loaded) return <AppLoading />;
-  if (loading) return <AppLoading />
+  if (!stage) return <AppLoading />
+
   return (
     <SafeAreaView style={styles.bg}>
       <ScrollView
