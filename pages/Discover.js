@@ -26,6 +26,7 @@ const defaultVal = {
   privacy: 'public',
 }
 
+const hasLoaded = false;
 function Discover({ navigation }) {
   const { timelines, error, stage, loading } = useSelector((state) => state.reducerTimeline);
   const [user, setUser] = useState(null);
@@ -103,6 +104,10 @@ function Discover({ navigation }) {
       })
     }
   }, [navigation])
+
+  useEffect(() => {
+    fetchTimeline();
+  }, [navigation]);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
