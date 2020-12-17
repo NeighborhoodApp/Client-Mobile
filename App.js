@@ -3,7 +3,19 @@ import React from 'react';
 import { Text, Image, TouchableOpacity, StyleSheet, Button, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { Home, GetStarted, JoinUs, Login, Waiting, Discover, Profile, Verification, Menu, PickLocation } from './pages';
+import {
+  Home,
+  GetStarted,
+  JoinUs,
+  Login,
+  Waiting,
+  Discover,
+  Profile,
+  Verification,
+  Menu,
+  PickLocation,
+  Comment,
+} from './pages';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Avatar } from 'react-native-paper';
 import { Provider } from 'react-redux';
@@ -53,7 +65,49 @@ export default function App() {
           <Stack.Screen name="JoinUs" component={JoinUs} options={{ headerShown: false }} />
           <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
           <Stack.Screen name="Waiting" component={Waiting} options={{ headerShown: false }} />
-          <Stack.Screen name="Discover" component={Discover} />
+          <Stack.Screen
+            name="Discover"
+            component={Discover}
+            options={{
+              headerTitle: () => (
+                <View style={styles.discoverRow}>
+                  <Text style={styles.title}>Discover</Text>
+                  <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
+                </View>
+              ),
+              headerLeft: null,
+              headerStyle: {
+                backgroundColor: '#161C2B',
+                height: 100,
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                alignSelf: 'center',
+                color: '#fff',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="Comment"
+            component={Comment}
+            options={{
+              headerTitle: () => (
+                <View style={styles.discoverRow}>
+                  <Text style={styles.title}>Comment</Text>
+                  <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
+                </View>
+              ),
+              headerStyle: {
+                backgroundColor: '#161C2B',
+                height: 100,
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                alignSelf: 'center',
+                color: '#fff',
+              },
+            }}
+          />
           <Stack.Screen
             name="Profile"
             component={Profile}

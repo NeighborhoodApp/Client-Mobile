@@ -25,7 +25,7 @@ const defaultVal = {
 };
 
 function Discover({ navigation }) {
-  const { timelines, error, stage } = useSelector((state) => state.reducerTimeline);
+  const { timelines, error, stage, loading } = useSelector((state) => state.reducerTimeline);
   const [user, setUser] = useState(null);
   const [selectedValue, setSelectedValue] = useState('public');
   const [payload, setPayload] = useState(defaultVal);
@@ -151,10 +151,17 @@ function Discover({ navigation }) {
           },
         });
       }
+<<<<<<< HEAD
       fetchTimeline();
       setImage(null);
       setFormData(null);
       setPayload({ description: '', privacy: 'public' });
+=======
+      fetchTimeline()
+      setImage(null)
+      setFormData(null)
+      setPayload({ description: '', privacy: 'public' })
+>>>>>>> 033c30818712b74ec604b80443afb0800656deaa
     } catch (error) {
       console.log(error);
     }
@@ -171,8 +178,19 @@ function Discover({ navigation }) {
     setPayload(value);
   };
 
+<<<<<<< HEAD
   if (!loaded) return <AppLoading />;
   if (!timelines.length || !user) return <Text>Loading</Text>;
+=======
+  const changePage = (id) => {
+    navigation.navigate('Comment', {
+      id
+    })
+  }
+
+  if (!loaded || !user) return <AppLoading />;
+  if (loading) return <AppLoading />;
+>>>>>>> 033c30818712b74ec604b80443afb0800656deaa
 
   return (
     <SafeAreaView style={styles.bg}>
@@ -189,6 +207,8 @@ function Discover({ navigation }) {
             />
             <View style={styles.boxProfile}>
               <Text style={styles.name}>{user.fullname}</Text>
+              <Text style={styles.location}>{user.address}</Text>
+
               <View style={{ flexDirection: 'row', width: '60%' }}>
                 <DropDownPicker
                   items={[
@@ -226,6 +246,7 @@ function Discover({ navigation }) {
               </Card>
             )}
             <View style={styles.boxStatus}>
+<<<<<<< HEAD
               <TextInput
                 defaultValue={payload.description}
                 onChangeText={(text) => handleInput(text, 'description')}
@@ -257,6 +278,43 @@ function Discover({ navigation }) {
               <View style={styles.boxCard}>
                 <View style={styles.boxText}>
                   <Text style={styles.status}>{el.description}</Text>
+=======
+              <TextInput multiline defaultValue={payload.description} onChangeText={(text) => handleInput(text, 'description')} style={styles.inputStatus} placeholder="What’s on your mind?" placeholderTextColor="white" />
+            </View>
+          </View>
+        </View>
+        {
+          timelines.map((el, index) => {
+            return (
+              <View key={`timeline${index}`} style={styles.box}>
+                <View style={styles.hr} />
+                <View style={styles.row}>
+                  <Avatar.Image size={39}
+                    source={{
+                      uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
+                    }}
+                  />
+                  <View style={styles.boxProfile}>
+                    <Text style={styles.name}>{el.User.fullname}</Text>
+                    <Text styles={styles.location}>{el.User.address}</Text>
+                  </View>
+                </View>
+                <View style={styles.hr} />
+                <View style={styles.boxCard}>
+                  <View style={styles.boxText}>
+                    <Text style={styles.status}>{el.description}</Text>
+                  </View>
+                  {
+                    el.image !== '' &&
+                    <Card style={styles.card}>
+                      <Card.Cover source={{ uri: el.image }} />
+                    </Card>
+                  }
+
+                  <TouchableOpacity onPress={() => changePage(el.id)}>
+                    <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}</Text>
+                  </TouchableOpacity>
+>>>>>>> 033c30818712b74ec604b80443afb0800656deaa
                 </View>
                 {el.image !== '' && (
                   <Card style={styles.card}>
@@ -388,7 +446,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   inputStatus: {
-    width: '100%',
+    width: '90%',
     marginTop: 15,
     marginBottom: 15,
     fontSize: 18,

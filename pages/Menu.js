@@ -33,7 +33,7 @@ function Menu({ navigation }) {
             <FontAwesome style={{ marginLeft: '8.5%' }} name="user" size={23} color="#2C6FC7" />
             <Text style={styles.menu}> Profile </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('Verification')}>
+          <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.replace('Verification')}>
             <FontAwesome5 style={styles.icon} name="house-user" size={20} color="#2C6FC7" />
             <Text style={styles.menu}> Verifications </Text>
           </TouchableOpacity>
