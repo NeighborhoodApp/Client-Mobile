@@ -1,9 +1,10 @@
+
 import React, { useEffect, useState } from 'react';
 
-import { View, Text, StyleSheet, Picker, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Picker, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native'
 import { Avatar } from 'react-native-paper';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
+import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
 import AppLoading from 'expo-app-loading';
 
 // import { registerPushNotification } from '../helpers/PushNotification';
@@ -12,33 +13,32 @@ import AppLoading from 'expo-app-loading';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { Card } from 'react-native-paper';
 import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
-import BottomNavigator from '../components/BottomNavigator';
+import BottomNavigator from '../components/BottomNavigator'
 import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import {axios} from '../helpers/Axios'
 
 const defaultVal = {
   description: '',
   privacy: 'public',
-};
+}
 
 function Discover({ navigation }) {
   const { timelines, error, stage, loading } = useSelector((state) => state.reducerTimeline);
   const [user, setUser] = useState(null);
-  const [selectedValue, setSelectedValue] = useState('public');
+  const [selectedValue, setSelectedValue] = useState("public");
   const [payload, setPayload] = useState(defaultVal);
   const [formData, setFormData] = useState(null);
   const dispatch = useDispatch();
 
   let [loaded] = useFonts({
-    Poppins_600SemiBold,
-    Ubuntu_300Light,
+    Poppins_600SemiBold, Ubuntu_300Light
   });
-
-  //   const [selectedValue, setSelectedValue] = useState('public');
-  //   const [expoPushToken, setExpoPushToken] = useState('');
+  
+//   const [selectedValue, setSelectedValue] = useState('public');
+//   const [expoPushToken, setExpoPushToken] = useState('');
 
   // useEffect(() => {
   //   registerPushNotification().then((token) => setExpoPushToken(token));
@@ -47,8 +47,10 @@ function Discover({ navigation }) {
   // useEffect(() => {
   //   verifyUser(expoPushToken);
   // }, [expoPushToken]);
-
+  
   const [image, setImage] = useState(null);
+
+  // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
 
   const fetchTimeline = () => {
     const option = {
@@ -78,21 +80,18 @@ function Discover({ navigation }) {
 
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
-          style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }}
-          onPress={() => {
-            navigation.navigate('Menu');
-          }}
-        >
-          <Avatar.Image
-            size={48}
-            source={{ uri: 'https://i.pinimg.com/474x/73/c3/e7/73c3e7cca66a885c53718d8f3688b02c.jpg' }}
-          />
+        <TouchableOpacity style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }} onPress={() => { navigation.navigate('Menu') }}>
+          <Avatar.Image size={48} source={{ uri: 'https://i.pinimg.com/474x/73/c3/e7/73c3e7cca66a885c53718d8f3688b02c.jpg', }} />
         </TouchableOpacity>
       ),
-    });
-    fetchTimeline();
-  }, [navigation]);
+    })
+    fetchTimeline()
+    return () => {
+      dispatch({
+        type: 'UNMOUNT_TIMELINES'
+      })
+    }
+  }, [navigation])
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -111,58 +110,57 @@ function Discover({ navigation }) {
       let match = /\.(\w+)$/.exec(filename);
       let type = match ? `image/${match[1]}` : `image`;
 
-      const data = new FormData();
+      const data = new FormData()
       data.append('file', { uri: localUri, name: filename, type });
 
-      data.append('file', result.uri);
+      data.append('file', result.uri)
 
-      setFormData(data);
+      setFormData(data)
     }
   };
 
   const submitHandler = async () => {
     console.log('press');
-    let uri;
+    let uri
     try {
       if (payload.description && formData) {
         console.log(formData);
         const { data } = await axios({
+          url: 'upload',
           method: 'post',
-          url: 'http://192.168.1.12:3000/upload',
           data: formData,
           headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        uri = data;
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        uri = data
       }
-
       if (payload.description) {
         await axios({
+          url: 'timeline',
           method: 'post',
-          url: 'http://192.168.1.12:3000/timeline',
           data: {
             description: payload.description,
             image: uri,
-            privacy: payload.privacy,
+            privacy: payload.privacy
           },
           headers: {
-            access_token: user.access_token,
-          },
-        });
+            access_token: user.access_token
+          }
+        })
       }
-      fetchTimeline();
-      setImage(null);
-      setFormData(null);
-      setPayload({ description: '', privacy: 'public' });
+      fetchTimeline()
+      setImage(null)
+      setFormData(null)
+      setPayload({ description: '', privacy: 'public' })
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   const handleInput = (text, name) => {
     if (name === 'privacy' && !text) {
-      text = 'public';
+      text = 'public'
     }
     const value = {
       ...payload,
@@ -173,24 +171,24 @@ function Discover({ navigation }) {
 
   const changePage = (id) => {
     navigation.navigate('Comment', {
-      id,
-    });
-  };
+      id
+    })
+  }
 
   if (!loaded || !user) return <AppLoading />;
   if (loading) return <AppLoading />;
 
   return (
     <SafeAreaView style={styles.bg}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.contentContainer}
+      >
         <View style={styles.boxAwal}>
           <View style={styles.row}>
-            <Avatar.Image
-              size={39}
-              style={{ marginTop: 5 }}
+            <Avatar.Image size={39} style={{ marginTop: 5 }}
               source={{
-                uri:
-                  'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
+                uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
               }}
             />
             <View style={styles.boxProfile}>
@@ -207,83 +205,70 @@ function Discover({ navigation }) {
                   containerStyle={{ height: 29, width: '70%', alignSelf: 'flex-start', marginTop: 4 }}
                   style={{ backgroundColor: '#fafafa' }}
                   itemStyle={{
-                    justifyContent: 'flex-start',
+                    justifyContent: 'flex-start'
                   }}
                   dropDownStyle={{ backgroundColor: '#fafafa' }}
                   onChangeItem={(item) => handleInput(item.value, 'privacy')}
                   labelStyle={{
                     fontSize: 13,
                     textAlign: 'left',
-                    color: '#000',
+                    color: '#000'
                   }}
                 />
                 {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
-                <TouchableOpacity onPress={pickImage}>
-                  <Text style={styles.addPhotos}>
-                    <MaterialIcons name="add-a-photo" size={14} color="#707070" /> Photo
-                  </Text>
-                </TouchableOpacity>
+                <TouchableOpacity onPress={pickImage}><Text style={styles.addPhotos}><MaterialIcons name="add-a-photo" size={14} color="#707070" />  Photo</Text></TouchableOpacity>
                 {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
               </View>
             </View>
           </View>
           <View style={styles.boxCard}>
-            {image && (
-              <Card style={styles.cardStatus}>
-                <Card.Cover source={{ uri: image }} />
-              </Card>
-            )}
+            {image && <Card style={styles.cardStatus}><Card.Cover source={{ uri: image }} /></Card>}
             <View style={styles.boxStatus}>
-              <TextInput
-                defaultValue={payload.description}
-                onChangeText={(text) => handleInput(text, 'description')}
-                style={styles.inputStatus}
-                placeholder="What’s on your mind?"
-                placeholderTextColor="white"
-              />
+              <TextInput multiline defaultValue={payload.description} onChangeText={(text) => handleInput(text, 'description')} style={styles.inputStatus} placeholder="What’s on your mind?" placeholderTextColor="white" />
             </View>
           </View>
         </View>
-        {timelines.map((el, index) => {
-          return (
-            <View key={`timeline${index}`} style={styles.box}>
-              <View style={styles.hr} />
-              <View style={styles.row}>
-                <Avatar.Image
-                  size={39}
-                  source={{
-                    uri:
-                      'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-                  }}
-                />
-                <View style={styles.boxProfile}>
-                  <Text style={styles.name}>{el.User.fullname}</Text>
-                  <Text styles={styles.location}>{el.User.Complex.name}</Text>
+        {
+          timelines.map((el, index) => {
+            return (
+              <View key={`timeline${index}`} style={styles.box}>
+                <View style={styles.hr} />
+                <View style={styles.row}>
+                  <Avatar.Image size={39}
+                    source={{
+                      uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
+                    }}
+                  />
+                  <View style={styles.boxProfile}>
+                    <Text style={styles.name}>{el.User.fullname}</Text>
+                    <Text styles={styles.location}>{el.User.address}</Text>
+                  </View>
                 </View>
-              </View>
-              <View style={styles.hr} />
-              <View style={styles.boxCard}>
-                <View style={styles.boxText}>
-                  <Text style={styles.status}>{el.description}</Text>
-                </View>
-                {el.image !== '' && (
-                  <Card style={styles.card}>
-                    <Card.Cover source={{ uri: el.image }} />
-                  </Card>
-                )}
+                <View style={styles.hr} />
+                <View style={styles.boxCard}>
+                  <View style={styles.boxText}>
+                    <Text style={styles.status}>{el.description}</Text>
+                  </View>
+                  {
+                    el.image !== '' &&
+                    <Card style={styles.card}>
+                      <Card.Cover source={{ uri: el.image }} />
+                    </Card>
+                  }
 
-                <Text style={styles.status}>
-                  <FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}
-                </Text>
+                  <TouchableOpacity onPress={() => changePage(el.id)}>
+                    <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.hr} />
               </View>
-              <View style={styles.hr} />
-            </View>
-          );
-        })}
+            )
+          })
+        }
       </ScrollView>
       <BottomNavigator submitHandler={submitHandler}></BottomNavigator>
-    </SafeAreaView>
-  );
+    </SafeAreaView >
+  )
 }
 
 const styles = StyleSheet.create({
@@ -292,7 +277,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#161C2B',
     width: '100%',
     height: '100%',
-    top: 0,
+    top: 0
   },
   paragraph: {
     margin: 24,
@@ -318,7 +303,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   col: {
     position: 'absolute',
@@ -331,18 +316,18 @@ const styles = StyleSheet.create({
     width: '100%',
     marginLeft: '15%',
     marginTop: 30,
-    marginBottom: 20,
+    marginBottom: 20
   },
   box: {
     flexDirection: 'column',
     width: '100%',
     marginLeft: '15%',
-    marginTop: 5,
+    marginTop: 5
   },
   row: {
     flexDirection: 'row',
     marginTop: '1%',
-    marginBottom: '1%',
+    marginBottom: '1%'
   },
   boxProfile: {
     flexDirection: 'column',
@@ -357,13 +342,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_600SemiBold',
     fontSize: 14,
     marginBottom: 1,
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   status: {
     fontFamily: 'Poppins_600SemiBold',
     fontSize: 15,
     marginTop: 12,
-    marginBottom: 8,
+    marginBottom: 8
   },
   inputText: {
     width: '100%',
@@ -393,7 +378,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.25,
     width: '86%',
     marginBottom: 8,
-    marginTop: 5,
+    marginTop: 5
   },
   inputStatus: {
     width: '90%',
@@ -401,13 +386,13 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontSize: 18,
     color: 'white',
-    marginLeft: 15,
+    marginLeft: 15
   },
   boxStatus: {
     width: '96%',
     backgroundColor: '#161C2B',
     borderRadius: 10,
-    borderWidth: 0.5,
+    borderWidth: 0.5
   },
   cardStatus: {
     zIndex: -999,
@@ -417,19 +402,14 @@ const styles = StyleSheet.create({
   },
   addPhotos: {
     fontFamily: 'Ubuntu_300Light',
-    fontSize: 13,
-    marginTop: 3,
-    fontWeight: 'bold',
-    marginLeft: 10,
-    justifyContent: 'center',
-    borderWidth: 0.5,
-    padding: 5,
-    paddingHorizontal: 13,
-    height: 29,
-    backgroundColor: '#FAFAFA',
-    borderColor: '#E3E3E3',
-    borderRadius: 5,
-  },
+    fontSize: 13, marginTop: 3,
+    fontWeight: 'bold', marginLeft: 10,
+    justifyContent: "center", borderWidth: 0.5,
+    padding: 5, paddingHorizontal: 13, height: 29,
+    backgroundColor: '#FAFAFA', borderColor: '#E3E3E3',
+    borderRadius: 5
+  }
 });
 
-export default Discover;
+
+export default Discover
