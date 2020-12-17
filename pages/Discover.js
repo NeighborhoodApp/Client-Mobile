@@ -38,7 +38,6 @@ function Discover({ navigation }) {
     Poppins_600SemiBold, Ubuntu_300Light
   });
 
-
   // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
 
   const fetchTimeline = () => {

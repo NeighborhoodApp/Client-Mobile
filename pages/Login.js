@@ -7,6 +7,8 @@ import { Fontisto, Feather } from '@expo/vector-icons';
 import errorHandler from '../helpers/errorHandler';
 import { axios } from '../helpers/Axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import callServer from '../helpers/callServer';
+import { useDispatch } from 'react-redux';
 
   const defaultVal = {
     email: '',
@@ -22,6 +24,8 @@ function Login({ navigation }) {
     Montserrat_600SemiBold,
     Ubuntu_500Medium,
   });
+
+  const dispatch = useDispatch();
 
   const toJoin = () => {
     navigation.replace('JoinUs');
@@ -48,6 +52,17 @@ function Login({ navigation }) {
 
           const newName = data.fullname.split('#');
           data.fullname = newName[0];
+
+          const option = {
+            url: 'users',
+            stage: 'getRealEstates',
+            method: 'get',
+            body: null,
+            headers: true, // true
+            type: 'SET_USERS',
+          };
+          // console.log(data, 'data login ..........');
+          dispatch(callServer(option));
           const jsonValue = JSON.stringify(data);
           await AsyncStorage.setItem('userlogedin', jsonValue);
         }

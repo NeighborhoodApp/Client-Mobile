@@ -20,9 +20,10 @@ export default function callServer(option) {
       if (option.headers) {
         const value = await AsyncStorage.getItem('userlogedin');
         const json = JSON.parse(value);
+        console.log('jsoonnn server ....', json, option.stage);
         payloadAxios['headers'] = {
           access_token: json.access_token,
-          coordinate: json.coordinate
+          coordinate: json.coordinate,
         };
       }
       // console.log('wxios fetch call server', payloadAxios);

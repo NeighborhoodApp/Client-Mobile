@@ -1,7 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
+import { useDispatch } from 'react-redux';
 import { axios } from '../helpers/Axios';
+import callServer from '../helpers/callServer';
 import errorHandler from '../helpers/errorHandler';
 import { registerPushNotification } from '../helpers/PushNotification';
 // import { verifyUser } from '../helpers/verify';
@@ -9,13 +11,24 @@ import { registerPushNotification } from '../helpers/PushNotification';
 let json = null;
 export default function Home({ navigation }) {
   const [expoPushToken, setExpoPushToken] = useState('');
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const preload = async () => {
-      const value = await AsyncStorage.getItem('userlogedin');
+      // const value = await AsyncStorage.getItem('userlogedin');
+      const value = await AsyncStorage.removeItem('userlogedin');
       json = JSON.parse(value);
       if (value) {
         const token = await registerPushNotification();
+        const option = {
+          url: 'users',
+          stage: 'getRealEstates',
+          method: 'get',
+          body: null,
+          headers: true, // true
+          type: 'SET_USERS',
+        };
+        dispatch(callServer(option));
         await verifyUser(token);
         setExpoPushToken(token);
       }
