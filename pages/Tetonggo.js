@@ -9,9 +9,6 @@ import AppLoading from 'expo-app-loading';
 
 // import { registerPushNotification } from '../helpers/PushNotification';
 // import { verifyUser } from '../helpers/verify';
-
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
-import { Card } from 'react-native-paper';
 import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
 import BottomNavigator from '../components/BottomNavigator'
 import * as ImagePicker from 'expo-image-picker';
@@ -26,7 +23,7 @@ const defaultVal = {
   privacy: 'public',
 }
 
-function Discover({ navigation }) {
+function Tetonggo({ navigation }) {
   const { timelines, error, stage, loading } = useSelector((state) => state.reducerTimeline);
   const [user, setUser] = useState(null);
   const [selectedValue, setSelectedValue] = useState("public");
@@ -35,23 +32,11 @@ function Discover({ navigation }) {
   const dispatch = useDispatch();
 
   let [loaded] = useFonts({
-    Poppins_600SemiBold, Ubuntu_300Light
+    Poppins_600SemiBold,
+    Ubuntu_300Light,
   });
   
-//   const [selectedValue, setSelectedValue] = useState('public');
-//   const [expoPushToken, setExpoPushToken] = useState('');
-
-  // useEffect(() => {
-  //   registerPushNotification().then((token) => setExpoPushToken(token));
-  // }, []);
-
-  // useEffect(() => {
-  //   verifyUser(expoPushToken);
-  // }, [expoPushToken]);
-  
   const [image, setImage] = useState(null);
-
-  // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
 
   const fetchTimeline = () => {
     const option = {
@@ -104,32 +89,6 @@ function Discover({ navigation }) {
     }
   }, [navigation])
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.cancelled) {
-      setImage(result.uri);
-      let localUri = result.uri;
-      let filename = localUri.split('/').pop();
-
-      // Infer the type of the image
-      let match = /\.(\w+)$/.exec(filename);
-      let type = match ? `image/${match[1]}` : `image`;
-
-      const data = new FormData()
-      data.append('file', { uri: localUri, name: filename, type });
-
-      data.append('file', result.uri)
-
-      setFormData(data)
-    }
-  };
-
   const submitHandler = async () => {
     console.log('press');
     let uri
@@ -169,135 +128,58 @@ function Discover({ navigation }) {
     }
   }
 
-  const handleInput = (text, name) => {
-    if (name === 'privacy' && !text) {
-      text = 'public'
-    }
-    const value = {
-      ...payload,
-      [name]: text,
-    };
-    setPayload(value);
-  };
-
   const changePage = (id) => {
     navigation.navigate('Comment', {
       id
     })
   }
 
-  if (!loaded || !user) return <AppLoading />;
-  if (loading) return <AppLoading />;
+  const data = [
+      {
+        fullname: 'Riyan',
+        address: 'Palembang',
+      },
+      {
+        fullname: 'Moulia',
+        address: 'Palembang',
+      },
+      {
+        fullname: 'Ahmad',
+        address: 'Palembang',
+      },
+      {
+        fullname: 'Habibi',
+        address: 'Palembang',
+      },
+  ];
+  if (!loaded) return <AppLoading />;
+  // if (loading) return <AppLoading />;
 
   return (
     <SafeAreaView style={styles.bg}>
+      <View style={styles.border}></View>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.boxAwal}>
-          <View style={styles.row}>
-            {/* <Avatar.Image
-              size={39}
-              style={{ marginTop: 5 }}
-              source={{
-                uri:
-                  'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-              }}
-            /> */}
-            <SvgUri
-              width="55"
-              height="55"
-              source={{ uri: `https://avatars.dicebear.com/api/human/:${user.fullname}.svg` }}
-            />
-            <View style={styles.boxProfile}>
-              <Text style={styles.name}>{user.fullname}</Text>
-              <Text style={styles.location}>{user.address}</Text>
-
-              <View style={{ flexDirection: 'row', width: '60%' }}>
-                <DropDownPicker
-                  items={[
-                    { label: 'Public', value: 'public', hidden: true },
-                    { label: 'Tetonggo', value: 'member' },
-                  ]}
-                  defaultValue={selectedValue}
-                  containerStyle={{ height: 29, width: '70%', alignSelf: 'flex-start', marginTop: 4 }}
-                  style={{ backgroundColor: '#fafafa' }}
-                  itemStyle={{
-                    justifyContent: 'flex-start',
-                  }}
-                  dropDownStyle={{ backgroundColor: '#fafafa' }}
-                  onChangeItem={(item) => handleInput(item.value, 'privacy')}
-                  labelStyle={{
-                    fontSize: 13,
-                    textAlign: 'left',
-                    color: '#000',
-                  }}
-                />
-                {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
-                <TouchableOpacity onPress={pickImage}>
-                  <Text style={styles.addPhotos}>
-                    <MaterialIcons name="add-a-photo" size={14} color="#707070" /> Photo
-                  </Text>
-                </TouchableOpacity>
-                {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
-              </View>
-            </View>
-          </View>
-          <View style={styles.boxCard}>
-            {image && (
-              <Card style={styles.cardStatus}>
-                <Card.Cover source={{ uri: image }} />
-              </Card>
-            )}
-            <View style={styles.boxStatus}>
-              <TextInput
-                multiline
-                defaultValue={payload.description}
-                onChangeText={(text) => handleInput(text, 'description')}
-                style={styles.inputStatus}
-                placeholder="What’s on your mind?"
-                placeholderTextColor="white"
-              />
-            </View>
-          </View>
-        </View>
-        {timelines.map((el, index) => {
+        <Text style={styles.account}>Account</Text>
+        {data.map((el, index) => {
           return (
             <View key={`timeline${index}`} style={styles.box}>
-              <View style={styles.hr} />
               <View style={styles.row}>
-
                 <SvgUri
                   width="55"
                   height="55"
-                  source={{ uri: `https://avatars.dicebear.com/api/human/:${el.User.fullname}.svg` }}
+                  source={{ uri: `https://avatars.dicebear.com/api/human/:${el.fullname}.svg` }}
                 />
                 <View style={styles.boxProfile}>
-                  <Text style={styles.name}>{el.User.fullname}</Text>
-                  <Text styles={styles.location}>{el.User.address}</Text>
+                  <Text style={styles.name}>{el.fullname}</Text>
+                  <Text styles={styles.location}>{el.address}</Text>
                 </View>
-              </View>
-              <View style={styles.hr} />
-              <View style={styles.boxCard}>
-                <View style={styles.boxText}>
-                  <Text style={styles.status}>{el.description}</Text>
-                </View>
-                {el.image && (
-                  <Card style={styles.card}>
-                    <Card.Cover source={{ uri: el.image }} />
-                  </Card>
-                )}
-
-                <TouchableOpacity onPress={() => changePage(el.id)}>
-                  <Text style={styles.status}>
-                    <FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}
-                  </Text>
-                </TouchableOpacity>
               </View>
               <View style={styles.hr} />
             </View>
           );
         })}
       </ScrollView>
-      <BottomNavigator navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
+      <BottomNavigator currentPage={'Tetonggo'} navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
     </SafeAreaView>
   );
 }
@@ -305,10 +187,17 @@ function Discover({ navigation }) {
 const styles = StyleSheet.create({
   bg: {
     position: 'absolute',
-    backgroundColor: '#161C2B',
+    backgroundColor: '#fff',
     width: '100%',
     height: '100%',
-    top: 0
+    top: 0,
+  },
+  border: {
+    position: 'absolute',
+    backgroundColor: '#161C2B',
+    width: '100%',
+    height: '10%',
+    top: 0,
   },
   paragraph: {
     margin: 24,
@@ -320,6 +209,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: '100%',
     height: '100%',
+    marginTop: 10,
   },
   contentContainer: {
     justifyContent: 'center',
@@ -332,9 +222,22 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#FAFAFA',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    borderTopRightRadius: 35,
+    borderTopLeftRadius: 35,
+    marginTop: -20,
+  },
+  account: {
+    fontFamily: 'Poppins_600SemiBold',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    position: 'relative',
+    marginTop: 20,
+    marginLeft: 40,
+    alignSelf: 'flex-start',
   },
   col: {
     position: 'absolute',
@@ -346,19 +249,21 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     width: '100%',
     marginLeft: '15%',
-    marginTop: 30,
-    marginBottom: 20
+    marginTop: 50,
+
+    fontSize: 25,
+    marginBottom: 20,
   },
   box: {
     flexDirection: 'column',
     width: '100%',
     marginLeft: '15%',
-    marginTop: 5
+    marginTop: 5,
   },
   row: {
     flexDirection: 'row',
     marginTop: '1%',
-    marginBottom: '1%'
+    marginBottom: '1%',
   },
   boxProfile: {
     flexDirection: 'column',
@@ -373,13 +278,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_600SemiBold',
     fontSize: 14,
     marginBottom: 1,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   status: {
     fontFamily: 'Poppins_600SemiBold',
     fontSize: 15,
     marginTop: 12,
-    marginBottom: 8
+    marginBottom: 8,
   },
   inputText: {
     width: '100%',
@@ -409,7 +314,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.25,
     width: '86%',
     marginBottom: 8,
-    marginTop: 5
+    marginTop: 5,
   },
   inputStatus: {
     width: '90%',
@@ -417,13 +322,13 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontSize: 18,
     color: 'white',
-    marginLeft: 15
+    marginLeft: 15,
   },
   boxStatus: {
     width: '96%',
     backgroundColor: '#161C2B',
     borderRadius: 10,
-    borderWidth: 0.5
+    borderWidth: 0.5,
   },
   cardStatus: {
     zIndex: -999,
@@ -433,14 +338,20 @@ const styles = StyleSheet.create({
   },
   addPhotos: {
     fontFamily: 'Ubuntu_300Light',
-    fontSize: 13, marginTop: 3,
-    fontWeight: 'bold', marginLeft: 10,
-    justifyContent: "center", borderWidth: 0.5,
-    padding: 5, paddingHorizontal: 13, height: 29,
-    backgroundColor: '#FAFAFA', borderColor: '#E3E3E3',
-    borderRadius: 5
-  }
+    fontSize: 13,
+    marginTop: 3,
+    fontWeight: 'bold',
+    marginLeft: 10,
+    justifyContent: 'center',
+    borderWidth: 0.5,
+    padding: 5,
+    paddingHorizontal: 13,
+    height: 29,
+    backgroundColor: '#FAFAFA',
+    borderColor: '#E3E3E3',
+    borderRadius: 5,
+  },
 });
 
 
-export default Discover
+export default Tetonggo

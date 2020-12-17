@@ -15,6 +15,7 @@ import {
   Menu,
   PickLocation,
   Comment,
+  Tetonggo,
 } from './pages';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Avatar } from 'react-native-paper';
@@ -31,8 +32,10 @@ export default function App() {
   return (
     <NavigationContainer>
       <Provider store={store}>
+
         <Stack.Navigator>
           {/* <Stack.Screen name="NotificationPage" component={NotificationPage} options={{ headerShown: true }} /> */}
+
           <Stack.Screen
             name="Home"
             component={Home}
@@ -227,6 +230,28 @@ export default function App() {
               headerTitle: () => (
                 <View style={styles.row}>
                   <Text style={styles.title}>Verification</Text>
+                  <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
+                </View>
+              ),
+              headerLeft: null,
+              headerStyle: {
+                backgroundColor: '#161C2B',
+                height: 100,
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                alignSelf: 'center',
+                color: '#fff',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="Tetonggo"
+            component={Tetonggo}
+            options={{
+              headerTitle: () => (
+                <View style={styles.discoverRow}>
+                  <Text style={styles.title}>Tetonggo</Text>
                   <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
                 </View>
               ),

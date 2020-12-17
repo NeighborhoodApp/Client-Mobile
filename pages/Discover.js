@@ -264,7 +264,6 @@ function Discover({ navigation }) {
             <View key={`timeline${index}`} style={styles.box}>
               <View style={styles.hr} />
               <View style={styles.row}>
-
                 <SvgUri
                   width="55"
                   height="55"
@@ -297,7 +296,7 @@ function Discover({ navigation }) {
           );
         })}
       </ScrollView>
-      <BottomNavigator navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
+      <BottomNavigator currentPage={"Home"} navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
     </SafeAreaView>
   );
 }

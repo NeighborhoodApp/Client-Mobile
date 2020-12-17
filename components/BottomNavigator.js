@@ -2,7 +2,14 @@ import React from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Animated, Text, Alert } from 'react-native';
 import { FontAwesome, MaterialIcons, Ionicons, AntDesign } from '@expo/vector-icons';
 
-export default function BottomNavigator({ navigation, submitHandler }) {
+export default function BottomNavigator({ currentPage, navigation, submitHandler }) {
+  const getColor = (page) => {
+    let color = '#00000';
+    if (currentPage === page) {
+      return '#2FBBF0';
+    }
+    return color;
+  };
   return (
     <>
       <View style={styles.outerCircle}>
@@ -46,10 +53,10 @@ export default function BottomNavigator({ navigation, submitHandler }) {
         <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <TouchableOpacity
             onPress={() => {
-              Alert.alert('click');
+              navigation.navigate('Discover');
             }}
           >
-            <MaterialIcons name="home" size={26} color="#2FBBF0" />
+            <MaterialIcons name="home" size={26} color={getColor('Home')} />
           </TouchableOpacity>
         </View>
 
@@ -59,7 +66,7 @@ export default function BottomNavigator({ navigation, submitHandler }) {
               navigation.navigate('EventCalendar');
             }}
           >
-            <Ionicons name="calendar-outline" size={24} color="black" />
+            <Ionicons name="calendar-outline" size={24} color={getColor('EventCalendar')} />
           </TouchableOpacity>
         </View>
 
@@ -72,18 +79,18 @@ export default function BottomNavigator({ navigation, submitHandler }) {
             }}
             style={{ marginTop: 10 }}
           >
-            <Ionicons name="ios-notifications-outline" size={24} color="black" />
+            <Ionicons name="ios-notifications-outline" size={24} color={getColor('Notification')} />
           </TouchableOpacity>
         </View>
 
         <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate('Profile');
+              navigation.navigate('Tetonggo');
             }}
             style={{ marginBottom: 14 }}
           >
-            <AntDesign name="user" size={24} color="black" />
+            <AntDesign name="user" size={24} color={getColor('Tetonggo')} />
           </TouchableOpacity>
         </View>
 
