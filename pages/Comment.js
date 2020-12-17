@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity, Image, Alert } from 'react-native'
 import { Avatar } from 'react-native-paper';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
@@ -10,11 +10,14 @@ import AppLoading from 'expo-app-loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import callServer from '../helpers/callServer';
 import BottomNavigator from '../components/BottomNavigator'
-import {axios} from '../helpers/Axios'
+import { axios } from '../helpers/Axios'
+import Loading from '../components/Loading'
 import { socket } from '../helpers/socket'
+import SvgUri from 'expo-svg-uri';
 
 function Discover({ route, navigation }) {
-  const { comments, error, stage, loading } = useSelector((state) => state.reducerComment);
+  const { comments, error, stage } = useSelector((state) => state.reducerComment);
+  const [loading, setLoading] = useState(false)
   const dispatch = useDispatch();
   const [user, setUser] = useState(null);
   const [com, setCom] = useState([])
@@ -38,6 +41,7 @@ function Discover({ route, navigation }) {
 
   // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
   useEffect(() => {
+    setLoading(true)
     const tes = async () => {
       const value = await AsyncStorage.getItem('userlogedin');
       const json = JSON.parse(value);
@@ -45,15 +49,21 @@ function Discover({ route, navigation }) {
       navigation.setOptions({
         headerRight: () => (
           <TouchableOpacity style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }} onPress={() => { navigation.navigate('Menu') }}>
-            <Avatar.Image size={48} source={{ uri: 'https://i.pinimg.com/474x/73/c3/e7/73c3e7cca66a885c53718d8f3688b02c.jpg', }} />
+            <SvgUri
+              width="35"
+              height="35"
+              source={{ uri: `https://avatars.dicebear.com/api/human/:${user ? user.fullname : 'random'}.svg` }}
+            />
           </TouchableOpacity>
         ),
       })
       fetchComment()
     }
     tes()
-    // setCom(comments)
 
+    setTimeout(() => {
+      setLoading(false)
+    }, 500);
   }, [navigation])
 
   useEffect(() => {
@@ -65,9 +75,15 @@ function Discover({ route, navigation }) {
     return () => {
       socket.emit('dc', id)
       console.log('out')
-      // dispatch({
-      //   type: 'UNMOUNT_COMMENTS'
-      // })
+      const option = {
+        url: 'timeline',
+        stage: 'getTimelines',
+        method: 'get',
+        body: null,
+        headers: true,
+        type: 'SET_TIMELINES',
+      };
+      dispatch(callServer(option));
     }
   }, [com])
 
@@ -90,96 +106,136 @@ function Discover({ route, navigation }) {
     setState('')
   }
 
-  if (!loaded) return <AppLoading />;
-  if (!stage) return <AppLoading />
+  const deleteCm = async (idc) => {
+    try {
+      await axios({
+        url: `comment/${id}/${idc}`,
+        method: 'delete',
+        headers: {
+          access_token: user.access_token
+        }
+      })
+      fetchComment()
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
+
+  const longPres = (id) => {
+    Alert.alert(
+      'Delete comment',
+      'Are you sure ?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel'
+        },
+        { text: 'OK', onPress: () => deleteCm(id) }
+      ],
+      { cancelable: false }
+    )
+  }
+
+  if (loading) return <Loading />
+  if (!loaded || !stage) return <AppLoading />;
 
   return (
     <SafeAreaView style={styles.bg}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.contentContainer}
-      >
-        {/* >>>>>>>>>>>>> BATAS SUCI <<<<<<<<<<<<< */}
-        <View style={styles.box}>
-          <View style={styles.row}>
-            <Avatar.Image size={55}
-              source={{
-                uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-              }}
-            />
-            <View style={styles.boxProfile}>
-              <Text style={styles.name}>{comments.User.fullname}</Text>
-              <Text styles={styles.location}>{comments.User.address}</Text>
-            </View>
-          </View>
-          <View style={styles.hr} />
-          <View style={styles.boxCard}>
-            <View style={styles.boxText}>
-              <Text style={styles.status}>{comments.description}</Text>
-            </View>
-            {
-              comments.image !== '' &&
-              <Card style={styles.card}>
-                <Card.Cover source={{ uri: comments.image }} />
-              </Card>
-            }
-            <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> {comments.Comments.length}</Text>
-          </View>
-          <View style={styles.hr} />
-        </View>
-        {/* INI COMMENT */}
-        {
-          comments.Comments.map((el, index) => {
-            return (
-              <View key={`comment${index}`} style={styles.rowComment}>
-                <Avatar.Image size={35}
-                  source={{
-                    uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-                  }}
-                />
-                <View style={styles.boxProfile}>
-                  <Text style={styles.nameComment}>{el.User.fullname}</Text>
-                  <Text style={styles.comment}>{el.comment}</Text>
-                </View>
+      <View style={styles.bg1}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.contentContainer}
+        >
+          {/* >>>>>>>>>>>>> BATAS SUCI <<<<<<<<<<<<< */}
+          <View style={styles.box}>
+            <View style={styles.row}>
+              <SvgUri
+                width="55"
+                height="55"
+                source={{ uri: `https://avatars.dicebear.com/api/human/:${comments.User.fullname}.svg` }}
+              />
+              <View style={styles.boxProfile}>
+                <Text style={styles.name}>{comments.User.fullname}</Text>
+                <Text styles={styles.location}>{comments.User.address}</Text>
               </View>
-            )
-          })
-        }
-        {
-          com.length > 0 &&
-          com.map((el, index) => {
-            return (
-              <View key={`commentNew${index}`} style={styles.rowComment}>
-                <Avatar.Image size={35}
-                  source={{
-                    uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-                  }}
-                />
-                <View style={styles.boxProfile}>
-                  <Text style={styles.nameComment}>{el.name}</Text>
-                  <Text style={styles.comment}>{el.comment}</Text>
-                </View>
+            </View>
+            <View style={styles.hr} />
+            <View style={styles.boxCard}>
+              <View style={styles.boxText}>
+                <Text style={styles.status}>{comments.description}</Text>
               </View>
-            )
-          })
-        }
-
-        <View style={styles.rowComment}>
-          <Avatar.Image size={35}
-            source={{
-              uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-            }}
-          />
-          <View style={styles.boxStatus}>
-            <TextInput defaultValue={state} onChangeText={(e) => inputHandler(e)} style={styles.inputStatus} placeholder="add a comment" placeholderTextColor="#625261" multiline />
+              {
+                comments.image &&
+                <Card style={styles.card}>
+                  <Card.Cover source={{ uri: comments.image }} />
+                </Card>
+              }
+              <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> {comments.Comments.length}</Text>
+            </View>
+            <View style={styles.hr} />
           </View>
-          <TouchableOpacity style={{ alignSelf: 'center' }} onPress={submitHandler}>
-            <FontAwesome name="paper-plane" size={20} color="#2FBBF0" />
-          </TouchableOpacity>
-        </View>
+          {/* INI COMMENT */}
+          {
+            comments.Comments.map((el, index) => {
+              return (
+                <View key={`comment${index}`} style={styles.rowComment}>
+                  <SvgUri
+                    width="35"
+                    height="35"
+                    source={{ uri: `https://avatars.dicebear.com/api/human/:${el.User.fullname}.svg` }}
+                  />
+                  <View style={styles.boxProfile}>
+                    {
+                      (el.UserId === user.id) ?
+                        <TouchableOpacity onLongPress={() => longPres(el.id)}>
+                          <Text style={styles.nameComment}>{el.User.fullname}</Text>
+                        </TouchableOpacity> :
+                        <Text style={styles.nameComment}>{el.User.fullname}</Text>
+                    }
+                    <Text style={styles.comment}>{el.comment}</Text>
+                  </View>
+                </View>
+              )
+            })
+          }
+          {
+            com.length > 0 &&
+            com.map((el, index) => {
+              return (
+                <View key={`commentNew${index}`} style={styles.rowComment}>
+                  <SvgUri
+                    width="35"
+                    height="35"
+                    source={{ uri: `https://avatars.dicebear.com/api/human/:${el.name}.svg` }}
+                  />
+                  <View style={styles.boxProfile}>
+                    <Text style={styles.nameComment}>{el.name}</Text>
+                    <Text style={styles.comment}>{el.comment}</Text>
+                  </View>
+                </View>
+              )
+            })
+          }
 
-      </ScrollView>
-      <BottomNavigator></BottomNavigator>
+          <View style={styles.rowComment}>
+          <SvgUri
+                    width="35"
+                    height="35"
+                    source={{ uri: `https://avatars.dicebear.com/api/human/:${user.fullname}.svg` }}
+                  />
+            <View style={styles.boxStatus}>
+              <TextInput defaultValue={state} onChangeText={(e) => inputHandler(e)} style={styles.inputStatus} placeholder="add a comment" placeholderTextColor="#625261" multiline />
+            </View>
+            <TouchableOpacity style={{ alignSelf: 'center' }} onPress={submitHandler}>
+              <FontAwesome name="paper-plane" size={20} color="#2FBBF0" />
+            </TouchableOpacity>
+          </View>
+
+        </ScrollView>
+        <BottomNavigator></BottomNavigator>
+      </View>
     </SafeAreaView >
   )
 }
@@ -187,10 +243,19 @@ function Discover({ route, navigation }) {
 const styles = StyleSheet.create({
   bg: {
     position: 'absolute',
-    backgroundColor: 'white',
+    backgroundColor: '#161C2B',
     width: '100%',
     height: '100%',
     top: 0
+  },
+  bg1: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    width: '100%',
+    height: '100%',
+    top: 0,
+    borderTopRightRadius: 35,
+    borderTopLeftRadius: 35,
   },
   paragraph: {
     margin: 24,

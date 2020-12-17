@@ -1,11 +1,12 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { View, Text, StyleSheet, Picker, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Picker, ScrollView, SafeAreaView, TextInput, TouchableOpacity, Alert } from 'react-native'
 import { Avatar } from 'react-native-paper';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
 import AppLoading from 'expo-app-loading';
+import Loading from '../components/Loading'
 
 // import { registerPushNotification } from '../helpers/PushNotification';
 // import { verifyUser } from '../helpers/verify';
@@ -18,7 +19,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {axios} from '../helpers/Axios'
+import { axios } from '../helpers/Axios'
 import SvgUri from 'expo-svg-uri';
 
 const defaultVal = {
@@ -28,7 +29,9 @@ const defaultVal = {
 
 const hasLoaded = false;
 function Discover({ navigation }) {
-  const { timelines, error, stage, loading } = useSelector((state) => state.reducerTimeline);
+  const { timelines, error, stage } = useSelector((state) => state.reducerTimeline);
+  const [loading, setLoading] = useState(false)
+  const { comments } = useSelector((state) => state.reducerComment);
   const [user, setUser] = useState(null);
   const [selectedValue, setSelectedValue] = useState("public");
   const [payload, setPayload] = useState(defaultVal);
@@ -38,9 +41,9 @@ function Discover({ navigation }) {
   let [loaded] = useFonts({
     Poppins_600SemiBold, Ubuntu_300Light
   });
-  
-//   const [selectedValue, setSelectedValue] = useState('public');
-//   const [expoPushToken, setExpoPushToken] = useState('');
+
+  //   const [selectedValue, setSelectedValue] = useState('public');
+  //   const [expoPushToken, setExpoPushToken] = useState('');
 
   // useEffect(() => {
   //   registerPushNotification().then((token) => setExpoPushToken(token));
@@ -49,7 +52,7 @@ function Discover({ navigation }) {
   // useEffect(() => {
   //   verifyUser(expoPushToken);
   // }, [expoPushToken]);
-  
+
   const [image, setImage] = useState(null);
 
   // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
@@ -67,7 +70,8 @@ function Discover({ navigation }) {
   };
 
   useEffect(() => {
-    (async () => {
+    setLoading(true)
+    const opened = (async () => {
       const value = await AsyncStorage.getItem('userlogedin');
       const json = JSON.parse(value);
       setUser(json);
@@ -78,7 +82,7 @@ function Discover({ navigation }) {
           alert('Sorry, we need camera roll permissions to make this work!');
         }
       }
-    })();
+    })
 
     navigation.setOptions({
       headerRight: () => (
@@ -91,19 +95,19 @@ function Discover({ navigation }) {
           <SvgUri
             width="35"
             height="35"
-            source={{ uri: `https://avatars.dicebear.com/api/human/:${user ? user.fullname : 'random' }.svg` }}
+            source={{ uri: `https://avatars.dicebear.com/api/human/:${user ? user.fullname : 'random'}.svg` }}
           />
-          
+
         </TouchableOpacity>
       ),
-    });
+    })
+
+    opened()
     fetchTimeline()
-    return () => {
-      dispatch({
-        type: 'UNMOUNT_TIMELINES'
-      })
-    }
-  }, [navigation])
+    setTimeout(() => {
+      setLoading(false)
+    }, 500);
+  }, [comments])
 
   useEffect(() => {
     fetchTimeline();
@@ -191,119 +195,143 @@ function Discover({ navigation }) {
     })
   }
 
-  if (!loaded || !user) return <AppLoading />;
-  if (loading) return <AppLoading />;
+  const deleteTl = async (id) => {
+    try {
+      await axios({
+        url: `timeline/${id}`,
+        method: 'delete',
+        headers: {
+          access_token: user.access_token
+        }
+      })
+      fetchTimeline()
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
+
+  const longPres = (id) => {
+    Alert.alert(
+      'Delete timeline',
+      'Are you sure ?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel'
+        },
+        { text: 'OK', onPress: () => deleteTl(id) }
+      ],
+      { cancelable: false }
+    )
+  }
+
+  if (loading) return <Loading />
+  if (!loaded || !stage) return <AppLoading />;
 
   return (
     <SafeAreaView style={styles.bg}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.boxAwal}>
-          <View style={styles.row}>
-            {/* <Avatar.Image
-              size={39}
-              style={{ marginTop: 5 }}
-              source={{
-                uri:
-                  'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-              }}
-            /> */}
-            <SvgUri
-              width="55"
-              height="55"
-              source={{ uri: `https://avatars.dicebear.com/api/human/:${user.fullname}.svg` }}
-            />
-            <View style={styles.boxProfile}>
-              <Text style={styles.name}>{user.fullname}</Text>
-              <Text style={styles.location}>{user.address}</Text>
+      <View style={styles.bg1}>
 
-              <View style={{ flexDirection: 'row', width: '60%' }}>
-                <DropDownPicker
-                  items={[
-                    { label: 'Public', value: 'public', hidden: true },
-                    { label: 'Tetonggo', value: 'member' },
-                  ]}
-                  defaultValue={selectedValue}
-                  containerStyle={{ height: 29, width: '70%', alignSelf: 'flex-start', marginTop: 4 }}
-                  style={{ backgroundColor: '#fafafa' }}
-                  itemStyle={{
-                    justifyContent: 'flex-start',
-                  }}
-                  dropDownStyle={{ backgroundColor: '#fafafa' }}
-                  onChangeItem={(item) => handleInput(item.value, 'privacy')}
-                  labelStyle={{
-                    fontSize: 13,
-                    textAlign: 'left',
-                    color: '#000',
-                  }}
-                />
-                {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
-                <TouchableOpacity onPress={pickImage}>
-                  <Text style={styles.addPhotos}>
-                    <MaterialIcons name="add-a-photo" size={14} color="#707070" /> Photo
-                  </Text>
-                </TouchableOpacity>
-                {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
-              </View>
-            </View>
-          </View>
-          <View style={styles.boxCard}>
-            {image && (
-              <Card style={styles.cardStatus}>
-                <Card.Cover source={{ uri: image }} />
-              </Card>
-            )}
-            <View style={styles.boxStatus}>
-              <TextInput
-                multiline
-                defaultValue={payload.description}
-                onChangeText={(text) => handleInput(text, 'description')}
-                style={styles.inputStatus}
-                placeholder="What’s on your mind?"
-                placeholderTextColor="white"
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.contentContainer}
+        >
+          <View style={styles.boxAwal}>
+            <View style={styles.row}>
+              <SvgUri
+                width="55"
+                height="55"
+                source={{ uri: `https://avatars.dicebear.com/api/human/:${user.fullname}.svg` }}
               />
+              <View style={styles.boxProfile}>
+                <Text style={styles.name}>{user.fullname}</Text>
+                <Text style={styles.location}>{user.address}</Text>
+
+                <View style={{ flexDirection: 'row', width: '60%' }}>
+                  <DropDownPicker
+                    items={[
+                      { label: 'Public', value: 'public', hidden: true },
+                      { label: 'Tetonggo', value: 'member' },
+                    ]}
+                    defaultValue={selectedValue}
+                    containerStyle={{ height: 29, width: '70%', alignSelf: 'flex-start', marginTop: 4 }}
+                    style={{ backgroundColor: '#fafafa' }}
+                    itemStyle={{
+                      justifyContent: 'flex-start'
+                    }}
+                    dropDownStyle={{ backgroundColor: '#fafafa' }}
+                    onChangeItem={(item) => handleInput(item.value, 'privacy')}
+                    labelStyle={{
+                      fontSize: 13,
+                      textAlign: 'left',
+                      color: '#000'
+                    }}
+                  />
+                  {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
+                  <TouchableOpacity onPress={pickImage}><Text style={styles.addPhotos}><MaterialIcons name="add-a-photo" size={14} color="#707070" />  Photo</Text></TouchableOpacity>
+                  {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
+                </View>
+              </View>
+            </View>
+            <View style={styles.boxCard}>
+              {image && <Card style={styles.cardStatus}><Card.Cover source={{ uri: image }} /></Card>}
+              <View style={styles.boxStatus}>
+                <TextInput multiline defaultValue={payload.description} onChangeText={(text) => handleInput(text, 'description')} style={styles.inputStatus} placeholder="What’s on your mind?" placeholderTextColor="white" />
+              </View>
             </View>
           </View>
-        </View>
-        {timelines.map((el, index) => {
-          return (
-            <View key={`timeline${index}`} style={styles.box}>
-              <View style={styles.hr} />
-              <View style={styles.row}>
-                <SvgUri
-                  width="55"
-                  height="55"
-                  source={{ uri: `https://avatars.dicebear.com/api/human/:${el.User.fullname}.svg` }}
-                />
-                <View style={styles.boxProfile}>
-                  <Text style={styles.name}>{el.User.fullname}</Text>
-                  <Text styles={styles.location}>{el.User.address}</Text>
-                </View>
-              </View>
-              <View style={styles.hr} />
-              <View style={styles.boxCard}>
-                <View style={styles.boxText}>
-                  <Text style={styles.status}>{el.description}</Text>
-                </View>
-                {el.image && (
-                  <Card style={styles.card}>
-                    <Card.Cover source={{ uri: el.image }} />
-                  </Card>
-                )}
+          {
+            timelines.map((el, index) => {
+              if (el.privacy === 'public' || el.User.RealEstateId === user.RealEstateId) {
+                return (
+                  <View key={`timeline${index}`} style={styles.box}>
+                    <View style={styles.hr} />
+                    <View style={styles.row}>
+                      <SvgUri
+                        width="55"
+                        height="55"
+                        source={{ uri: `https://avatars.dicebear.com/api/human/:${el.User.fullname}.svg` }}
+                      />
+                      <View style={styles.boxProfile}>
 
-                <TouchableOpacity onPress={() => changePage(el.id)}>
-                  <Text style={styles.status}>
-                    <FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.hr} />
-            </View>
-          );
-        })}
-      </ScrollView>
-      <BottomNavigator currentPage={"Home"} navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
-    </SafeAreaView>
-  );
+                        {
+                          (el.UserId === user.id) ?
+                            <TouchableOpacity onLongPress={() => longPres(el.id)}>
+                              <Text style={styles.name}>{el.User.fullname}</Text>
+                            </TouchableOpacity> :
+                            <Text style={styles.name}>{el.User.fullname}</Text>
+                        }
+                        <Text styles={styles.location}>{el.User.address}</Text>
+                      </View>
+                    </View>
+                    <View style={styles.hr} />
+                    <View style={styles.boxCard}>
+                      <View style={styles.boxText}>
+                        <Text style={styles.status}>{el.description}</Text>
+                      </View>
+                      {
+                        el.image &&
+                        <Card style={styles.card}>
+                          <Card.Cover source={{ uri: el.image }} />
+                        </Card>
+                      }
+                      <TouchableOpacity onPress={() => changePage(el.id)}>
+                        <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={styles.hr} />
+                  </View>
+                )
+              }
+            })
+          }
+        </ScrollView>
+        <BottomNavigator navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
+      </View>
+    </SafeAreaView >
+  )
 }
 
 const styles = StyleSheet.create({
@@ -313,6 +341,15 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     top: 0
+  },
+  bg1: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    width: '100%',
+    height: '100%',
+    top: 0,
+    borderTopRightRadius: 35,
+    borderTopLeftRadius: 35,
   },
   paragraph: {
     margin: 24,
