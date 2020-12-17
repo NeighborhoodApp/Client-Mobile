@@ -22,7 +22,7 @@ export default function callServer(option) {
         const json = JSON.parse(value);
         payloadAxios['headers'] = {
           access_token: json.access_token,
-          coordinate: json.coordinate
+          coordinate: json.coordinate,
         };
       }
       console.log('wxios fetch call server', payloadAxios);
@@ -31,7 +31,6 @@ export default function callServer(option) {
       console.log('from server', data);
       // console.log(option);
       // console.log('from server', data);
-
       console.log(option);
       dispatch({
         type: option.type,
