@@ -13,9 +13,9 @@ const timeToString = (time) => {
     return date.toISOString().split('T')[0];
 };
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const EventCalendar: React.FC = ({ navigation }) => {    
+const EventCalendar = ({ navigation }) => {    
     const [items, setItems] = useState({});
     const [isModalVisible, setModalVisible] = useState(false);
     const [isFocused, setIsFocused] = useState('true');
