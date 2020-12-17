@@ -10,9 +10,9 @@ function Menu({ navigation }) {
     Roboto_500Medium,
   });
 
-  const handleLogout = async () => {
-    await AsyncStorage.clear();
-    navigation.replace('Home')
+  const logout = async () => {
+    await AsyncStorage.removeItem('userlogedin');
+    navigation.replace('Home');
   };
 
   if (!loaded) return <AppLoading />;
@@ -43,11 +43,11 @@ function Menu({ navigation }) {
             <FontAwesome5 style={styles.icon} name="house-user" size={20} color="#2C6FC7" />
             <Text style={styles.menu}> Verifications </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btn_menu}>
+          <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('CreateFee')}>
             <MaterialIcons style={styles.icon} name="monetization-on" size={20} color="#2C6FC7" />
             <Text style={styles.menu}> Create Fee </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btn_logout} onPress={() => handleLogout()}>
+          <TouchableOpacity style={styles.btn_logout} onPress={() => logout()}>
             <MaterialIcons style={styles.icon} name="monetization-on" size={20} color="#2C6FC7" />
             <Text style={styles.logout}> Logout </Text>
           </TouchableOpacity>

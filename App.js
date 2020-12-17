@@ -22,7 +22,7 @@ import { Provider } from 'react-redux';
 import store from './store';
 import NotificationPage from './pages/Notification';
 import CreateEvent from './pages/CreateEvent';
-import EventCalendar from './pages/EventCalendar';
+import CreateFee from './pages/CreateFee';
 
 const Stack = createStackNavigator();
 
@@ -137,6 +137,28 @@ export default function App() {
               headerTitle: () => (
                 <View style={styles.row}>
                   <Text style={styles.title}>Add Event</Text>
+                  <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
+                </View>
+              ),
+              headerLeft: null,
+              headerStyle: {
+                backgroundColor: '#161C2B',
+                height: 100,
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                alignSelf: 'center',
+                color: '#fff',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="CreateFee"
+            component={CreateFee}
+            options={{
+              headerTitle: () => (
+                <View style={styles.row}>
+                  <Text style={styles.title}>Add Fee</Text>
                   <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
                 </View>
               ),

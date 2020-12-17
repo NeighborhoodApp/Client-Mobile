@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 // import { View, Text, StyleSheet } from 'react-native'
-import { Button, Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import { Button, Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, Platform, Alert } from 'react-native';
 // import Modal from 'react-native-modal';
 import { TextInput } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -76,28 +76,26 @@ function CreateEvent({ navigation }) {
     setName(text);
   };
 
-  const handleAddEvent = () => {
-    const addEvent = () => {
+  const handleAddFee = () => {
+    const addFee = () => {
       const option = {
-        url: `event`,
-        stage: 'addEvent',
+        url: `fee`,
+        stage: 'addFee',
         method: 'post',
         body: {
           name: name,
           description: description,
-          CategoryId: category,
-          image: 'hello',
-          date: date,
+          due_date: date,
           RealEstateId: user.RealEstateId,
+          ComplexId: user.ComplexId,
         },
         headers: true,
-        type: 'ADD_EVENT',
+        type: 'ADD_FEE',
       };
-      
       dispatch(callServer(option));
     };
-    addEvent();
-    Alert.alert('Success', `${name} Event is created! Your neighbours will receive a notification in a short notice`, [
+    addFee();
+    Alert.alert('Success', `${name} fee is created! Your neighbours will receive a notification in a short notice`, [
       // { text: "Don't leave", style: 'cancel', onPress: () => {} },
       {
         text: 'Ok',
@@ -153,8 +151,7 @@ function CreateEvent({ navigation }) {
           Title
         </Text>
         <TextInput
-          placeholder="Tetonggo Event"
-          placeholderTextColor="black"
+          placeholder="Tetonggo Fee"
           style={{ height: '6%', width: '80%', backgroundColor: 'white', borderBottomColor: 'black' }}
           onChangeText={(text) => handleInputName(text)}
         ></TextInput>
@@ -226,7 +223,7 @@ function CreateEvent({ navigation }) {
         ></TextInput>
         <TouchableOpacity
           style={{ width: '70%', height: 40, backgroundColor: '#161C2B', paddingVertical: 10, marginTop: 30 }}
-          onPress={() => handleAddEvent()}
+          onPress={() => handleAddFee()}
         >
           <Text style={{ alignSelf: 'center', fontWeight: 'bold', color: 'white' }}>SAVE</Text>
         </TouchableOpacity>

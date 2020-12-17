@@ -7,11 +7,16 @@ export default function BottomNavigator(props) {
 	return (
 		<>
 			<View style={styles.outerCircle}>
-				<TouchableWithoutFeedback onPress={props.submitHandler}>
+				{/* <TouchableWithoutFeedback onPress={props.submitHandler}>
 					<View style={[styles.button, styles.actionBtn]}>
 						<FontAwesome name="plus" size={18} color="white" />
 					</View>
-				</TouchableWithoutFeedback>
+				</TouchableWithoutFeedback> */}
+				<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+					<TouchableOpacity onPress={props.submitHandler}>
+						<FontAwesome name="plus" size={30} color="#2FBBF0" style={{marginTop: 10}} />
+					</TouchableOpacity>
+				</View>
 			</View>
 			{/* >>>>>>> BOX NAVIGATOR <<<<< */}
 			<View style={{
@@ -106,7 +111,7 @@ const styles = StyleSheet.create({
 
 	},
 	actionBtn: {
-		backgroundColor: '#2FBBF0',
+		backgroundColor: 'white',
 		textShadowOffset: { width: 5, height: 5 },
 		textShadowRadius: 10,
 		borderWidth: 2,

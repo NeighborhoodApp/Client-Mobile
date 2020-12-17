@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native'
 import { Avatar } from 'react-native-paper';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { Card } from 'react-native-paper';
@@ -11,22 +10,20 @@ import AppLoading from 'expo-app-loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import callServer from '../helpers/callServer';
 import BottomNavigator from '../components/BottomNavigator'
-import axios from 'axios'
+import {axios} from '../helpers/Axios'
+import { socket } from '../helpers/socket'
 
 function Discover({ route, navigation }) {
-  const [socket, setSocket] = useState()
   const { comments, error, stage, loading } = useSelector((state) => state.reducerComment);
   const dispatch = useDispatch();
   const [user, setUser] = useState(null);
-  const [com, setCom] = useState('')
+  const [com, setCom] = useState([])
   const [state, setState] = useState('')
-  const [chat, setChat] = useState([])
   const { id } = route.params
   let [loaded] = useFonts({
     Poppins_600SemiBold, Ubuntu_300Light
   });
 
-  console.log(id)
   const fetchComment = () => {
     const option = {
       url: `timeline/${id}`,
@@ -38,6 +35,7 @@ function Discover({ route, navigation }) {
     };
     dispatch(callServer(option));
   };
+
   // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
   useEffect(() => {
     const tes = async () => {
@@ -53,12 +51,25 @@ function Discover({ route, navigation }) {
       })
       fetchComment()
     }
-
     tes()
-    return () => {
-      console.log('out')
-    }
+    // setCom(comments)
+
   }, [navigation])
+
+  useEffect(() => {
+    socket.emit('join', id);
+
+    socket.on('comment', ({ comment, name }) => {
+      setCom([...com, { comment, name }])
+    })
+    return () => {
+      socket.emit('dc', id)
+      console.log('out')
+      // dispatch({
+      //   type: 'UNMOUNT_COMMENTS'
+      // })
+    }
+  }, [com])
 
   const inputHandler = (e) => {
     setState(e)
@@ -67,7 +78,7 @@ function Discover({ route, navigation }) {
   const submitHandler = async () => {
     await axios({
       method: 'post',
-      url: `http://192.168.1.12:3000/comment/${id}`,
+      url: `comment/${id}`,
       data: {
         comment: state
       },
@@ -75,11 +86,13 @@ function Discover({ route, navigation }) {
         access_token: user.access_token
       }
     })
+    socket.emit('new comment', { comment: state, id: id, name: user.fullname });
     setState('')
   }
 
   if (!loaded) return <AppLoading />;
-  if (loading) return <AppLoading />
+  if (!stage) return <AppLoading />
+
   return (
     <SafeAreaView style={styles.bg}>
       <ScrollView
@@ -126,6 +139,24 @@ function Discover({ route, navigation }) {
                 />
                 <View style={styles.boxProfile}>
                   <Text style={styles.nameComment}>{el.User.fullname}</Text>
+                  <Text style={styles.comment}>{el.comment}</Text>
+                </View>
+              </View>
+            )
+          })
+        }
+        {
+          com.length > 0 &&
+          com.map((el, index) => {
+            return (
+              <View key={`commentNew${index}`} style={styles.rowComment}>
+                <Avatar.Image size={35}
+                  source={{
+                    uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
+                  }}
+                />
+                <View style={styles.boxProfile}>
+                  <Text style={styles.nameComment}>{el.name}</Text>
                   <Text style={styles.comment}>{el.comment}</Text>
                 </View>
               </View>

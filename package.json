@@ -44,13 +44,14 @@
     "react-native-modal": "^11.5.6",
     "react-native-paper": "^4.5.0",
     "react-native-reanimated": "^1.13.2",
+    "react-native-safe-area-view": "^1.1.1",
     "react-native-screens": "^2.16.1",
     "react-native-svg-uri": "^1.2.3",
     "react-native-web": "~0.13.12",
     "react-redux": "^7.2.2",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
-    "socket.io-client": "^2.1.1"
+    "socket.io-client": "^2.3.1"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",
