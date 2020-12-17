@@ -13,6 +13,7 @@ import BottomNavigator from '../components/BottomNavigator'
 import { axios } from '../helpers/Axios'
 import Loading from '../components/Loading'
 import { socket } from '../helpers/socket'
+import SvgUri from 'expo-svg-uri';
 
 function Discover({ route, navigation }) {
   const { comments, error, stage } = useSelector((state) => state.reducerComment);
@@ -48,7 +49,11 @@ function Discover({ route, navigation }) {
       navigation.setOptions({
         headerRight: () => (
           <TouchableOpacity style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }} onPress={() => { navigation.navigate('Menu') }}>
-            <Avatar.Image size={48} source={{ uri: 'https://i.pinimg.com/474x/73/c3/e7/73c3e7cca66a885c53718d8f3688b02c.jpg', }} />
+            <SvgUri
+              width="35"
+              height="35"
+              source={{ uri: `https://avatars.dicebear.com/api/human/:${user ? user.fullname : 'random'}.svg` }}
+            />
           </TouchableOpacity>
         ),
       })
@@ -146,10 +151,10 @@ function Discover({ route, navigation }) {
           {/* >>>>>>>>>>>>> BATAS SUCI <<<<<<<<<<<<< */}
           <View style={styles.box}>
             <View style={styles.row}>
-              <Avatar.Image size={55}
-                source={{
-                  uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-                }}
+              <SvgUri
+                width="55"
+                height="55"
+                source={{ uri: `https://avatars.dicebear.com/api/human/:${comments.User.fullname}.svg` }}
               />
               <View style={styles.boxProfile}>
                 <Text style={styles.name}>{comments.User.fullname}</Text>
@@ -176,10 +181,10 @@ function Discover({ route, navigation }) {
             comments.Comments.map((el, index) => {
               return (
                 <View key={`comment${index}`} style={styles.rowComment}>
-                  <Avatar.Image size={35}
-                    source={{
-                      uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-                    }}
+                  <SvgUri
+                    width="35"
+                    height="35"
+                    source={{ uri: `https://avatars.dicebear.com/api/human/:${el.User.fullname}.svg` }}
                   />
                   <View style={styles.boxProfile}>
                     {
@@ -200,10 +205,10 @@ function Discover({ route, navigation }) {
             com.map((el, index) => {
               return (
                 <View key={`commentNew${index}`} style={styles.rowComment}>
-                  <Avatar.Image size={35}
-                    source={{
-                      uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-                    }}
+                  <SvgUri
+                    width="35"
+                    height="35"
+                    source={{ uri: `https://avatars.dicebear.com/api/human/:${el.name}.svg` }}
                   />
                   <View style={styles.boxProfile}>
                     <Text style={styles.nameComment}>{el.name}</Text>
@@ -215,11 +220,11 @@ function Discover({ route, navigation }) {
           }
 
           <View style={styles.rowComment}>
-            <Avatar.Image size={35}
-              source={{
-                uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-              }}
-            />
+          <SvgUri
+                    width="35"
+                    height="35"
+                    source={{ uri: `https://avatars.dicebear.com/api/human/:${user.fullname}.svg` }}
+                  />
             <View style={styles.boxStatus}>
               <TextInput defaultValue={state} onChangeText={(e) => inputHandler(e)} style={styles.inputStatus} placeholder="add a comment" placeholderTextColor="#625261" multiline />
             </View>

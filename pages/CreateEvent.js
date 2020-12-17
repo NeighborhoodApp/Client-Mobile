@@ -93,6 +93,7 @@ function CreateEvent({ navigation }) {
         headers: true,
         type: 'ADD_EVENT',
       };
+      
       dispatch(callServer(option));
     };
     addEvent();

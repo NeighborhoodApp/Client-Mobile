@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { axios } from '../helpers/Axios'
+import SvgUri from 'expo-svg-uri';
 
 const defaultVal = {
   description: '',
@@ -84,8 +85,18 @@ function Discover({ navigation }) {
 
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }} onPress={() => { navigation.navigate('Menu') }}>
-          <Avatar.Image size={48} source={{ uri: 'https://i.pinimg.com/474x/73/c3/e7/73c3e7cca66a885c53718d8f3688b02c.jpg', }} />
+        <TouchableOpacity
+          style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }}
+          onPress={() => {
+            navigation.navigate('Menu');
+          }}
+        >
+          <SvgUri
+            width="35"
+            height="35"
+            source={{ uri: `https://avatars.dicebear.com/api/human/:${user ? user.fullname : 'random'}.svg` }}
+          />
+
         </TouchableOpacity>
       ),
     })
@@ -224,10 +235,10 @@ function Discover({ navigation }) {
         >
           <View style={styles.boxAwal}>
             <View style={styles.row}>
-              <Avatar.Image size={39} style={{ marginTop: 5 }}
-                source={{
-                  uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-                }}
+              <SvgUri
+                width="55"
+                height="55"
+                source={{ uri: `https://avatars.dicebear.com/api/human/:${user.fullname}.svg` }}
               />
               <View style={styles.boxProfile}>
                 <Text style={styles.name}>{user.fullname}</Text>
@@ -273,10 +284,10 @@ function Discover({ navigation }) {
                   <View key={`timeline${index}`} style={styles.box}>
                     <View style={styles.hr} />
                     <View style={styles.row}>
-                      <Avatar.Image size={39}
-                        source={{
-                          uri: 'https://ath2.unileverservices.com/wp-content/uploads/sites/3/2017/07/black-men-haircuts-afro-natural-hair-683x1024.jpg',
-                        }}
+                      <SvgUri
+                        width="55"
+                        height="55"
+                        source={{ uri: `https://avatars.dicebear.com/api/human/:${el.User.fullname}.svg` }}
                       />
                       <View style={styles.boxProfile}>
 

@@ -8,4 +8,5 @@ export { default as Profile } from "./Profile"
 export { default as Verification } from "./Verification"
 export { default as PickLocation } from "./PickLocation"
 export { default as Menu } from "./Menu"
-export { default as Comment } from "./Comment"
+export { default as Comment } from './Comment';
+export { default as Tetonggo } from './Tetonggo';
