@@ -82,11 +82,6 @@ function Tetonggo({ navigation }) {
       ),
     });
     fetchTimeline()
-    return () => {
-      dispatch({
-        type: 'UNMOUNT_TIMELINES'
-      })
-    }
   }, [navigation])
 
   const submitHandler = async () => {
