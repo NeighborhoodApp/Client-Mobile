@@ -95,12 +95,13 @@ function Discover({ navigation }) {
           <SvgUri
             width="35"
             height="35"
-            source={{ uri: `https://avatars.dicebear.com/api/human/:${user ? user.fullname : 'random'}.svg` }}
+            source={{
+              uri: `https://avatars.dicebear.com/api/avataaars/${user ? user.fullname : 'random'}.svg?mood[]=happy`,
+            }}
           />
-
         </TouchableOpacity>
       ),
-    })
+    });
 
     opened()
     fetchTimeline()
@@ -233,17 +234,15 @@ function Discover({ navigation }) {
   return (
     <SafeAreaView style={styles.bg}>
       <View style={styles.bg1}>
-
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.contentContainer}
-        >
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
           <View style={styles.boxAwal}>
             <View style={styles.row}>
               <SvgUri
                 width="55"
                 height="55"
-                source={{ uri: `https://avatars.dicebear.com/api/human/:${user.fullname}.svg` }}
+                source={{
+                  uri: `https://avatars.dicebear.com/api/avataaars/${user ? user.fullname : 'random'}.svg?mood[]=happy`,
+                }}
               />
               <View style={styles.boxProfile}>
                 <Text style={styles.name}>{user.fullname}</Text>
@@ -259,79 +258,92 @@ function Discover({ navigation }) {
                     containerStyle={{ height: 29, width: '70%', alignSelf: 'flex-start', marginTop: 4 }}
                     style={{ backgroundColor: '#fafafa' }}
                     itemStyle={{
-                      justifyContent: 'flex-start'
+                      justifyContent: 'flex-start',
                     }}
                     dropDownStyle={{ backgroundColor: '#fafafa' }}
                     onChangeItem={(item) => handleInput(item.value, 'privacy')}
                     labelStyle={{
                       fontSize: 13,
                       textAlign: 'left',
-                      color: '#000'
+                      color: '#000',
                     }}
                   />
                   {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
-                  <TouchableOpacity onPress={pickImage}><Text style={styles.addPhotos}><MaterialIcons name="add-a-photo" size={14} color="#707070" />  Photo</Text></TouchableOpacity>
+                  <TouchableOpacity onPress={pickImage}>
+                    <Text style={styles.addPhotos}>
+                      <MaterialIcons name="add-a-photo" size={14} color="#707070" /> Photo
+                    </Text>
+                  </TouchableOpacity>
                   {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
                 </View>
               </View>
             </View>
             <View style={styles.boxCard}>
-              {image && <Card style={styles.cardStatus}><Card.Cover source={{ uri: image }} /></Card>}
+              {image && (
+                <Card style={styles.cardStatus}>
+                  <Card.Cover source={{ uri: image }} />
+                </Card>
+              )}
               <View style={styles.boxStatus}>
-                <TextInput multiline defaultValue={payload.description} onChangeText={(text) => handleInput(text, 'description')} style={styles.inputStatus} placeholder="What’s on your mind?" placeholderTextColor="white" />
+                <TextInput
+                  multiline
+                  defaultValue={payload.description}
+                  onChangeText={(text) => handleInput(text, 'description')}
+                  style={styles.inputStatus}
+                  placeholder="What’s on your mind?"
+                  placeholderTextColor="white"
+                />
               </View>
             </View>
           </View>
-          {
-            timelines.map((el, index) => {
-              if (el.privacy === 'public' || el.User.RealEstateId === user.RealEstateId) {
-                return (
-                  <View key={`timeline${index}`} style={styles.box}>
-                    <View style={styles.hr} />
-                    <View style={styles.row}>
-                      <SvgUri
-                        width="55"
-                        height="55"
-                        source={{ uri: `https://avatars.dicebear.com/api/human/:${el.User.fullname}.svg` }}
-                      />
-                      <View style={styles.boxProfile}>
-
-                        {
-                          (el.UserId === user.id) ?
-                            <TouchableOpacity onLongPress={() => longPres(el.id)}>
-                              <Text style={styles.name}>{el.User.fullname}</Text>
-                            </TouchableOpacity> :
-                            <Text style={styles.name}>{el.User.fullname}</Text>
-                        }
-                        <Text styles={styles.location}>{el.User.address}</Text>
-                      </View>
+          {timelines.map((el, index) => {
+            if (el.privacy === 'public' || el.User.RealEstateId === user.RealEstateId) {
+              return (
+                <View key={`timeline${index}`} style={styles.box}>
+                  <View style={styles.hr} />
+                  <View style={styles.row}>
+                    <SvgUri
+                      width="55"
+                      height="55"
+                      source={{ uri: `https://avatars.dicebear.com/api/avataaars/${user ? user.fullname : 'random'}.svg?mood[]=happy` }}
+                    />
+                    <View style={styles.boxProfile}>
+                      {el.UserId === user.id ? (
+                        <TouchableOpacity onLongPress={() => longPres(el.id)}>
+                          <Text style={styles.name}>{el.User.fullname}</Text>
+                        </TouchableOpacity>
+                      ) : (
+                        <Text style={styles.name}>{el.User.fullname}</Text>
+                      )}
+                      <Text styles={styles.location}>{el.User.address}</Text>
                     </View>
-                    <View style={styles.hr} />
-                    <View style={styles.boxCard}>
-                      <View style={styles.boxText}>
-                        <Text style={styles.status}>{el.description}</Text>
-                      </View>
-                      {
-                        el.image &&
-                        <Card style={styles.card}>
-                          <Card.Cover source={{ uri: el.image }} />
-                        </Card>
-                      }
-                      <TouchableOpacity onPress={() => changePage(el.id)}>
-                        <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}</Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={styles.hr} />
                   </View>
-                )
-              }
-            })
-          }
+                  <View style={styles.hr} />
+                  <View style={styles.boxCard}>
+                    <View style={styles.boxText}>
+                      <Text style={styles.status}>{el.description}</Text>
+                    </View>
+                    {el.image && (
+                      <Card style={styles.card}>
+                        <Card.Cover source={{ uri: el.image }} />
+                      </Card>
+                    )}
+                    <TouchableOpacity onPress={() => changePage(el.id)}>
+                      <Text style={styles.status}>
+                        <FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.hr} />
+                </View>
+              );
+            }
+          })}
         </ScrollView>
         <BottomNavigator navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
       </View>
-    </SafeAreaView >
-  )
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({

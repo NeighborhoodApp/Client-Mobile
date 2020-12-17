@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 // import { View, Text, StyleSheet } from 'react-native'
-import { Button, Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import { Button, Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, Platform, Alert } from 'react-native';
 // import Modal from 'react-native-modal';
 import { TextInput } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { sendNotification } from '../helpers/PushNotification';
 
 function CreateEvent({ navigation }) {
   const [category, setCategory] = useState(null);
@@ -29,6 +30,8 @@ function CreateEvent({ navigation }) {
     };
     getUser();
   }, []);
+
+  const { users } = useSelector((state) => state.reducerUser);
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -77,23 +80,24 @@ function CreateEvent({ navigation }) {
   };
 
   const handleAddEvent = () => {
+    const payload = {
+      name: name,
+      description: description,
+      CategoryId: category,
+      image: 'hello',
+      date: date,
+      RealEstateId: user.RealEstateId,
+    };
     const addEvent = () => {
       const option = {
         url: `event`,
         stage: 'addEvent',
         method: 'post',
-        body: {
-          name: name,
-          description: description,
-          CategoryId: category,
-          image: 'hello',
-          date: date,
-          RealEstateId: user.RealEstateId,
-        },
+        body: payload,
         headers: true,
         type: 'ADD_EVENT',
       };
-      
+      sendNotify(payload);
       dispatch(callServer(option));
     };
     addEvent();
@@ -105,6 +109,23 @@ function CreateEvent({ navigation }) {
         onPress: () => navigation.replace('Menu'),
       },
     ]);
+  };
+
+  const newUser = user ? users.filter((el) => el.RealEstateId === user.RealEstateId) : null;
+
+  const sendNotify = async (data) => {
+    console.log(newUser.expoPushToken, 'newUser.expoPushToken');
+    const token = []
+    for (let i = 0; i < newUser.length; i++) {
+      if (newUser[i].expoPushToken && newUser[i].id !== user.id) {
+        if (newUser[i].expoPushToken) {
+          token.push(newUser[i].expoPushToken);
+        }
+      }
+    }
+    await sendNotification(token, 'data.name', 'data.description', {
+      from: { fullname: user.fullname, userid: user.id },
+    });
   };
 
   return (
@@ -155,7 +176,7 @@ function CreateEvent({ navigation }) {
         <TextInput
           placeholder="Tetonggo Event"
           placeholderTextColor="black"
-          style={{ height: '6%', width: '80%', backgroundColor: 'white', borderBottomColor: 'black' }}
+          style={{ height: 40, width: 300, backgroundColor: 'white', borderBottomColor: 'black' }}
           onChangeText={(text) => handleInputName(text)}
         ></TextInput>
         <Text
@@ -173,7 +194,7 @@ function CreateEvent({ navigation }) {
         </Text>
         {/* <TextInput
           placeholder="Date"
-          style={{ height: '6%', width: '80%', backgroundColor: 'white', borderBottomColor: 'black' }}
+          style={{ height: 40, width: 300, backgroundColor: 'white', borderBottomColor: 'black' }}
         ></TextInput> */}
         <View>
           <View>
@@ -221,12 +242,12 @@ function CreateEvent({ navigation }) {
         </Text>
         <TextInput
           placeholder="Write a note here"
-          style={{ height: '6%', width: '80%', backgroundColor: 'white', borderBottomColor: 'black' }}
+          style={{ height: 40, width: 300, backgroundColor: 'white', borderBottomColor: 'black' }}
           onChangeText={(text) => handleInputDesc(text)}
         ></TextInput>
         <TouchableOpacity
-          style={{ width: '70%', height: 40, backgroundColor: '#161C2B', paddingVertical: 10, marginTop: 30 }}
-          onPress={() => handleAddEvent()}
+          style={{ width: 300, height: 40, backgroundColor: '#161C2B', paddingVertical: 10, marginTop: 30 }}
+          onPress={() => sendNotify()}
         >
           <Text style={{ alignSelf: 'center', fontWeight: 'bold', color: 'white' }}>SAVE</Text>
         </TouchableOpacity>
@@ -269,7 +290,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     marginTop: 5,
-    color: 'black',
+    color: '#000',
   },
   button2: {
     height: 110,

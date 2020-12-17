@@ -24,9 +24,10 @@ const defaultVal = {
 }
 
 function Tetonggo({ navigation }) {
-  const { users, error, stage, loading } = useSelector((state) => state.reducerUser);
+  const { users, user: userNow, error, stage, loading } = useSelector((state) => state.reducerUser);
   const [user, setUser] = useState(null);
-  const [selectedValue, setSelectedValue] = useState("public");
+  const [selectedUser, setSelectedUser] = useState({  user: '', address: ''  });
+  const [selectedValue, setSelectedValue] = useState('public');
   const [payload, setPayload] = useState(defaultVal);
   const [formData, setFormData] = useState(null);
   const dispatch = useDispatch();
@@ -35,7 +36,7 @@ function Tetonggo({ navigation }) {
     Poppins_600SemiBold,
     Ubuntu_300Light,
   });
-  
+
   const [image, setImage] = useState(null);
 
   // const fetchTimeline = () => {
@@ -49,7 +50,8 @@ function Tetonggo({ navigation }) {
   //   };
   //   dispatch(callServer(option));
   // };
-  console.log(users)
+
+  console.log(users);
   useEffect(() => {
     (async () => {
       const value = await AsyncStorage.getItem('userlogedin');
@@ -75,23 +77,22 @@ function Tetonggo({ navigation }) {
           <SvgUri
             width="35"
             height="35"
-            source={{ uri: `https://avatars.dicebear.com/api/human/:${user ? user.fullname : 'random' }.svg` }}
+            source={{ uri: `https://avatars.dicebear.com/api/human/:${user ? user.fullname : 'random'}.svg` }}
           />
-          
         </TouchableOpacity>
       ),
     });
     // fetchTimeline()
     return () => {
       dispatch({
-        type: 'UNMOUNT_TIMELINES'
-      })
-    }
-  }, [navigation])
+        type: 'UNMOUNT_TIMELINES',
+      });
+    };
+  }, [navigation]);
 
   const submitHandler = async () => {
     console.log('press');
-    let uri
+    let uri;
     try {
       if (payload.description && formData) {
         console.log(formData);
@@ -100,10 +101,10 @@ function Tetonggo({ navigation }) {
           method: 'post',
           data: formData,
           headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        })
-        uri = data
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        uri = data;
       }
       if (payload.description) {
         await axios({
@@ -112,46 +113,55 @@ function Tetonggo({ navigation }) {
           data: {
             description: payload.description,
             image: uri,
-            privacy: payload.privacy
+            privacy: payload.privacy,
           },
           headers: {
-            access_token: user.access_token
-          }
-        })
+            access_token: user.access_token,
+          },
+        });
       }
-      fetchTimeline()
-      setImage(null)
-      setFormData(null)
-      setPayload({ description: '', privacy: 'public' })
+      fetchTimeline();
+      setImage(null);
+      setFormData(null);
+      setPayload({ description: '', privacy: 'public' });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
+
+  const newUser = user ? users.filter((el) =>
+    (el.ComplexId === user.ComplexId && el.status === 'Active')) : null;
+  // useEffect(() => {
+  //   if (user) {
+  //     setSelectedUser(newUser);;
+  //   }
+  // }, [userNow]);;
 
   const changePage = (id) => {
     navigation.navigate('Comment', {
-      id
-    })
-  }
+      id,
+    });
+  };
 
   const data = [
-      {
-        fullname: 'Riyan',
-        address: 'Palembang',
-      },
-      {
-        fullname: 'Moulia',
-        address: 'Palembang',
-      },
-      {
-        fullname: 'Ahmad',
-        address: 'Palembang',
-      },
-      {
-        fullname: 'Habibi',
-        address: 'Palembang',
-      },
+    {
+      fullname: 'Riyan',
+      address: 'Palembang',
+    },
+    {
+      fullname: 'Moulia',
+      address: 'Palembang',
+    },
+    {
+      fullname: 'Ahmad',
+      address: 'Palembang',
+    },
+    {
+      fullname: 'Habibi',
+      address: 'Palembang',
+    },
   ];
+  console.log(user, 'userrrr.....');;
   if (!loaded) return <AppLoading />;
   // if (loading) return <AppLoading />;
 
@@ -160,15 +170,16 @@ function Tetonggo({ navigation }) {
       <View style={styles.border}></View>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
         <Text style={styles.account}>Account</Text>
-        {data.map((el, index) => {
+        { !newUser ? null : newUser.map((el, index) => {
           return (
             <View key={`timeline${index}`} style={styles.box}>
               <View style={styles.row}>
                 <SvgUri
                   width="55"
                   height="55"
-                  source={{ uri: `https://avatars.dicebear.com/api/human/:${el.fullname}.svg` }}
+                  source={{ uri: `https://avatars.dicebear.com/api/avataaars/:${el.fullname}.svg?mood[]=happy` }}
                 />
+                
                 <View style={styles.boxProfile}>
                   <Text style={styles.name}>{el.fullname}</Text>
                   <Text styles={styles.location}>{el.address}</Text>

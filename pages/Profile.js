@@ -1,4 +1,4 @@
-import React, { useEffect }  from 'react'
+import React, { useEffect, useState }  from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity} from 'react-native'
 import { Avatar } from 'react-native-paper';
 import { useFonts, Ubuntu_300Light,Ubuntu_500Medium } from '@expo-google-fonts/ubuntu'
@@ -7,6 +7,8 @@ import { FontAwesome, Fontisto, Feather, Entypo, FontAwesome5, AntDesign, Materi
 import AppLoading from 'expo-app-loading';
 import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import SvgUri from 'expo-svg-uri';
 
 function Profile({ navigation }) {
   const [loaded] = useFonts({
@@ -15,6 +17,23 @@ function Profile({ navigation }) {
     Ubuntu_500Medium,
   });
 
+  const [user, setUser] = useState({
+    fullname: '',
+    address: '',
+    email: ''
+  });
+
+  useEffect(() => {
+    const getUser = async () => {
+      const value = await AsyncStorage.getItem('userlogedin');
+      const json = JSON.parse(value);
+      setUser(json);
+    }
+    getUser()
+  }, [])
+
+  // const { user, error, stage, loading } = useSelector((state) => state.reducerUser);
+  console.log(user, 'user.....')
   function toNotification() {
     navigation.navigate('Notification');
   }
@@ -25,26 +44,45 @@ function Profile({ navigation }) {
     <View style={styles.container}>
       {/* >>>>>> PROFILE PAGE <<<<<<< */}
       <View style={styles.images}>
-        <Avatar.Image
+        {/* <Avatar.Image
           size={100}
           source={{
             uri: 'https://i.pinimg.com/474x/73/c3/e7/73c3e7cca66a885c53718d8f3688b02c.jpg',
           }}
+        /> */}
+        <SvgUri
+          width="100"
+          height="100"
+          source={{
+            uri: `https://avatars.dicebear.com/api/avataaars/:${user ? user.fullname : 'random'}.svg?mood[]=happy`,
+          }}
         />
+        
       </View>
       <View style={styles.box}>
         <View stle={styles.bg}></View>
         <View style={styles.input}>
           <FontAwesome name="user" size={20} color="white" style={{ marginLeft: 10 }} />
-          <TextInput style={styles.Textinput} placeholder="Full Name" placeholderTextColor="#FFF" />
+          <TextInput
+            style={styles.Textinput}
+            value={user ? user.fullname : ''}
+            placeholder="Full Name"
+            placeholderTextColor="#FFF"
+          />
         </View>
         <View style={styles.hr} />
         <View style={styles.input}>
           <Fontisto name="email" size={20} color="white" style={{ marginLeft: 5 }} />
-          <TextInput style={styles.Textinput} placeholder="Email" placeholderTextColor="#FFF" />
+          <TextInput
+            style={styles.Textinput}
+            value={user ? user.email : ''}
+            placeholder="Email"
+            placeholderTextColor="#FFF"
+            readOnly
+          />
         </View>
-        <View style={styles.hr} />
-        <View style={styles.input}>
+        {/* <View style={styles.hr} /> */}
+        {/* <View style={styles.input}>
           <Feather name="lock" size={20} color="white" style={{ marginLeft: 5 }} />
           <TextInput
             style={styles.Textinput}
@@ -52,37 +90,43 @@ function Profile({ navigation }) {
             placeholderTextColor="#FFF"
             secureTextEntry={true}
           />
-        </View>
+        </View> */}
         <View style={styles.hr} />
         <View style={styles.input}>
           <Entypo name="location" size={20} color="white" style={{ marginLeft: 6 }} />
-          <TextInput style={styles.Textinput} placeholder="Address" placeholderTextColor="#FFF" />
+          <TextInput
+            style={styles.Textinput}
+            value={user ? user.address : ''}
+            placeholder="Address"
+            placeholderTextColor="#FFF"
+            readOnly
+          />
         </View>
         <View style={styles.hr} />
 
         {/* >>>>>> FEES PAGE <<<<<<< */}
-        <View style={styles.input}>
+        {/* <View style={styles.input}>
           <FontAwesome name="pencil-square-o" size={20} color="white" style={{ marginLeft: 6 }} />
-          <TextInput style={styles.Textinput} placeholder="Title" placeholderTextColor="#FFF" />
+          <TextInput style={styles.Textinput} placeholder="Title" placeholderTextColor="#FFF" readOnly />
         </View>
         <View style={styles.hr} />
         <View style={styles.input}>
           <FontAwesome5 name="search-dollar" size={20} color="white" style={{ marginLeft: 6 }} />
-          <TextInput style={styles.Textinput} placeholder="Fees" placeholderTextColor="#FFF" />
+          <TextInput style={styles.Textinput} placeholder="Fees" placeholderTextColor="#FFF" readOnly />
         </View>
         <View style={styles.hr} />
         <View style={styles.input}>
           <AntDesign name="clockcircle" size={19} color="white" style={{ marginLeft: 6 }} />
-          <TextInput style={styles.Textinput} placeholder="Due Date " placeholderTextColor="#FFF" />
+          <TextInput style={styles.Textinput} placeholder="Due Date " placeholderTextColor="#FFF" readOnly />
         </View>
-        <View style={styles.hr} />
+        <View style={styles.hr} /> */}
         {/* >>>>>> BUTTON FOR CREATE FEES <<<<<<< */}
-        <TouchableOpacity style={styles.btn}>
+        {/* <TouchableOpacity style={styles.btn}>
           <Text style={styles.submit} onPress={toNotification}>
             {' '}
             SUBMIT{' '}
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );
