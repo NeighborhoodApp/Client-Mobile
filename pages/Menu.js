@@ -42,7 +42,7 @@ function Menu({ navigation }) {
             <Fontisto style={styles.icon} name="calendar" size={22} color="#2C6FC7" />
             <Text style={styles.menu}> Create Event </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btn_menu}>
+          <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('Tetonggo')}>
             <FontAwesome5 style={styles.icon} name="users" size={18} color="#2C6FC7" />
             <Text style={styles.menu}> Neighbours </Text>
           </TouchableOpacity>
