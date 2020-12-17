@@ -13,7 +13,7 @@ const defaultVal = {
   email: '',
   password: '',
   address: '',
-}
+};
 
 function JoinUs({ navigation }) {
   const [payload, setPayload] = useState(defaultVal);
@@ -47,7 +47,6 @@ function JoinUs({ navigation }) {
         });
         const jsonValue = JSON.stringify(data);
         await AsyncStorage.setItem('userlogedin', jsonValue);
-
         navigation.replace('Login');
 
         console.log('Welcome,' + data.fullname);

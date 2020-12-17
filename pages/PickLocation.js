@@ -77,6 +77,17 @@ function PickLocation({ navigation }) {
     dispatch(callServer(option));
   };
 
+  const getUser = async () => {
+    try {
+      const value = await AsyncStorage.getItem('userlogedin');
+      const json = JSON.parse(value);
+      setUserLogedIn(json);
+      // console.log('user logedIn', json);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const addItem = () => {
     const activeEstates = [];
     realEstates.forEach((el) => {
@@ -318,4 +329,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PickLocation
+export default PickLocation;

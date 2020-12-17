@@ -32,7 +32,6 @@ export default function reducer(state = initState, action) {
       return { ...state, user: null, stage: null, error: null };
 
     case 'SET_USERS_LOADING':
-      return { ...state, loading: action.payload };
     case 'SET_USER_LOADING':
     case 'UPDATE_USER_LOADING':
       return { ...state, loading: action.payload, stage: null };
