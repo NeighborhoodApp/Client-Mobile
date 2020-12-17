@@ -14,8 +14,8 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     const preload = async () => {
-      // const value = await AsyncStorage.getItem('userlogedin');
-      const value = await AsyncStorage.removeItem('userlogedin');
+      const value = await AsyncStorage.getItem('userlogedin');
+      // const value = await AsyncStorage.removeItem('userlogedin');
       json = JSON.parse(value);
       if (value) {
         const token = await registerPushNotification();

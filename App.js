@@ -32,7 +32,6 @@ export default function App() {
   return (
     <NavigationContainer>
       <Provider store={store}>
-
         <Stack.Navigator>
           {/* <Stack.Screen name="NotificationPage" component={NotificationPage} options={{ headerShown: true }} /> */}
 
@@ -118,7 +117,7 @@ export default function App() {
             options={{
               headerTitle: () => (
                 <View style={styles.row}>
-                  <Text style={styles.title}>Profile / Create Fees</Text>
+                  <Text style={styles.title}>Profile</Text>
                   <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
                 </View>
               ),
