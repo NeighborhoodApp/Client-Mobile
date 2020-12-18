@@ -4,6 +4,7 @@ import { useFonts, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import { Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import AppLoading from 'expo-app-loading';
 import SvgUri from 'expo-svg-uri';
+import { Avatar } from 'react-native-paper';
 
 function VerificationList(props) {
   const [loaded] = useFonts({
@@ -16,10 +17,16 @@ function VerificationList(props) {
 
   return (
     <View style={styles.row}>
-      <SvgUri
+      {/* <SvgUri
         width="55"
         height="55"
         source={{ uri: `https://avatars.dicebear.com/api/human/:${props.user.fullname}.svg` }}
+      /> */}
+      <Avatar.Image
+        size={39}
+        source={{
+          uri: `https://randomuser.me/api/portraits/men/${props.user.id}.jpg`,
+        }}
       />
       <View style={styles.column}>
         <Text style={styles.name}>{props.user.fullname}</Text>

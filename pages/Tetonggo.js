@@ -23,7 +23,20 @@ const defaultVal = {
   privacy: 'public',
 }
 
+let hasLoaded = false;
 function Tetonggo({ navigation }) {
+  useEffect(() => {
+    const option = {
+      url: 'users',
+      stage: 'getRealEstates',
+      method: 'get',
+      body: null,
+      headers: true, // true
+      type: 'SET_USERS',
+    };
+    dispatch(callServer(option));
+  }, []);
+  
   const { users, user: userNow, error, stage, loading } = useSelector((state) => state.reducerUser);
   const [user, setUser] = useState(null);
   const [selectedUser, setSelectedUser] = useState({ user: '', address: '' });
@@ -52,6 +65,7 @@ function Tetonggo({ navigation }) {
   // };
 
   useEffect(() => {
+    hasLoaded = false;
     let temp
     const tes = async () => {
       const value = await AsyncStorage.getItem('userlogedin');

@@ -15,8 +15,6 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const EventCalendar = ({ navigation }) => {
   const [dateNow, setDateNow] = useState()
-  const { fees, loading, error, stage } = useSelector(state => state.reducerFee)
-  const { events } = useSelector(state => state.reducerEvent)
   // const [filterFees, setFilterFees] = ([])
   // const [filterEvents, setFilterEvents] = ([])
   const [items, setItems] = useState({});
@@ -59,10 +57,13 @@ const EventCalendar = ({ navigation }) => {
     };
     fetchEvent()
   }, [])
+  
+  const { fees, loading, error, stage } = useSelector((state) => state.reducerFee);
+  const { events } = useSelector((state) => state.reducerEvent);
   if (!user) return <Loading />
-
-  console.log(fees[0])
-  console.log(events[0])
+  console.log('..........events')
+  console.log(fees[0], 'feesss...')
+  console.log(events[0], 'event...')
   const loadItems = (day) => {
     setTimeout(() => {
       const filterFees = fees.filter(el => el.ComplexId === user.ComplexId)

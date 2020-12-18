@@ -8,4 +8,7 @@ export const actionRemoveRealEstate = () => {
 export const actionRemoveUser = () => {
   return { type: 'REMOVE_USER', payload: null };
 };
+export const actionRemoveUsers = () => {
+  return { type: 'REMOVE_USERS', payload: null };
+};
 ;
