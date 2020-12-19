@@ -25,15 +25,15 @@ export default function callServerV2(option) {
       dispatch({ type: option.type + '_ERROR', payload: null });
       // console.log(option);
       const { data } = await axios(payloadAxios);
-
+      // console.log('Data From Axios: ' + option.stage, data);
       dispatch({
         type: option.type,
         stage: option.stage,
         payload: option.id ? option.id : option.deletedId ? option.deletedId : data,
       });
     } catch (error) {
-      console.log(error);
-      console.log('axios', error.response, 'stage', option.stage);
+      console.error(error);
+      console.error('axios', error.response, 'stage', option.stage);
       dispatch({
         type: option.type + '_ERROR',
         stage: option.stage,
