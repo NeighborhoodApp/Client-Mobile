@@ -23,20 +23,20 @@ export default function callServerV2(option) {
     try {
       dispatch({ type: option.type + '_LOADING', payload: true });
       dispatch({ type: option.type + '_ERROR', payload: null });
-
+      // console.log(option);
       const { data } = await axios(payloadAxios);
 
       dispatch({
         type: option.type,
-        stage: option.stage || null,
+        stage: option.stage,
         payload: option.id ? option.id : option.deletedId ? option.deletedId : data,
       });
     } catch (error) {
       console.log(error);
-      // console.log('axios', error.response || error.message);
+      console.log('axios', error.response, 'stage', option.stage);
       dispatch({
         type: option.type + '_ERROR',
-        stage: option.stage || null,
+        stage: option.stage,
         payload: error.response || { msg: 'Somthing error on fetch' },
       });
     } finally {

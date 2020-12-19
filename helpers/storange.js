@@ -11,14 +11,6 @@ export const storeData = async (key, value) => {
   }
 };
 
-// async function getData() {
-//   return await axios.get('https://jsonplaceholder.typicode.com/posts');
-// }
-
-// (async () => {
-//   console.log(await getData());
-// })();
-
 export const getUserLogedIn = async () => {
   try {
     const value = await AsyncStorage.getItem('userlogedin');
@@ -27,10 +19,19 @@ export const getUserLogedIn = async () => {
       return data;
     } else {
       alert('Your session is expired');
-      return 'expired';
+      return {};
     }
   } catch (e) {
-    return 'expired';
+    return {};
+  }
+};
+
+export const setUserLogedIn = async (user) => {
+  try {
+    await AsyncStorage.setItem('userlogedin', user);
+    return 'saved'
+  } catch (e) {
+    return 'failed message: ' + e.stack;
   }
 };
 

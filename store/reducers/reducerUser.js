@@ -8,6 +8,7 @@ const initState = {
 };
 
 export default function reducer(state = initState, action) {
+  // console.log('action', action.stage)
   switch (action.type) {
     case 'SET_USERS':
       if (action.payload.allUsers) {
@@ -21,9 +22,9 @@ export default function reducer(state = initState, action) {
       return { ...state, users: action.payload, stage: action.stage, error: null };
     case 'SET_USER':
       if (action.payload.foundUser) {
-        return { ...state, user: action.payload.foundUser, stage: action.stage, error: null };
+        return { ...state, user: action.payload.foundUser, stage: action.stage || null, error: null };
       }
-      return { ...state, user: action.payload, stage: action.stage, error: null };
+      return { ...state, user: action.payload, stage: action.stage || action.stage || null, error: null };
     case 'UPDATE_USER':
       console.log(action);
       const updatedUser = state.users.filter((user) => user.id !== action.payload);

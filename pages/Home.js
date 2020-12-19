@@ -1,80 +1,113 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AppLoading from 'expo-app-loading';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { axios } from '../helpers/Axios';
 import callServer from '../helpers/callServer';
 import callServerV2 from '../helpers/callServer.v2';
+import errorHandler from '../helpers/errorHandler';
 import { registerPushNotification } from '../helpers/PushNotification';
-import { getUserLogedIn } from '../helpers/storange';
-import { actionRemoveUser } from '../store/actions/action';
+import { getUserLogedIn, setUserLogedIn } from '../helpers/storange';
+import { actionRemoveStageError, actionRemoveUser } from '../store/actions/action';
 // import { verifyUser } from '../helpers/verify';
 
 let json = null;
 export default function Home({ navigation }) {
-  const [expoPushToken, setExpoPushToken] = useState('');
+  const [userLogedIn, setUserLogedIn] = useState(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
     (async () => {
+      console.log('-----UseEffect Pertama')
       const userLogedIn = await getUserLogedIn();
-      if (typeof userLogedIn === 'object') {
-        const expoPushToken = await registerPushNotification();
-        dispatch(actionRemoveUser());
-        dispatch(
-          callServerV2({
-            url: 'users/verify/' + userLogedIn.id,
-            stage: 'verifyUser',
-            data: {
-              expoPushToken,
-            },
-            headers: {
-              access_token: userLogedIn.access_token,
-            },
-            type: 'SET_USER',
-          }),
-        );
-      } else {
-        console.log('Session Expired');
-      }
+      setUserLogedIn(userLogedIn);
     })();
-
-    const preload = async () => {
-      const value = await AsyncStorage.getItem('userlogedin');
-      // const value = await AsyncStorage.removeItem('userlogedin');
-      json = JSON.parse(value);
-      if (value) {
-        const token = await registerPushNotification();
-        const option = {
-          url: 'users',
-          stage: 'getRealEstates',
-          method: 'get',
-          body: null,
-          headers: true, // true
-          type: 'SET_USERS',
-        };
-        dispatch(callServer(option));
-        await verifyUser(token);
-        setExpoPushToken(token);
-      }
-      if (value) {
-        if (!json.RealEstateId) {
-          navigation.replace('PickLocation');
-        } else if (json.status === 'Inactive') {
-          navigation.replace('Waiting');
-        } else {
-          navigation.replace('GetStarted');
-        }
-      } else {
-        navigation.replace('GetStarted');
-      }
-    };
-    // preload();
   }, []);
 
-  const { loading, data, error } = useSelector((state) => state.reducerUser);
+  useEffect(() => {
+    (async () => {
+      console.log('userLogedIn', userLogedIn);
+      if (userLogedIn !== null) {
+        console.log('-----UseEffect UserLogedIn', userLogedIn.hasOwnProperty('id'));
+        if (userLogedIn.hasOwnProperty('id')) {
+          dispatch(
+            callServerV2({
+              url: 'users/verify/' + userLogedIn.id,
+              stage: 'verifyUser',
+              method: 'PUT',
+              body: {
+                expoPushToken: expoPushToken,
+              },
+              headers: {
+                access_token: userLogedIn.access_token,
+              },
+              type: 'SET_USER',
+            }),
+          );
+        } else {
+          navigation.replace('Login');
+          console.log('Session Expired');
+        }
+      } 
+      
+    })();
+  }, [userLogedIn])
 
-  if ()
+  const { loading, user, users, error, stage } = useSelector((state) => state.reducerUser);
+
+  useEffect(() => {
+    (async () => {
+      if (user) {
+        console.log('-----UseEffect User');
+        // callServerV2({
+        //   url: 'users',
+        //   stage: 'getAllUser',
+        //   method: 'get',
+        //   headers: {
+        //     access_token: userLogedIn.access_token,
+        //   },
+        //   type: 'SET_USERS',
+        // });
+        // const newVal = { ...userLogedIn };
+        // for (const key in user) {
+        //   if (user.hasOwnProperty(key)) {
+        //     newVal[key] = user[key];
+        //   }
+        // }
+        const isSaved = await setUserLogedIn(newVal);
+        console.log(isSaved, newVal);
+      }
+    })();
+  }, [user])
+
+  useEffect(() => {
+    (async () => {
+      console.log('-----UseEffect Users');
+
+    })();
+  }, [users])
+
+  if (loading) return <AppLoading />;
+  if (error) return (
+    <View style={styles.container}>
+      <Text>Error..... {JSON.stringify(error)}</Text>
+    </View>
+  );
+
+  // useEffect(() => {}, []);
+  console.log('stage', stage, 'error', error, 'loading', loading);
+  // if (error) {
+  //   console.error(errorHandler(error));
+  // }
+  // if (stage === 'verifyUser') {
+  //   console.log('stage', stage, 'error', error);
+    
+  // } else if (stage === 'getAllUser') {
+  //   console.log('User.....', user);
+  //   // dispatch(actionRemoveStageError());
+  // }
+
   const verifyUser = async (expoPushToken) => {
     try {
       const value = await AsyncStorage.getItem('userlogedin');
@@ -124,7 +157,7 @@ export default function Home({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text>Loading.....</Text>
+      <Text>Loading..... { JSON.stringify(users) }</Text>
       {/* <Button title="JOIN US PAGE" onPress={goJoin}></Button> */}
     </View>
   );
