@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import callServerV2 from '../helpers/callServer.v2';
+import errorHandler from '../helpers/errorHandler';
 import { registerPushNotification } from '../helpers/PushNotification';
 import { getUserLogedIn, setUserLogedIn } from '../helpers/storange';
 
@@ -66,9 +67,7 @@ export default function Home({ navigation }) {
         const newVal = { ...userLogin };
         for (const key in user) {
           if (user.hasOwnProperty(key)) {
-            if (key !== 'status') {
-              newVal[key] = user[key];
-            }
+            newVal[key] = user[key];
           }
         }
         await setUserLogedIn(JSON.stringify(newVal));
@@ -87,18 +86,19 @@ export default function Home({ navigation }) {
     })();
   }, [users]);
 
+  const goJoin = () => {
+    navigation.replace('GetStarted');
+  };
+
   if (loading) return <AppLoading />;
 
   if (error)
     return (
       <View style={styles.container}>
-        <Text>Error.....</Text>
+        <Text>{errorHandler(error)}</Text>
       </View>
     );
 
-  const goJoin = () => {
-    navigation.replace('GetStarted');
-  };
 
   return (
     <View style={styles.container}>

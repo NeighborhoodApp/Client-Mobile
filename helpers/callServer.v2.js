@@ -32,12 +32,11 @@ export default function callServerV2(option) {
         payload: option.id ? option.id : option.deletedId ? option.deletedId : data,
       });
     } catch (error) {
-      console.error(error);
-      console.error('axios', error.response, 'stage', option.stage);
+      console.error('axios', error.message, 'stage', option.stage);
       dispatch({
         type: option.type + '_ERROR',
         stage: option.stage,
-        payload: error.response || { msg: 'Somthing error on fetch' },
+        payload: error.response || error || { msg: 'Somthing error on fetch' },
       });
     } finally {
       dispatch({ type: option.type + '_LOADING', payload: false });
