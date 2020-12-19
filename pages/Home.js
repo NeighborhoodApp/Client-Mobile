@@ -1,6 +1,6 @@
 import AppLoading from 'expo-app-loading';
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import callServerV2 from '../helpers/callServer.v2';
 import { registerPushNotification } from '../helpers/PushNotification';
@@ -66,7 +66,9 @@ export default function Home({ navigation }) {
         const newVal = { ...userLogin };
         for (const key in user) {
           if (user.hasOwnProperty(key)) {
-            newVal[key] = user[key];
+            if (key !== 'status') {
+              newVal[key] = user[key];
+            }
           }
         }
         await setUserLogedIn(JSON.stringify(newVal));
@@ -78,8 +80,10 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     (async () => {
-      console.log('-----UseEffect Users');
-      goJoin(userLogin);
+      if (users.length > 0) {
+        console.log('-----UseEffect Users');
+        goJoin();
+      }
     })();
   }, [users]);
 
@@ -92,23 +96,13 @@ export default function Home({ navigation }) {
       </View>
     );
 
-  const goJoin = (user) => {
-    if (user) {
-      if (!user.RealEstateId) {
-        navigation.replace('PickLocation');
-      } else if (user.status === 'Inactive') {
-        navigation.replace('Waiting');
-      } else {
-        navigation.replace('GetStarted');
-      }
-    } else {
-      navigation.replace('GetStarted');
-    }
+  const goJoin = () => {
+    navigation.replace('GetStarted');
   };
 
   return (
     <View style={styles.container}>
-      <Text>Loading..... {JSON.stringify(users)}</Text>
+      <Text>Loading.....</Text>
       {/* <Button title="JOIN US PAGE" onPress={goJoin}></Button> */}
     </View>
   );
