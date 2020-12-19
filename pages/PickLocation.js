@@ -1,28 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useFonts, Ubuntu_300Light, Ubuntu_500Medium, Ubuntu_700Bold } from '@expo-google-fonts/ubuntu';
 import { Montserrat_500Medium } from '@expo-google-fonts/montserrat';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Icon from 'react-native-vector-icons/Feather';
 import AppLoading from 'expo-app-loading';
 import { useDispatch, useSelector } from 'react-redux';
-import callServer from '../helpers/callServer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { cos } from 'react-native-reanimated';
 import errorHandler from '../helpers/errorHandler';
-import { axios } from '../helpers/Axios';
 import customAlert from '../helpers/alert';
-import { actionRemoveRealEstate } from '../store/actions/action';
+import { getUserLogedIn, setUserLogedIn } from '../helpers/storange';
+import callServerV2 from '../helpers/callServer.v2';
 
-let i = 1;
-const defaultVal = [
-  { label: ' Riyan', value: 'usa', icon: () => <Icon name="flag" size={18} color="#900" />, hidden: true },
-  { label: 'UK', value: 'uk', icon: () => <Icon name="flag" size={18} color="#900" /> },
-  { label: 'France', value: 'france', icon: () => <Icon name="flag" size={18} color="#900" /> },
-];
-
-let isLoaded = false;
-let render = 1;
 function PickLocation({ navigation }) {
   let [loaded] = useFonts({
     Ubuntu_300Light,
@@ -37,21 +25,47 @@ function PickLocation({ navigation }) {
   const [selectedComplexes, setSelectedComplexes] = useState(null);
   const [items, setItems] = useState([]);
   const [itemsComplexs, setItemsComplexs] = useState([]);
-  const [userLogedIn, setUserLogedIn] = useState(null);
-
-  const { realEstates, error, stage } = useSelector((state) => state.reducerRealEstate);
-  const { result, error: errUser, stage: stageUser } = useSelector((state) => state.reducerUser);
+  const [userLogin, setUserLogin] = useState(null);
 
   useEffect(() => {
-    const load = async () => {
-      const value = await AsyncStorage.getItem('userlogedin');
-      const json = JSON.parse(value);
-      setUserLogedIn(json);
-      dispatch(actionRemoveRealEstate())
-      fetchRealEstate();
-    }
-    load();
+    (async () => {
+      const user = await getUserLogedIn();
+      setUserLogin(user)
+    })();
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (userLogin) {
+        if (userLogin.hasOwnProperty('access_token')) {
+          dispatch(
+            callServerV2({
+              url: 'real-estates',
+              stage: 'getRealEstates',
+              type: 'SET_REAL_ESTATES',
+            }),
+          );
+        } else {
+          customAlert({
+            actionConfirm: () => {
+              navigation.replace('Login');
+            },
+            title: 'Session Expired',
+            message: `Please login firts or register!`,
+          });
+        }
+      }
+    })();
+  }, [userLogin])
+
+  const { realEstates, error, loading } = useSelector((state) => state.reducerRealEstate);
+  const { user, stage } = useSelector((state) => state.reducerUser);
+
+  useEffect(() => {
+    if (realEstates.length > 0) {
+      addItem();
+    }
+  }, [realEstates]);
 
   useEffect(() => {
     if (selectedEstates) {
@@ -60,33 +74,19 @@ function PickLocation({ navigation }) {
   }, [selectedEstates]);
 
   useEffect(() => {
-    if (realEstates) {
-      addItem();
+    if (user && user) {
+      if (stage === 'updateUser') {
+        // console.log('userrrrr....', user);
+        customAlert({
+          actionConfirm: () => {
+            navigation.replace('Waiting');
+          },
+          title: 'Register Success',
+          message: `Hi, ${user.fullname}, Your account has submited for approval.\nPlease wait until your account is verified!`,
+        });
+      }
     }
-  }, [realEstates]);
-
-  const fetchRealEstate = () => {
-    const option = {
-      url: 'real-estates',
-      stage: 'getRealEstates',
-      method: 'get',
-      body: null,
-      headers: null, // true
-      type: 'SET_REAL_ESTATES',
-    };
-    dispatch(callServer(option));
-  };
-
-  const getUser = async () => {
-    try {
-      const value = await AsyncStorage.getItem('userlogedin');
-      const json = JSON.parse(value);
-      setUserLogedIn(json);
-      // console.log('user logedIn', json);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  }, [user])
 
   const addItem = () => {
     const activeEstates = [];
@@ -118,76 +118,47 @@ function PickLocation({ navigation }) {
     }
   };
 
-  const prosesApproval = async () => {
-    if (userLogedIn) {
-      const newName = userLogedIn.fullname.split('#');
+  const prosesApproval = () => {
+    if (userLogin.hasOwnProperty('access_token')) {
+      const newName = userLogin.fullname.split('#');
       const updatedUser = {
-        ...userLogedIn,
+        ...userLogin,
         RealEstateId: selectedEstates,
         ComplexId: selectedComplexes,
         fullname: newName[0],
       };
+
       const { fullname, address, RoleId, RealEstateId, ComplexId } = updatedUser;
-      const payload = { fullname: newName[0], address, RoleId, RealEstateId, ComplexId };
-      console.log(RealEstateId, ComplexId, 'RealEstateId && ComplexId');
+      const payload = { fullname, address, RoleId, RealEstateId, ComplexId };
+      
       if (RealEstateId && ComplexId) {
-        console.log('payload', payload);
-        try {
-          await axios({
-            url: 'users/' + userLogedIn.id,
-            method: 'PUT',
-            data: payload,
-            headers: {
-              access_token: userLogedIn.access_token,
-            },
-          });
-          const jsonValue = JSON.stringify(updatedUser);
-          await AsyncStorage.setItem('userlogedin', jsonValue);
-          Alert.alert(
-            'Register Success',
-            `Hi, ${updatedUser.fullname}, Your account has submited for approval.\nPlease wait until your account is verified!`,
-            [
-              // { text: "Don't leave", style: 'cancel', onPress: () => {} },
-              {
-                text: 'Ok',
-                style: 'destructive',
-                onPress: () => navigation.replace('Waiting'),
+        (async () => {
+          dispatch(
+            callServerV2({
+              url: 'users/' + userLogin.id,
+              stage: 'updateUser',
+              method: 'PUT',
+              body: payload,
+              headers: {
+                access_token: userLogin.access_token,
               },
-            ],
+              type: 'SET_USER',
+            }),
           );
-        } catch (error) {
-          const msg = errorHandler(error);
-          console.log(msg);
-        }
+          await setUserLogedIn(updatedUser)
+        })();
       } else {
-        Alert.alert('Register Failed', `Hi, ${updatedUser.fullname}, Please select Real Estate and Complex!`, [
-          // { text: "Don't leave", style: 'cancel', onPress: () => {} },
-          {
-            text: 'Ok',
-            style: 'destructive',
-            // onPress: () => navigation.replace('Waiting'),
-          },
-        ]);
+        customAlert({
+          actionConfirm: () => { },
+          title: 'Register Failed',
+          message:
+            `Hi, ${updatedUser.fullname}, Please select Real Estate and Complex!`,
+        });
       }
-    } else {
-       Alert.alert('Please Login', `Please login firts or register!`, [
-         // { text: "Don't leave", style: 'cancel', onPress: () => {} },
-         {
-           text: 'Ok',
-           style: 'destructive',
-           onPress: () => navigation.replace('Login'),
-         },
-       ]);
     }
   }
-      
-  // console.log(render, stageUser, errUser, result);
-
-  const handleChange = (itemValue) => {
-    setSelectedEstates(itemValue);
-  };
   
-  if (!loaded) return <AppLoading />;
+  if (!loaded || loading) return <AppLoading />;
 
   return (
     <View style={styles.container}>
@@ -210,7 +181,6 @@ function PickLocation({ navigation }) {
               justifyContent: 'flex-start',
             }}
             dropDownStyle={{ backgroundColor: '#fafafa' }}
-            // onValueChange={(itemValue, itemIndex) => handleChange(itemValue)}
             onChangeItem={(item) => setSelectedEstates(item.value)}
           />
         )}
@@ -227,7 +197,6 @@ function PickLocation({ navigation }) {
             justifyContent: 'flex-start',
           }}
           dropDownStyle={{ backgroundColor: '#fafafa' }}
-          // onValueChange={(itemValue, itemIndex) => setSelectedEstates(itemValue)}
           onChangeItem={(item) => setSelectedComplexes(item.value)}
         />
       </View>

@@ -22,8 +22,8 @@ export default function Home({ navigation }) {
   useEffect(() => {
     (async () => {
       if (userLogin !== null) {
-        // console.log('-----UseEffect userLogin', userLogin.hasOwnProperty('id'));
-        if (userLogin.hasOwnProperty('id')) {
+        console.log('-----UseEffect userLogin', userLogin);
+        if (userLogin.hasOwnProperty('access_token')) {
           const expoPushToken = await registerPushNotification();
           dispatch(
             callServerV2({
@@ -63,19 +63,17 @@ export default function Home({ navigation }) {
             },
             type: 'SET_USERS',
           }),
-        );;;
+        );
         const newVal = { ...userLogin };
         for (const key in user) {
           if (user.hasOwnProperty(key)) {
             newVal[key] = user[key];
           }
         }
-        await setUserLogedIn(JSON.stringify(newVal));
+        await setUserLogedIn(newVal);
       }
     })();
   }, [user]);
-
-  console.log('users', users);
 
   useEffect(() => {
     (async () => {
@@ -92,13 +90,13 @@ export default function Home({ navigation }) {
 
   if (loading) return <AppLoading />;
 
-  if (error)
+  if (error) {
     return (
       <View style={styles.container}>
         <Text>{errorHandler(error)}</Text>
       </View>
     );
-
+  }
 
   return (
     <View style={styles.container}>

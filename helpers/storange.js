@@ -28,7 +28,7 @@ export const getUserLogedIn = async () => {
 
 export const setUserLogedIn = async (user) => {
   try {
-    await AsyncStorage.setItem('userlogedin', user);
+    await AsyncStorage.setItem('userlogedin', JSON.stringify(user));
     return 'saved'
   } catch (e) {
     return 'failed message: ' + e.stack;
