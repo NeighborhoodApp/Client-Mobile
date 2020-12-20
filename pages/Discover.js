@@ -110,7 +110,7 @@ function Discover({ navigation }) {
     })();
   }, [timelines])
 
-  const fetchTimeline = () => {
+  const fetchTimeline = (token, coordinate) => {
     (async () => {
       if (Platform.OS !== 'web') {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -123,8 +123,8 @@ function Discover({ navigation }) {
           url: 'timeline',
           stage: 'getTimelines',
           headers: {
-            access_token: userLogin.access_token,
-            coordinate: userLogin.coordinate,
+            access_token: userLogin ? userLogin.access_token : token,
+            coordinate: userLogin ? userLogin.coordinate : coordinate,
           },
           type: 'SET_TIMELINES',
         }),
@@ -258,9 +258,22 @@ function Discover({ navigation }) {
   }
 
   const onRefresh = useCallback(async () => {
-    await fetchTimeline()
-    setRefreshing(true);
-    wait(2000).then(() => setRefreshing(false));
+    try {
+      setRefreshing(true);
+      if (!userLogin) {
+        const userLogedIn = await getUserLogedIn()
+        await fetchTimeline(userLogedIn.access_token, userLogedIn.coordinate)
+      } else {
+        await fetchTimeline()
+      }
+      setTimeout(() => {
+        setRefreshing(false)
+      }, 2000);
+    } catch (error) {
+      console.log(error)
+    }
+
+    // wait(2000).then(() => setRefreshing(false));
   }, []);
 
   if (!loaded || !userLogin || loading) return <Loading />;
