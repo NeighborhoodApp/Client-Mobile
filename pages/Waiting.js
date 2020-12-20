@@ -3,22 +3,11 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-na
 import { useFonts, Ubuntu_300Light, Ubuntu_500Medium, Ubuntu_700Bold } from '@expo-google-fonts/ubuntu';
 import { Montserrat_500Medium } from '@expo-google-fonts/montserrat';
 import { AntDesign } from '@expo/vector-icons'; 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppLoading from 'expo-app-loading';
 import { useDispatch, useSelector } from 'react-redux';
-import callServer from '../helpers/callServer';
-import { actionRemoveRealEstate, actionRemoveUser } from '../store/actions/action';
+import { getUserLogedIn, setUserLogedIn } from '../helpers/storange';
+import callServerV2 from '../helpers/callServer.v2';
 
-const defaultValue = {
-  address: '',
-  email: '',
-  fullname: '',
-  id: '',
-  status: 'Inactive'
-};
-
-let statusUser = null;
-let tempUser = null;
 export default function Waiting({ navigation }) {
   let [loaded] = useFonts({
     Ubuntu_300Light,
@@ -29,50 +18,76 @@ export default function Waiting({ navigation }) {
 
   const dispatch = useDispatch();
 
-  const [user, setUser] = useState(defaultValue);
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const [userLogin, setUserLogin] = useState(null);
   const [message, setMessage] = useState({
     type: '',
     content: '.',
   });
 
-  // ! Pertama
   useEffect(() => {
-    const preload = async () => {
-      setMessage({
-        type: 'default',
-        content: 'Please wait...\n until your account \n is verified.',
-      });
-      setHasLoaded(false);
-      dispatch(actionRemoveUser());
-      let rawData = await AsyncStorage.getItem('userlogedin');
-      let dataJson = JSON.parse(rawData); 
-
-      if (dataJson) {
-        const option = {
-          url: 'users/' + dataJson.id,
-          stage: 'null',
-          method: 'get',
-          body: null,
-          headers: null, // true
-          type: 'SET_USER',
-        };
-        dispatch(callServer(option));
-      } else {
-        Alert.alert('Session Expired', `Please, login first!`, [
-          // { text: "Don't leave", style: 'cancel', onPress: () => {} },
-          {
-            text: 'Ok',
-            style: 'destructive',
-            onPress: () => navigation.replace('Login'),
-          },
-        ]);
-      }
-    };
-    preload();
+    (async () => {
+      const user = await getUserLogedIn();
+      setUserLogin(user);
+    })();
   }, []);
 
-  const { user: userRedux, loading, error, stage } = useSelector((state) => state.reducerUser);
+  useEffect(() => {
+    if (userLogin) {
+      if (userLogin.hasOwnProperty('access_token')) {
+        dispatch(
+          callServerV2({
+            url: 'users/' + userLogin.id,
+            stage: 'checkUser',
+            headers: {
+              access_token: userLogin.access_token,
+            },
+            type: 'SET_USER',
+          }),
+        );
+      } else {
+        console.log('Session Expired');
+        navigation.replace('Login');
+      }
+    }
+  }, [userLogin]);
+
+  const { user, stage } = useSelector((state) => state.reducerUser);
+
+  useEffect(() => {
+    (async () => {
+      if (stage === 'checkUser') {
+        const { fullname, status } = user;
+        const splitName = fullname.split('#');
+        let message = {
+          type: 'default',
+          content: 'Please wait...\n until your account \n is verified.',
+        };
+        if (splitName[1] == 'declined') {
+          message = {
+            type: 'declined',
+            content: 'Your Request is decline \n Click next to Repickup \n Your valid location!',
+          };
+        } else if (status === 'Active') {
+          message = {
+            type: 'Verified',
+            content: 'Your account is verified\n Click next to connect \n with your neighbour.',
+          };
+        }
+
+        setMessage({
+          ...message,
+          fullname: splitName[0],
+        });
+
+        const newUser = {
+          ...userLogin,
+          status,
+          fullname: splitName[0],
+        };
+        await setUserLogedIn(newUser);
+      }
+    })();
+  }, [user]);
 
   const toDiscover = () => {
     navigation.replace('Discover');
@@ -85,82 +100,34 @@ export default function Waiting({ navigation }) {
   const toNext = (status, isdeclined) => {
     if (message.type === 'declined') {
       toPickLocation();
-    } else if (message.type === 'verify') {
+    } else if (message.type === 'Verified') {
       toDiscover();
     }
   };
-  
-  // ! Kedua
-  if (!hasLoaded && userRedux) {
-    setHasLoaded(true);
-    const prosesData = async () => {
-      const { RoleId, address, email, RealEstateId, ComplexId, expoPushToken, fullname, id, status } = userRedux;
-      const payload = { RoleId, address, email, RealEstateId, ComplexId, expoPushToken, fullname, id, status };
-      try {
-        payload.coordinate = userRedux.RealEstate.coordinate;
-        const json = JSON.parse(JSON.stringify(userRedux));
-        const splitName = json.fullname.split('#');
-        payload.fullname = splitName[0];
-
-        // console.log(userRedux, 'User REdux.........')
-        if (splitName[1] === 'declined') {
-          payload.RealEstateId = null;
-          payload.ComplexId = null;
-          setMessage({
-            fullname,
-            type: 'declined',
-            content: 'Your Request is decline \n Click next to Repickup \n Your valid location!',
-          });
-        } else if (status === 'active') {
-          setMessage({
-            fullname,
-            type: 'verify',
-            content: 'Your account is verified\n Click next to connect \n with your neighbour.',
-          });
-        } else if (status === 'inactive') {
-          setMessage({
-            fullname,
-            type: 'inactive',
-            content: 'Please wait...\n until your account \n is verified.',
-          });
-        }
-        setUser(payload);
-        const jstrify = JSON.stringify(payload);
-        await AsyncStorage.setItem('userlogedin', jstrify);
-      } catch (error) {
-        console.log(error)
-      }
-      
-    }
-    prosesData();
-  }
-
-  console.log(message, '................................')
 
   if (!loaded) return <AppLoading />;
 
-  // console.log(splitName[1] == 'declined, statusUser);
   return (
     <View style={styles.container}>
       {/* <Text style={styles.firstLine}> {statusUser}, {user.fullname}! </Text> */}
       <Image style={styles.waiting} source={require('../assets/waiting.png')} />
       <View style={styles.box}>
-        <Text style={styles.firstLine}> Hi, {user.fullname}! </Text>
+        <Text style={styles.firstLine}> Hi, {message.fullname}! </Text>
         <Text style={styles.secondLine}>
           {/* <Text style={styles.secondLine}> Please wait... {"\n"} until your account {"\n"} is verified.</Text> */}{' '}
           {/* Status User {statusUser + ' ' + splitName[1] + ' '} Split Name */}
           {message.content}
         </Text>
       </View>
-      {message.type === 'declined' || message.type === 'verify' ? (
+      {message.type === 'declined' || message.type === 'Verified' ? (
         <View style={styles.footer}>
           <View style={styles.row} onPress={() => toNext()}>
             <Text style={styles.next} onPress={() => toNext()}>
               {' '}
               Next{' '}
             </Text>
-            <TouchableOpacity style={styles.btn_next}>
-              <AntDesign name="right" size={16} color="black" onPress={() => toNext()} />
+            <TouchableOpacity style={styles.btn_next} onPress={() => toNext()}>
+              <AntDesign name="right" size={16} color="black" />
             </TouchableOpacity>
           </View>
         </View>

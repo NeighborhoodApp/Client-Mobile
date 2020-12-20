@@ -67,6 +67,11 @@ export default function Home({ navigation }) {
         const newVal = { ...userLogin };
         for (const key in user) {
           if (user.hasOwnProperty(key)) {
+            if (key === 'status') {
+              if (user[key] === 'Active') {
+                continue;
+              }
+            }
             newVal[key] = user[key];
           }
         }

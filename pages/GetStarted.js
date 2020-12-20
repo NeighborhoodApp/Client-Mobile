@@ -23,7 +23,7 @@ function GetStarted({ navigation }) {
     if (user.hasOwnProperty('id')) {
       if (!user.RealEstateId) {
         navigation.replace('PickLocation');
-      } else if (user.status === 'Inactive' || user.status === 'Verified') {
+      } else if (user.status === 'Inactive') {
         navigation.replace('Waiting');
       } else if (user.status === 'Active') {
         navigation.replace('Discover');
