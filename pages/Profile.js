@@ -1,14 +1,10 @@
-import React, { useEffect, useState }  from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity} from 'react-native'
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { Avatar } from 'react-native-paper';
-import { useFonts, Ubuntu_300Light,Ubuntu_500Medium } from '@expo-google-fonts/ubuntu'
-import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat'
-import { FontAwesome, Fontisto, Feather, Entypo, FontAwesome5, AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
-import AppLoading from 'expo-app-loading';
-import { useDispatch, useSelector } from 'react-redux';
-import callServer from '../helpers/callServer'
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import SvgUri from 'expo-svg-uri';
+import { useFonts, Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
+import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat';
+import { FontAwesome, Fontisto, Entypo } from '@expo/vector-icons';
+import { useSelector } from 'react-redux';
 import { getUserLogedIn } from '../helpers/storange';
 import Loading from '../components/Loading';
 
