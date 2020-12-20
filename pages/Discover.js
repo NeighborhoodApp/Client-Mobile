@@ -1,19 +1,27 @@
+import React, { useEffect, useState, useCallback } from 'react';
 
-import React, { useEffect, useState } from 'react';
-
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity, Alert } from 'react-native'
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  RefreshControl,
+} from 'react-native';
 import { Avatar } from 'react-native-paper';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
-import Loading from '../components/Loading'
+import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
+import Loading from '../components/Loading';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { Card } from 'react-native-paper';
 import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
-import BottomNavigator from '../components/BottomNavigator'
+import BottomNavigator from '../components/BottomNavigator';
 import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
-import { axios } from '../helpers/Axios'
-import Axios from 'axios';
+import { axios } from '../helpers/Axios';
 import callServerV2 from '../helpers/callServer.v2';
 import { actionRemoveTimeline } from '../store/actions/action';
 import { getUserLogedIn } from '../helpers/storange';
@@ -22,16 +30,25 @@ import AppLoading from 'expo-app-loading';
 const defaultVal = {
   description: '',
   privacy: 'public',
-}
+};
+
+const wait = (timeout) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, timeout);
+  });
+};
 
 function Discover({ navigation }) {
-  const [selectedValue, setSelectedValue] = useState("public");
+  const [selectedValue, setSelectedValue] = useState('public');
   const [payload, setPayload] = useState(defaultVal);
   const [formData, setFormData] = useState(null);
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   let [loaded] = useFonts({
-    Poppins_600SemiBold, Ubuntu_300Light
+    Poppins_600SemiBold,
+    Ubuntu_300Light,
   });
 
   const [image, setImage] = useState(null);
@@ -42,11 +59,11 @@ function Discover({ navigation }) {
 
   useEffect(() => {
     (async () => {
-      console.log('-----UseEffect 1')
+      console.log('-----UseEffect 1');
       const userLogedIn = await getUserLogedIn();
       setUserLogin(userLogedIn);
     })();
-  }, [])
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -57,13 +74,13 @@ function Discover({ navigation }) {
           fetchTimeline();
         } else {
           console.log('Session Expired');
-          navigation.replace('Login')
+          navigation.replace('Login');
         }
       }
     })();
-  }, [userLogin])
+  }, [userLogin]);
 
-  const { timelines, newTimeline, loading } = useSelector((state) => state.reducerTimeline);
+  const { timelines, newTimeline } = useSelector((state) => state.reducerTimeline);
 
   useEffect(() => {
     (async () => {
@@ -78,14 +95,15 @@ function Discover({ navigation }) {
               image: imgbUri === 'noimage' ? '' : imgbUri,
             },
             headers: {
-              access_token: userLogin.access_token
+              access_token: userLogin.access_token,
             },
             type: 'CREATE_TIMELINE',
-          }))
-        setImgbUri(null)
+          }),
+        );
+        setImgbUri(null);
       }
     })();
-  }, [imgbUri])
+  }, [imgbUri]);
 
   useEffect(() => {
     (async () => {
@@ -94,15 +112,15 @@ function Discover({ navigation }) {
         dispatch(actionRemoveTimeline());
       }
     })();
-  }, [newTimeline])
+  }, [newTimeline]);
 
   useEffect(() => {
     (async () => {
       if (timelines.length > 0) {
-        // Take some action 
+        // Take some action
       }
     })();
-  }, [timelines])
+  }, [timelines]);
 
   const fetchTimeline = () => {
     (async () => {
@@ -135,15 +153,16 @@ function Discover({ navigation }) {
             navigation.navigate('Menu');
           }}
         >
-          <Avatar.Image size={39}
+          <Avatar.Image
+            size={39}
             source={{
               uri: `https://randomuser.me/api/portraits/men/${userLogin.id}.jpg`,
             }}
           />
         </TouchableOpacity>
       ),
-    })
-  }
+    });
+  };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -162,11 +181,10 @@ function Discover({ navigation }) {
       let match = /\.(\w+)$/.exec(filename);
       let type = match ? `image/${match[1]}` : `image`;
 
-      const data = new FormData()
-      data.append('image', { uri: localUri, name: filename, type });
+      const data = new FormData();
+      data.append('file', { uri: localUri, name: filename, type });
 
-      data.append('image', result.uri);
-
+      data.append('file', result.uri);
       setImgbUri(null);
       setFormData(data);
     }
@@ -174,29 +192,37 @@ function Discover({ navigation }) {
 
   const submitHandler = async () => {
     console.log('press');
+    setLoading(true);
+    let uri;
     try {
       if (payload.description && formData) {
-        console.log(formData);
-        const { data } = await Axios({
-          url: 'https://api.imgbb.com/1/upload?key=d49e97d44b3f247ce10cf5e749bdfa6b',
+        const { data } = await axios({
+          url: 'upload',
           method: 'post',
           data: formData,
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
-        setImgbUri(data.data.display_url);
+        setImgbUri(data);
       } else if (payload.description) {
-        setImgbUri('noimage')
+        setImgbUri('noimage');
       }
+
+      setTimeout(() => {
+        setLoading(false);
+        setImage(null);
+        setFormData(null);
+        setPayload({ description: '', privacy: 'public' });
+      }, 500);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   const handleInput = (text, name) => {
     if (name === 'privacy' && !text) {
-      text = 'public'
+      text = 'public';
     }
     const value = {
       ...payload,
@@ -207,9 +233,9 @@ function Discover({ navigation }) {
 
   const changePage = (id) => {
     navigation.navigate('Comment', {
-      id
-    })
-  }
+      id,
+    });
+  };
 
   const deleteTl = async (id) => {
     try {
@@ -217,15 +243,14 @@ function Discover({ navigation }) {
         url: `timeline/${id}`,
         method: 'delete',
         headers: {
-          access_token: userLogin.access_token
-        }
-      })
-      fetchTimeline()
+          access_token: userLogin.access_token,
+        },
+      });
+      fetchTimeline();
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-
-  }
+  };
 
   const longPres = (id) => {
     Alert.alert(
@@ -235,20 +260,32 @@ function Discover({ navigation }) {
         {
           text: 'Cancel',
           onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel'
+          style: 'cancel',
         },
-        { text: 'OK', onPress: () => deleteTl(id) }
+        { text: 'OK', onPress: () => deleteTl(id) },
       ],
-      { cancelable: false }
-    )
-  }
+      { cancelable: false },
+    );
+  };
+
+  const onRefresh = useCallback(async () => {
+    if (userLogin.access_token) {
+      await fetchTimeline();
+    }
+    setRefreshing(true);
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
 
   if (!loaded || !userLogin) return <AppLoading />;
   if (loading) return <Loading />;
   return (
     <SafeAreaView style={styles.bg}>
       <View style={styles.bg1}>
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.contentContainer}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        >
           <View style={styles.boxAwal}>
             <View style={styles.row}>
               <Avatar.Image
@@ -260,7 +297,7 @@ function Discover({ navigation }) {
               />
               <View style={styles.boxProfile}>
                 <Text style={styles.name}>{userLogin.fullname}</Text>
-                <Text style={styles.location}>{userLogin.address}</Text>
+                <Text style={styles.location}>{userLogin.RealEstate.name}</Text>
 
                 <View style={{ flexDirection: 'row', width: '60%' }}>
                   <DropDownPicker
@@ -334,15 +371,21 @@ function Discover({ navigation }) {
                       ) : (
                         <Text style={styles.name}>{el.User.fullname}</Text>
                       )}
-                      <Text styles={styles.location}>{el.User.address}</Text>
+                      <Text styles={styles.location}>{el.User.RealEstate.name}</Text>
                     </View>
+                    <FontAwesome
+                      name={el.privacy === 'public' ? 'globe' : 'users'}
+                      size={25}
+                      color="#161C2B"
+                      style={{ alignSelf: 'center', marginLeft: 165 }}
+                    />
                   </View>
                   <View style={styles.hr} />
                   <View style={styles.boxCard}>
                     <View style={styles.boxText}>
                       <Text style={styles.status}>{el.description}</Text>
                     </View>
-                    {el.image.length > 0 ? (
+                    {el.image ? (
                       <Card style={styles.card}>
                         <Card.Cover source={{ uri: el.image }} />
                       </Card>
@@ -371,7 +414,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#161C2B',
     width: '100%',
     height: '100%',
-    top: 0
+    top: 0,
   },
   bg1: {
     position: 'absolute',
@@ -406,7 +449,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   col: {
     position: 'absolute',
@@ -419,18 +462,18 @@ const styles = StyleSheet.create({
     width: '100%',
     marginLeft: '15%',
     marginTop: 30,
-    marginBottom: 20
+    marginBottom: 20,
   },
   box: {
     flexDirection: 'column',
     width: '100%',
     marginLeft: '15%',
-    marginTop: 5
+    marginTop: 5,
   },
   row: {
     flexDirection: 'row',
     marginTop: '1%',
-    marginBottom: '1%'
+    marginBottom: '1%',
   },
   boxProfile: {
     flexDirection: 'column',
@@ -445,13 +488,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_600SemiBold',
     fontSize: 14,
     marginBottom: 1,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   status: {
     fontFamily: 'Poppins_600SemiBold',
     fontSize: 15,
     marginTop: 12,
-    marginBottom: 8
+    marginBottom: 8,
   },
   inputText: {
     width: '100%',
@@ -471,6 +514,7 @@ const styles = StyleSheet.create({
   },
   boxCard: {
     width: '90%',
+    zIndex: -1,
   },
   card: {
     justifyContent: 'flex-start',
@@ -481,7 +525,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.25,
     width: '86%',
     marginBottom: 8,
-    marginTop: 5
+    marginTop: 5,
   },
   inputStatus: {
     width: '90%',
@@ -489,30 +533,35 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontSize: 18,
     color: 'white',
-    marginLeft: 15
+    marginLeft: 15,
   },
   boxStatus: {
     width: '96%',
     backgroundColor: '#161C2B',
     borderRadius: 10,
-    borderWidth: 0.5
+    borderWidth: 0.5,
   },
   cardStatus: {
-    zIndex: -999,
+    // zIndex: -999,
     marginBottom: 10,
     justifyContent: 'flex-start',
     width: '94%',
   },
   addPhotos: {
     fontFamily: 'Ubuntu_300Light',
-    fontSize: 13, marginTop: 3,
-    fontWeight: 'bold', marginLeft: 10,
-    justifyContent: "center", borderWidth: 0.5,
-    padding: 5, paddingHorizontal: 13, height: 29,
-    backgroundColor: '#FAFAFA', borderColor: '#E3E3E3',
-    borderRadius: 5
-  }
+    fontSize: 13,
+    marginTop: 3,
+    fontWeight: 'bold',
+    marginLeft: 10,
+    justifyContent: 'center',
+    borderWidth: 0.5,
+    padding: 5,
+    paddingHorizontal: 13,
+    height: 29,
+    backgroundColor: '#FAFAFA',
+    borderColor: '#E3E3E3',
+    borderRadius: 5,
+  },
 });
 
-
-export default Discover
+export default Discover;

@@ -15,7 +15,7 @@ import Loading from '../components/Loading'
 import { socket } from '../helpers/socket'
 import SvgUri from 'expo-svg-uri';
 
-function Discover({ route, navigation }) {
+function Comment({ route, navigation }) {
   const { comments, error, stage } = useSelector((state) => state.reducerComment);
   const [loading, setLoading] = useState(false)
   const dispatch = useDispatch();
@@ -69,24 +69,16 @@ function Discover({ route, navigation }) {
   }, [navigation])
 
   useEffect(() => {
+    let flag = false
     socket.emit('join', id);
 
-    socket.on('comment', ({ comment, name }) => {
-      setCom([...com, { comment, name }])
+    socket.on('comment', ({ comment, name, img }) => {
+      setCom([...com, { comment, name, img }])
     })
-    return () => {
-      socket.emit('dc', id)
-      console.log('out')
-      const option = {
-        url: 'timeline',
-        stage: 'getTimelines',
-        method: 'get',
-        body: null,
-        headers: true,
-        type: 'SET_TIMELINES',
-      };
-      dispatch(callServer(option));
-    }
+
+    return(() => {
+      flag = true
+    })
   }, [com])
 
   const inputHandler = (e) => {
@@ -104,7 +96,8 @@ function Discover({ route, navigation }) {
         access_token: user.access_token
       }
     })
-    socket.emit('new comment', { comment: state, id: id, name: user.id });
+    socket.emit('new comment', { comment: state, id: id, name: user.fullname, img: user.id});
+
     setState('')
   }
 
@@ -142,7 +135,7 @@ function Discover({ route, navigation }) {
 
   if (loading) return <Loading />
   if (!loaded || !stage) return <AppLoading />;
-
+  
   return (
     <SafeAreaView style={styles.bg}>
       <View style={styles.bg1}>
@@ -169,10 +162,10 @@ function Discover({ route, navigation }) {
                 <Text style={styles.status}>{comments.description}</Text>
               </View>
               {
-                comments.image &&
+                comments.image ?
                 <Card style={styles.card}>
                   <Card.Cover source={{ uri: comments.image }} />
-                </Card>
+                </Card> : null
               }
               <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> {comments.Comments.length}</Text>
             </View>
@@ -236,7 +229,6 @@ function Discover({ route, navigation }) {
           </View>
 
         </ScrollView>
-        <BottomNavigator></BottomNavigator>
       </View>
     </SafeAreaView >
   )
@@ -414,4 +406,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default Discover
+export default Comment
