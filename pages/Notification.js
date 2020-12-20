@@ -14,7 +14,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
-export default function NotificationPage() {
+export default function NotificationPage({ navigation }) {
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
@@ -33,6 +33,7 @@ export default function NotificationPage() {
     // (works when app is foregrounded, backgrounded, or killed)
     responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
       console.log(response);
+      navigation.navigate('EventCalendar');
     });
 
     console.log(expoPushToken);

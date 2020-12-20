@@ -402,7 +402,7 @@ function Discover({ navigation }) {
             }
           })}
         </ScrollView>
-        <BottomNavigator navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
+        <BottomNavigator currentPage="Home" navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
       </View>
     </SafeAreaView>
   );

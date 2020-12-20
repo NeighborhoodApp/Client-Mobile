@@ -61,7 +61,7 @@ function Login({ navigation }) {
 
   useEffect(() => {
     (async () => {
-      // console.log('List Users', users.length);
+      console.log('List Users', users.length);
       if (users.length > 0 && user) {
         const userLogin = await getUserLogedIn();
         // console.log('userLogin', userLogin);
@@ -89,6 +89,7 @@ function Login({ navigation }) {
   };
 
   const prosesLogin = async () => {
+    console.log('payload', payload);
     if (payload.email && payload.password) {
       dispatch(
         callServerV2({
@@ -100,7 +101,7 @@ function Login({ navigation }) {
         }),
       );
     } else {
-      console.log('All field required!');
+      setErrMessage('All field required!');
     }
   };
 
