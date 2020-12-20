@@ -69,10 +69,15 @@ function Comment({ route, navigation }) {
   }, [navigation])
 
   useEffect(() => {
+    let flag = false
     socket.emit('join', id);
 
     socket.on('comment', ({ comment, name, img }) => {
       setCom([...com, { comment, name, img }])
+    })
+
+    return(() => {
+      flag = true
     })
   }, [com])
 
