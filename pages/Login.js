@@ -4,9 +4,6 @@ import AppLoading from 'expo-app-loading';
 import { useFonts, Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat';
 import { Fontisto, Feather } from '@expo/vector-icons';
-import errorHandler from '../helpers/errorHandler';
-import { axios } from '../helpers/Axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
   const defaultVal = {
     email: '',
@@ -39,25 +36,7 @@ function Login({ navigation }) {
   };
 
   const prosesLogin = async () => {
-    if (payload.email && payload.password) {
-      try {
-        const { data } = await axios({
-          url: 'users/login-client',
-          method: 'post',
-          data: payload,
-        });
-        console.log(data);
-        const jsonValue = JSON.stringify(data);
-        await AsyncStorage.setItem('userlogedin', jsonValue);
-        navigation.replace('Waiting');
-        console.log('Welcome,' + data.fullname);
-      } catch (error) {
-        const msg = errorHandler(error);
-        console.log(msg);
-      }
-    } else {
-      console.log('All field required!')
-    }
+    toWaiting();
   };
 
   if (!loaded) {

@@ -1,18 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useFonts, Ubuntu_300Light, Ubuntu_500Medium, Ubuntu_700Bold } from '@expo-google-fonts/ubuntu';
 import { Montserrat_500Medium } from '@expo-google-fonts/montserrat';
 import { AntDesign } from '@expo/vector-icons'; 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AppLoading from 'expo-app-loading';
 
-const defaultValue = {
-  address: '',
-  email: '',
-  fullname: '',
-  id: '',
-};
-
-function Waiting() {
+function Waiting({ navigation }) {
   let [loaded] = useFonts({
     Ubuntu_300Light,
     Ubuntu_500Medium,
@@ -20,23 +13,16 @@ function Waiting() {
     Montserrat_500Medium,
   });
 
-  const [user, setUser] = useState(defaultValue);
-
-  useEffect(() => {
-    const getUser = async () => {
-      const value = await AsyncStorage.getItem('userlogedin');
-      setUser(JSON.parse(value));
-    };
-    getUser();
-  }, []);
-
-  console.log(user);
+  const toDiscover = () => {
+    navigation.navigate('Discover')
+  }
+  if  (!loaded) return <AppLoading />
 
   return (
     <View style={styles.container}>
       <Image style={styles.waiting} source={require('../assets/waiting.png')} />
       <View style={styles.box}>
-        <Text style={styles.firstLine}> Hi, {user.fullname}! </Text>
+        <Text style={styles.firstLine}> Hi, Tetonggo! </Text>
         <Text style={styles.secondLine}>
           {/* <Text style={styles.secondLine}> Please wait... {"\n"} until your account {"\n"} is verified.</Text> */}
           {' '}

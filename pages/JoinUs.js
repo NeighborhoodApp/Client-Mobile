@@ -37,24 +37,7 @@ function JoinUs({ navigation }) {
   };
 
   const prosesJoin = async () => {
-    if (payload.fullname && payload.email && payload.password && payload.address) {
-      try {
-        const { data } = await axios({
-          url: 'users/register-warga',
-          method: 'post',
-          data: payload,
-        });
-        const jsonValue = JSON.stringify(data);
-        await AsyncStorage.setItem('userlogedin', jsonValue);
-        navigation.dispatch('Login');
-        console.log('Welcome,' + data.fullname);
-      } catch (error) {
-        const msg = errorHandler(error);
-        console.log(msg);
-      }
-    } else {
-      console.log('All field required!');
-    }
+    toLogin();
   };
 
   if (!loaded) {
