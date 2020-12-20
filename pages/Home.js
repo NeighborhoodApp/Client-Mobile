@@ -1,5 +1,6 @@
 import AppLoading from 'expo-app-loading';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import * as Notifications from 'expo-notifications';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import callServerV2 from '../helpers/callServer.v2';
@@ -9,6 +10,9 @@ import { getUserLogedIn, setUserLogedIn } from '../helpers/storange';
 
 export default function Home({ navigation }) {
   const [userLogin, setUserLogin] = useState(null);
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -24,6 +28,18 @@ export default function Home({ navigation }) {
         console.log('-----UseEffect userLogin', userLogin);
         if (userLogin.hasOwnProperty('access_token')) {
           const expoPushToken = await registerPushNotification();
+
+          // This listener is fired whenever a notification is received while the app is foregrounded
+          notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
+            setNotification(notification);
+          });
+
+          // This listener is fired whenever a user taps on or interacts with a notification
+          // (works when app is foregrounded, backgrounded, or killed)
+          responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
+            // console.log(response);
+            navigation.navigate('EventCalendar');
+          });
           dispatch(
             callServerV2({
               url: 'users/verify/' + userLogin.id,

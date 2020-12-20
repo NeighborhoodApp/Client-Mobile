@@ -56,8 +56,11 @@ function CreateEvent({ navigation, route }) {
 
   const handleSubmit = () => {
     console.log('payload', payload);
+    const newPayload = {
+      ...payload,
+    };
     const { name, description, CategoryId, date } = payload;
-    payload.date = new Date(date);
+    newPayload.date = new Date(date);
 
     if ((name, description, CategoryId)) {
       dispatch(
@@ -65,7 +68,7 @@ function CreateEvent({ navigation, route }) {
           url: 'event',
           stage: 'addEvent',
           method: 'post',
-          body: payload,
+          body: newPayload,
           headers: {
             access_token: userLogin.access_token,
           },
@@ -158,7 +161,7 @@ function CreateEvent({ navigation, route }) {
         <TextInput
           placeholder="Date"
           editable={false}
-          value={payload.date}
+          value={String(payload.date)}
           placeholderTextColor="black"
           style={{ height: 40, width: 300, backgroundColor: 'white', borderBottomColor: 'black' }}
         ></TextInput>

@@ -33,7 +33,7 @@ export default function App() {
     <NavigationContainer>
       <Provider store={store}>
         <Stack.Navigator>
-          <Stack.Screen name="NotificationPage" component={NotificationPage} options={{ headerShown: true }} />
+          {/* <Stack.Screen name="NotificationPage" component={NotificationPage} options={{ headerShown: true }} /> */}
 
           <Stack.Screen
             name="Home"
