@@ -1,29 +1,23 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { View, Text, StyleSheet, Picker, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native'
 import { Avatar } from 'react-native-paper';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
 import AppLoading from 'expo-app-loading';
 
-// import { registerPushNotification } from '../helpers/PushNotification';
-// import { verifyUser } from '../helpers/verify';
 import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
 import BottomNavigator from '../components/BottomNavigator'
-import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { axios } from '../helpers/Axios'
-import SvgUri from 'expo-svg-uri';
 
 const defaultVal = {
   description: '',
   privacy: 'public',
 }
 
-let hasLoaded = false;
 function Tetonggo({ navigation }) {
   useEffect(() => {
     const option = {

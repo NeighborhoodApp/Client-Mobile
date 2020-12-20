@@ -38,10 +38,10 @@ function Menu({ navigation }) {
             <MaterialIcons style={styles.icon} name="notifications-active" size={22} color="#2C6FC7" />
             <Text style={styles.menu}> Notifications </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('CreateEvent')}>
+          {/* <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('CreateEvent')}>
             <Fontisto style={styles.icon} name="calendar" size={22} color="#2C6FC7" />
             <Text style={styles.menu}> Create Event </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('Tetonggo')}>
             <FontAwesome5 style={styles.icon} name="users" size={18} color="#2C6FC7" />
             <Text style={styles.menu}> Neighbours </Text>
