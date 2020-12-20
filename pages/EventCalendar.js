@@ -56,8 +56,11 @@ const EventCalendar = ({ navigation }) => {
       dispatch(callServer(option));
     };
     fetchEvent()
+    return (() => {
+      console.log('out')
+    })
   }, [])
-  
+
   const { fees, loading, error, stage } = useSelector((state) => state.reducerFee);
   const { events } = useSelector((state) => state.reducerEvent);
   if (!user) return <Loading />
@@ -144,7 +147,7 @@ const EventCalendar = ({ navigation }) => {
   const renderEmptyDate = (item) => {
     return (
       <View
-        style={[styles.item, { height: 60, backgroundColor: 'white'}]}
+        style={[styles.item, { height: 60, backgroundColor: 'white' }]}
       >
         {/* <Text>This is empty date!</Text> */}
       </View>

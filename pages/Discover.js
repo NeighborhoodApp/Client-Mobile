@@ -261,7 +261,7 @@ function Discover({ navigation }) {
                 <Text style={styles.name}>{userLogin.fullname}</Text>
                 <Text style={styles.location}>{userLogin.address}</Text>
 
-                <View style={{ flexDirection: 'row', width: '60%' }}>
+                <View style={{ flexDirection: 'row', width: '60%', zIndex: 9999 }}>
                   <DropDownPicker
                     items={[
                       { label: 'Public', value: 'public', hidden: true },
@@ -470,6 +470,7 @@ const styles = StyleSheet.create({
   },
   boxCard: {
     width: '90%',
+    zIndex: -9999
   },
   card: {
     justifyContent: 'flex-start',

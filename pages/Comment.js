@@ -236,7 +236,6 @@ function Discover({ route, navigation }) {
           </View>
 
         </ScrollView>
-        <BottomNavigator></BottomNavigator>
       </View>
     </SafeAreaView >
   )

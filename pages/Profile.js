@@ -1,7 +1,7 @@
-import React, { useEffect, useState }  from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity} from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import { Avatar } from 'react-native-paper';
-import { useFonts, Ubuntu_300Light,Ubuntu_500Medium } from '@expo-google-fonts/ubuntu'
+import { useFonts, Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu'
 import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat'
 import { FontAwesome, Fontisto, Feather, Entypo, FontAwesome5, AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
@@ -35,7 +35,7 @@ function Profile({ navigation, route }) {
   }, [])
 
   const { users } = useSelector((state) => state.reducerUser);
-  
+
   useEffect(() => {
     (async () => {
       if (userLogin) {
@@ -54,10 +54,11 @@ function Profile({ navigation, route }) {
   if (!loaded || !selectedUser) return <Loading />;
   console.log(selectedUser)
   return (
-    <View style={styles.container}>
-      {/* >>>>>> PROFILE PAGE <<<<<<< */}
-      <View style={styles.images}>
-        {/* <SvgUri
+    <View style={styles.bg}>
+      <View style={styles.container}>
+        {/* >>>>>> PROFILE PAGE <<<<<<< */}
+        <View style={styles.images}>
+          {/* <SvgUri
           width="100"
           height="100"
           source={{
@@ -66,42 +67,42 @@ function Profile({ navigation, route }) {
             }.svg?mood[]=happy`,
           }}
         /> */}
-        <Avatar.Image
-          size={100}
-          source={{
-            uri: `https://randomuser.me/api/portraits/men/${selectedUser.id}.jpg`,
-          }}
-        />
-      </View>
-      <View style={styles.box}>
-        <View stle={styles.bg}></View>
-        <View style={styles.input}>
-          <FontAwesome name="user" size={20} color="white" style={{ marginRight: 5 }} />
-          <Text style={styles.Textinput}> {selectedUser.fullname}</Text>
+          <Avatar.Image
+            size={100}
+            source={{
+              uri: `https://randomuser.me/api/portraits/men/${selectedUser.id}.jpg`,
+            }}
+          />
         </View>
-        <View style={styles.hr} />
-        <View style={styles.input}>
-          <Fontisto name="email" size={20} color="white" style={{ marginLeft: 0 }} />
-          <Text style={styles.Textinput}> {selectedUser.email}</Text>
-        </View>
-        <View style={styles.hr} />
-        <View style={styles.input}>
-          <Entypo name="location" size={20} color="white" style={{ marginLeft: 0 }} />
-          <Text style={styles.Textinput}> {selectedUser.address}</Text>
-        </View>
-        <View style={styles.hr} />
-        <View style={styles.input}>
-          <FontAwesome name="building" size={20} color="white" style={{ marginRight: 5 }} />
-          <Text style={styles.Textinput}> {selectedUser.RealEstate.name}</Text>
-        </View>
+        <View style={styles.box}>
+          <View stle={styles.bg}></View>
+          <View style={styles.input}>
+            <FontAwesome name="user" size={20} color="white" style={{ marginRight: 5 }} />
+            <Text style={styles.Textinput}> {selectedUser.fullname}</Text>
+          </View>
+          <View style={styles.hr} />
+          <View style={styles.input}>
+            <Fontisto name="email" size={20} color="white" style={{ marginLeft: 0 }} />
+            <Text style={styles.Textinput}> {selectedUser.email}</Text>
+          </View>
+          <View style={styles.hr} />
+          <View style={styles.input}>
+            <Entypo name="location" size={20} color="white" style={{ marginLeft: 0 }} />
+            <Text style={styles.Textinput}> {selectedUser.address}</Text>
+          </View>
+          <View style={styles.hr} />
+          <View style={styles.input}>
+            <FontAwesome name="building" size={20} color="white" style={{ marginRight: 5 }} />
+            <Text style={styles.Textinput}> {selectedUser.RealEstate.name}</Text>
+          </View>
 
-        <View style={styles.hr} />
-        <View style={styles.input}>
-          <FontAwesome name="home" size={20} color="white" style={{ marginRight: 5 }} />
-          <Text style={styles.Textinput}> {selectedUser.Complex.name}</Text>
-        </View>
-        {/* >>>>>> FEES PAGE <<<<<<< */}
-        {/* <View style={styles.input}>
+          <View style={styles.hr} />
+          <View style={styles.input}>
+            <FontAwesome name="home" size={20} color="white" style={{ marginRight: 5 }} />
+            <Text style={styles.Textinput}> {selectedUser.Complex.name}</Text>
+          </View>
+          {/* >>>>>> FEES PAGE <<<<<<< */}
+          {/* <View style={styles.input}>
           <FontAwesome name="pencil-square-o" size={20} color="white" style={{ marginLeft: 6 }} />
           <TextInput style={styles.Textinput} placeholder="Title" placeholderTextColor="#FFF" readOnly />
         </View>
@@ -116,23 +117,33 @@ function Profile({ navigation, route }) {
           <TextInput style={styles.Textinput} placeholder="Due Date " placeholderTextColor="#FFF" readOnly />
         </View>
         <View style={styles.hr} /> */}
-        {/* >>>>>> BUTTON FOR CREATE FEES <<<<<<< */}
-        {/* <TouchableOpacity style={styles.btn}>
+          {/* >>>>>> BUTTON FOR CREATE FEES <<<<<<< */}
+          {/* <TouchableOpacity style={styles.btn}>
           <Text style={styles.submit} onPress={toNotification}>
             {' '}
             SUBMIT{' '}
           </Text>
         </TouchableOpacity> */}
+        </View>
       </View>
     </View>
   );
 }
 const styles = StyleSheet.create({
+  bg: {
+    position: 'absolute',
+    backgroundColor: '#161C2B',
+    width: '100%',
+    height: '100%',
+    top: 0
+  },
   container: {
     flex: 1,
     backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
+    borderTopRightRadius: 35,
+    borderTopLeftRadius: 35,
   },
   images: {
     top: 0,
@@ -157,6 +168,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     position: 'absolute',
     top: 100,
+    borderRadius: 20
   },
   Textinput: {
     height: 25,
