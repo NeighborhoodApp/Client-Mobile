@@ -104,6 +104,7 @@ const EventCalendar = ({ navigation }) => {
         if (found.length < 1) {
           items[strTime].push({
             category: 'addnewitem',
+            date: strTime,
             backgroundColor: '#cddef6',
           });
         }
@@ -121,7 +122,7 @@ const EventCalendar = ({ navigation }) => {
     return item.category == 'addnewitem' ? (
       <TouchableOpacity
         style={[styles.item, { backgroundColor: item.backgroundColor }]}
-        onPress={() => navigation.navigate('CreateEvent')}
+        onPress={() => navigation.navigate('CreateEvent', { date: item.date })}
       >
         <FontAwesome
           name="plus"
@@ -129,7 +130,6 @@ const EventCalendar = ({ navigation }) => {
           color="black"
           style={{ marginRight: 5, textAlign: 'center', textAlignVertical: 'center' }}
         />
-        {/* <Text style={{ fontWeight: 'bold' }}>Category: {item.category}</Text> */}
       </TouchableOpacity>
     ) : (
       <TouchableOpacity

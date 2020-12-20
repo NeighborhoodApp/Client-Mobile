@@ -1,6 +1,6 @@
 const initState = {
   events: [],
-  event: {}, // event Now Loginned
+  event: null, // event Now Loginned
   error: null,
   loading: false,
   stage: null, // create, update, delete, edit, customize welcome
