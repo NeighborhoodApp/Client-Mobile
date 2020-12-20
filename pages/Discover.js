@@ -1,7 +1,7 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity, Alert } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity, Alert, RefreshControl } from 'react-native'
 import { Avatar } from 'react-native-paper';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
@@ -13,7 +13,6 @@ import BottomNavigator from '../components/BottomNavigator'
 import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import { axios } from '../helpers/Axios'
-import Axios from 'axios';
 import callServerV2 from '../helpers/callServer.v2';
 import { actionRemoveTimeline } from '../store/actions/action';
 import { getUserLogedIn } from '../helpers/storange';
@@ -23,11 +22,19 @@ const defaultVal = {
   privacy: 'public',
 }
 
+const wait = (timeout) => {
+  return new Promise(resolve => {
+    setTimeout(resolve, timeout);
+  });
+}
+
 function Discover({ navigation }) {
   const [selectedValue, setSelectedValue] = useState("public");
   const [payload, setPayload] = useState(defaultVal);
   const [formData, setFormData] = useState(null);
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false);
 
   let [loaded] = useFonts({
     Poppins_600SemiBold, Ubuntu_300Light
@@ -62,7 +69,7 @@ function Discover({ navigation }) {
     })();
   }, [userLogin])
 
-  const { timelines, newTimeline, loading } = useSelector((state) => state.reducerTimeline);
+  const { timelines, newTimeline } = useSelector((state) => state.reducerTimeline);
 
   useEffect(() => {
     (async () => {
@@ -162,32 +169,40 @@ function Discover({ navigation }) {
       let type = match ? `image/${match[1]}` : `image`;
 
       const data = new FormData()
-      data.append('image', { uri: localUri, name: filename, type });
+      data.append('file', { uri: localUri, name: filename, type });
 
-      data.append('image', result.uri);
-
+      data.append('file', result.uri)
       setImgbUri(null);
-      setFormData(data);
+      setFormData(data)
     }
   };
 
   const submitHandler = async () => {
     console.log('press');
+    setLoading(true)
+    let uri
     try {
       if (payload.description && formData) {
-        console.log(formData);
-        const { data } = await Axios({
-          url: 'https://api.imgbb.com/1/upload?key=d49e97d44b3f247ce10cf5e749bdfa6b',
+        const { data } = await axios({
+          url: 'upload',
           method: 'post',
           data: formData,
           headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        setImgbUri(data.data.display_url);
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        setImgbUri(data)
       } else if (payload.description) {
         setImgbUri('noimage')
       }
+
+      setTimeout(() => {
+        setLoading(false)
+        setImage(null)
+        setFormData(null)
+        setPayload({ description: '', privacy: 'public' })
+      }, 500);
+
     } catch (error) {
       console.log(error)
     }
@@ -242,12 +257,22 @@ function Discover({ navigation }) {
     )
   }
 
+  const onRefresh = useCallback(async () => {
+    await fetchTimeline()
+    setRefreshing(true);
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
+
   if (!loaded || !userLogin || loading) return <Loading />;
   // if (!loaded || !stage || !user) return <AppLoading />;
   return (
     <SafeAreaView style={styles.bg}>
       <View style={styles.bg1}>
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
           <View style={styles.boxAwal}>
             <View style={styles.row}>
               <Avatar.Image
@@ -259,7 +284,7 @@ function Discover({ navigation }) {
               />
               <View style={styles.boxProfile}>
                 <Text style={styles.name}>{userLogin.fullname}</Text>
-                <Text style={styles.location}>{userLogin.address}</Text>
+                <Text style={styles.location}>{userLogin.RealEstate.name}</Text>
 
                 <View style={{ flexDirection: 'row', width: '60%' }}>
                   <DropDownPicker
@@ -331,17 +356,18 @@ function Discover({ navigation }) {
                           <Text style={styles.name}>{el.User.fullname}</Text>
                         </TouchableOpacity>
                       ) : (
-                        <Text style={styles.name}>{el.User.fullname}</Text>
-                      )}
-                      <Text styles={styles.location}>{el.User.address}</Text>
+                          <Text style={styles.name}>{el.User.fullname}</Text>
+                        )}
+                      <Text styles={styles.location}>{el.User.RealEstate.name}</Text>
                     </View>
+                    <FontAwesome name={el.privacy === 'public' ? 'globe' : 'users'} size={25} color="#161C2B" style={{ alignSelf: 'center', marginLeft: 165 }} />
                   </View>
                   <View style={styles.hr} />
                   <View style={styles.boxCard}>
                     <View style={styles.boxText}>
                       <Text style={styles.status}>{el.description}</Text>
                     </View>
-                    {el.image.length > 0 ? (
+                    {el.image ? (
                       <Card style={styles.card}>
                         <Card.Cover source={{ uri: el.image }} />
                       </Card>
@@ -470,6 +496,7 @@ const styles = StyleSheet.create({
   },
   boxCard: {
     width: '90%',
+    zIndex: -1
   },
   card: {
     justifyContent: 'flex-start',
@@ -497,7 +524,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5
   },
   cardStatus: {
-    zIndex: -999,
+    // zIndex: -999,
     marginBottom: 10,
     justifyContent: 'flex-start',
     width: '94%',

@@ -132,16 +132,16 @@ const EventCalendar = ({ navigation }) => {
         />
       </TouchableOpacity>
     ) : (
-      <TouchableOpacity
-        style={[styles.item, { backgroundColor: item.backgroundColor }]}
+        <TouchableOpacity
+          style={[styles.item, { backgroundColor: item.backgroundColor }]}
         // onPress={() => navigation.navigate('CreateEvent')}
-      >
-        <Text style={{ fontWeight: 'bold' }}>Event Owner: {item.tetonggo}</Text>
-        <Text style={{ fontWeight: 'bold' }}>Category: {item.category}</Text>
-        <Text style={{ fontWeight: 'bold' }}>Title: {item.name}</Text>
-        <Text>{item.description}</Text>
-      </TouchableOpacity>
-    );
+        >
+          <Text style={{ fontWeight: 'bold' }}>Event Owner: {item.tetonggo}</Text>
+          <Text style={{ fontWeight: 'bold' }}>Category: {item.category}</Text>
+          <Text style={{ fontWeight: 'bold' }}>Title: {item.name}</Text>
+          <Text>{item.description}</Text>
+        </TouchableOpacity>
+      );
   };
 
   const renderEmptyDate = (item) => {
