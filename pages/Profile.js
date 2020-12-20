@@ -9,101 +9,97 @@ import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SvgUri from 'expo-svg-uri';
+import { getUserLogedIn } from '../helpers/storange';
+import Loading from '../components/Loading';
 
-function Profile({ navigation }) {
+function Profile({ navigation, route }) {
   const [loaded] = useFonts({
     Ubuntu_300Light,
     Montserrat_600SemiBold,
     Ubuntu_500Medium,
   });
 
-  const [user, setUser] = useState({
-    fullname: '',
-    address: '',
-    email: ''
-  });
+  const [userLogin, setUserLogin] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  // const [user, setUser] = useState({
+  //   fullname: '',
+  //   address: '',
+  //   email: ''
+  // });
 
   useEffect(() => {
-    const getUser = async () => {
-      const value = await AsyncStorage.getItem('userlogedin');
-      const json = JSON.parse(value);
-      setUser(json);
-    }
-    getUser()
+    (async () => {
+      const userLogedIn = await getUserLogedIn();
+      setUserLogin(userLogedIn);
+    })();
   }, [])
 
-  // const { user, error, stage, loading } = useSelector((state) => state.reducerUser);
-  console.log(user, 'user.....')
+  const { users } = useSelector((state) => state.reducerUser);
+  
+  useEffect(() => {
+    (async () => {
+      if (userLogin) {
+        const userId = route.params ? route.params.userId : userLogin.id;
+        const userSelect = users.filter((el) => el.id === userId);
+        setSelectedUser(userSelect[0]);
+      }
+    })();
+  }, [userLogin]);
+
+  // console.log(user, 'user.....')
   function toNotification() {
     navigation.navigate('Notification');
   }
 
-  if (!loaded) return <AppLoading />;
-
+  if (!loaded || !selectedUser) return <Loading />;
+  console.log(selectedUser)
   return (
     <View style={styles.container}>
       {/* >>>>>> PROFILE PAGE <<<<<<< */}
       <View style={styles.images}>
-        {/* <Avatar.Image
-          size={100}
-          source={{
-            uri: 'https://i.pinimg.com/474x/73/c3/e7/73c3e7cca66a885c53718d8f3688b02c.jpg',
-          }}
-        /> */}
-        <SvgUri
+        {/* <SvgUri
           width="100"
           height="100"
           source={{
-            uri: `https://avatars.dicebear.com/api/avataaars/:${user ? user.fullname : 'random'}.svg?mood[]=happy`,
+            uri: `https://avatars.dicebear.com/api/avataaars/:${
+              selectedUser ? selectedUser.fullname : 'random'
+            }.svg?mood[]=happy`,
+          }}
+        /> */}
+        <Avatar.Image
+          size={100}
+          source={{
+            uri: `https://randomuser.me/api/portraits/men/${selectedUser.id}.jpg`,
           }}
         />
-        
       </View>
       <View style={styles.box}>
         <View stle={styles.bg}></View>
         <View style={styles.input}>
-          <FontAwesome name="user" size={20} color="white" style={{ marginLeft: 10 }} />
-          <TextInput
-            style={styles.Textinput}
-            value={user ? user.fullname : ''}
-            placeholder="Full Name"
-            placeholderTextColor="#FFF"
-          />
+          <FontAwesome name="user" size={20} color="white" style={{ marginRight: 5 }} />
+          <Text style={styles.Textinput}> {selectedUser.fullname}</Text>
         </View>
         <View style={styles.hr} />
         <View style={styles.input}>
-          <Fontisto name="email" size={20} color="white" style={{ marginLeft: 5 }} />
-          <TextInput
-            style={styles.Textinput}
-            value={user ? user.email : ''}
-            placeholder="Email"
-            placeholderTextColor="#FFF"
-            readOnly
-          />
+          <Fontisto name="email" size={20} color="white" style={{ marginLeft: 0 }} />
+          <Text style={styles.Textinput}> {selectedUser.email}</Text>
         </View>
-        {/* <View style={styles.hr} /> */}
-        {/* <View style={styles.input}>
-          <Feather name="lock" size={20} color="white" style={{ marginLeft: 5 }} />
-          <TextInput
-            style={styles.Textinput}
-            placeholder="Password"
-            placeholderTextColor="#FFF"
-            secureTextEntry={true}
-          />
-        </View> */}
         <View style={styles.hr} />
         <View style={styles.input}>
-          <Entypo name="location" size={20} color="white" style={{ marginLeft: 6 }} />
-          <TextInput
-            style={styles.Textinput}
-            value={user ? user.address : ''}
-            placeholder="Address"
-            placeholderTextColor="#FFF"
-            readOnly
-          />
+          <Entypo name="location" size={20} color="white" style={{ marginLeft: 0 }} />
+          <Text style={styles.Textinput}> {selectedUser.address}</Text>
         </View>
         <View style={styles.hr} />
+        <View style={styles.input}>
+          <FontAwesome name="building" size={20} color="white" style={{ marginRight: 5 }} />
+          <Text style={styles.Textinput}> {selectedUser.RealEstate.name}</Text>
+        </View>
 
+        <View style={styles.hr} />
+        <View style={styles.input}>
+          <FontAwesome name="home" size={20} color="white" style={{ marginRight: 5 }} />
+          <Text style={styles.Textinput}> {selectedUser.Complex.name}</Text>
+        </View>
         {/* >>>>>> FEES PAGE <<<<<<< */}
         {/* <View style={styles.input}>
           <FontAwesome name="pencil-square-o" size={20} color="white" style={{ marginLeft: 6 }} />
@@ -166,15 +162,15 @@ const styles = StyleSheet.create({
     height: 25,
     fontFamily: 'Ubuntu_300Light',
     color: 'white',
-    marginLeft: 15,
+    marginLeft: 10,
     fontSize: 15,
-    marginBottom: 8,
+    marginBottom: 4,
   },
   hr: {
     borderBottomColor: '#A2A2A2',
     borderBottomWidth: 0.6,
     width: '80%',
-    marginBottom: 10,
+    marginBottom: 4,
   },
   btn: {
     elevation: 8,

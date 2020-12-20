@@ -12,4 +12,6 @@ export const actionRemoveUser = () => {
 export const actionRemoveUsers = () => {
   return { type: 'REMOVE_USERS', payload: null };
 };
-;
+export const actionRemoveTimeline = () => {
+  return { type: 'REMOVE_NEW_TIMELINE', payload: null };
+};

@@ -158,30 +158,32 @@ function Tetonggo({ navigation }) {
       address: 'Palembang',
     },
   ];
-  console.log(user, 'userrrr.....');;
+  console.log(user, 'userrrr.....');
   if (!loaded) return <AppLoading />;
-  // if (loading) return <AppLoading />;
-// console.log(newUser)
+
   return (
     <SafeAreaView style={styles.bg}>
       <View style={styles.border}></View>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
-        <Text style={styles.account}>Account</Text>
+        <Text style={styles.account}>My Tetonggo</Text>
         {!newUser ? null : newUser.map((el, index) => {
           return (
             <View key={`timeline${index}`} style={styles.box}>
-              <View style={styles.row}>
-                <Avatar.Image size={39}
-                  source={{
-                    uri: `https://randomuser.me/api/portraits/men/${el.id}.jpg`,
-                  }}
-                />
+              <TouchableOpacity onPress={() => navigation.navigate('Profile', { userId: el.id })}>
+                <View style={styles.row}>
+                  <Avatar.Image
+                    size={39}
+                    source={{
+                      uri: `https://randomuser.me/api/portraits/men/${el.id}.jpg`,
+                    }}
+                  />
 
-                <View style={styles.boxProfile}>
-                  <Text style={styles.name}>{el.fullname}</Text>
-                  <Text styles={styles.location}>{el.address}</Text>
+                  <View style={styles.boxProfile}>
+                    <Text style={styles.name}>{el.fullname}</Text>
+                    <Text styles={styles.location}>{el.address}</Text>
+                  </View>
                 </View>
-              </View>
+              </TouchableOpacity>
               <View style={styles.hr} />
             </View>
           );

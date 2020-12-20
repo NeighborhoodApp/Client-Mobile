@@ -1,26 +1,22 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { View, Text, StyleSheet, Picker, ScrollView, SafeAreaView, TextInput, TouchableOpacity, Alert } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity, Alert } from 'react-native'
 import { Avatar } from 'react-native-paper';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
-import AppLoading from 'expo-app-loading';
 import Loading from '../components/Loading'
-
-// import { registerPushNotification } from '../helpers/PushNotification';
-// import { verifyUser } from '../helpers/verify';
-
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { Card } from 'react-native-paper';
 import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
 import BottomNavigator from '../components/BottomNavigator'
 import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
-import callServer from '../helpers/callServer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { axios } from '../helpers/Axios'
-import SvgUri from 'expo-svg-uri';
+import Axios from 'axios';
+import callServerV2 from '../helpers/callServer.v2';
+import { actionRemoveTimeline } from '../store/actions/action';
+import { getUserLogedIn } from '../helpers/storange';
 
 const defaultVal = {
   description: '',
@@ -28,10 +24,6 @@ const defaultVal = {
 }
 
 function Discover({ navigation }) {
-  const { timelines, error, stage } = useSelector((state) => state.reducerTimeline);
-  const [loading, setLoading] = useState(false)
-  const { comments } = useSelector((state) => state.reducerComment);
-  const [user, setUser] = useState(null);
   const [selectedValue, setSelectedValue] = useState("public");
   const [payload, setPayload] = useState(defaultVal);
   const [formData, setFormData] = useState(null);
@@ -41,49 +33,99 @@ function Discover({ navigation }) {
     Poppins_600SemiBold, Ubuntu_300Light
   });
 
-  //   const [selectedValue, setSelectedValue] = useState('public');
-  //   const [expoPushToken, setExpoPushToken] = useState('');
-
-  // useEffect(() => {
-  //   registerPushNotification().then((token) => setExpoPushToken(token));
-  // }, []);
-
-  // useEffect(() => {
-  //   verifyUser(expoPushToken);
-  // }, [expoPushToken]);
-
   const [image, setImage] = useState(null);
+  const [userLogin, setUserLogin] = useState(null);
+  const [imgbUri, setImgbUri] = useState(null);
 
   // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
 
-  const fetchTimeline = () => {
-    const option = {
-      url: 'timeline',
-      stage: 'getTimelines',
-      method: 'get',
-      body: null,
-      headers: true,
-      type: 'SET_TIMELINES',
-    };
-    dispatch(callServer(option));
-  };
+  useEffect(() => {
+    (async () => {
+      console.log('-----UseEffect 1')
+      const userLogedIn = await getUserLogedIn();
+      setUserLogin(userLogedIn);
+    })();
+  }, [])
 
   useEffect(() => {
-    let temp
-    const opened = (async () => {
-      const value = await AsyncStorage.getItem('userlogedin');
-      const json = JSON.parse(value);
-      temp = json.id
-      setUser(json);
+    (async () => {
+      if (userLogin) {
+        console.log('-----UseEffect 2');
+        if (userLogin.access_token && userLogin.coordinate) {
+          setupUpOption();
+          fetchTimeline();
+        } else {
+          console.log('Session Expired');
+          navigation.replace('Login')
+        }
+      }
+    })();
+  }, [userLogin])
 
+  const { timelines, newTimeline, loading } = useSelector((state) => state.reducerTimeline);
+
+  useEffect(() => {
+    (async () => {
+      if (imgbUri || imgbUri === 'noimage') {
+        dispatch(
+          callServerV2({
+            url: 'timeline',
+            method: 'post',
+            body: {
+              description: payload.description,
+              privacy: payload.privacy,
+              image: imgbUri === 'noimage' ? '' : imgbUri,
+            },
+            headers: {
+              access_token: userLogin.access_token
+            },
+            type: 'CREATE_TIMELINE',
+          }))
+        setImgbUri(null)
+      }
+    })();
+  }, [imgbUri])
+
+  useEffect(() => {
+    (async () => {
+      if (newTimeline) {
+        fetchTimeline();
+        dispatch(actionRemoveTimeline());
+      }
+    })();
+  }, [newTimeline])
+
+  useEffect(() => {
+    (async () => {
+      if (timelines.length > 0) {
+        // Take some action 
+      }
+    })();
+  }, [timelines])
+
+  const fetchTimeline = () => {
+    (async () => {
       if (Platform.OS !== 'web') {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
           alert('Sorry, we need camera roll permissions to make this work!');
         }
       }
-    })
+      dispatch(
+        callServerV2({
+          url: 'timeline',
+          stage: 'getTimelines',
+          headers: {
+            access_token: userLogin.access_token,
+            coordinate: userLogin.coordinate,
+          },
+          type: 'SET_TIMELINES',
+        }),
+      );
+    })();
+  };
 
+  const setupUpOption = () => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity
@@ -94,19 +136,13 @@ function Discover({ navigation }) {
         >
           <Avatar.Image size={39}
             source={{
-              uri: `https://randomuser.me/api/portraits/men/${temp ? temp : null}.jpg`,
+              uri: `https://randomuser.me/api/portraits/men/${userLogin.id}.jpg`,
             }}
           />
         </TouchableOpacity>
       ),
     })
-
-    opened()
-    fetchTimeline()
-    setTimeout(() => {
-      setLoading(false)
-    }, 500);
-  }, [comments])
+  }
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -126,47 +162,32 @@ function Discover({ navigation }) {
       let type = match ? `image/${match[1]}` : `image`;
 
       const data = new FormData()
-      data.append('file', { uri: localUri, name: filename, type });
+      data.append('image', { uri: localUri, name: filename, type });
 
-      data.append('file', result.uri)
+      data.append('image', result.uri);
 
-      setFormData(data)
+      setImgbUri(null);
+      setFormData(data);
     }
   };
 
   const submitHandler = async () => {
     console.log('press');
-    let uri
     try {
       if (payload.description && formData) {
-        const { data } = await axios({
-          url: 'upload',
+        console.log(formData);
+        const { data } = await Axios({
+          url: 'https://api.imgbb.com/1/upload?key=d49e97d44b3f247ce10cf5e749bdfa6b',
           method: 'post',
           data: formData,
           headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        })
-        uri = data
-      }
-      if (payload.description) {
-        await axios({
-          url: 'timeline',
-          method: 'post',
-          data: {
-            description: payload.description,
-            image: uri,
-            privacy: payload.privacy
+            'Content-Type': 'multipart/form-data',
           },
-          headers: {
-            access_token: user.access_token
-          }
-        })
+        });
+        setImgbUri(data.data.display_url);
+      } else if (payload.description) {
+        setImgbUri('noimage')
       }
-      fetchTimeline()
-      setImage(null)
-      setFormData(null)
-      setPayload({ description: '', privacy: 'public' })
     } catch (error) {
       console.log(error)
     }
@@ -195,7 +216,7 @@ function Discover({ navigation }) {
         url: `timeline/${id}`,
         method: 'delete',
         headers: {
-          access_token: user.access_token
+          access_token: userLogin.access_token
         }
       })
       fetchTimeline()
@@ -221,26 +242,24 @@ function Discover({ navigation }) {
     )
   }
 
-  if (loading) return <Loading />
-  if (!loaded || !stage || !user) return <AppLoading />;
+  if (!loaded || !userLogin || loading) return <Loading />;
+  // if (!loaded || !stage || !user) return <AppLoading />;
   return (
     <SafeAreaView style={styles.bg}>
       <View style={styles.bg1}>
-
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.contentContainer}
-        >
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
           <View style={styles.boxAwal}>
             <View style={styles.row}>
-              <Avatar.Image size={39} style={{ marginTop: 5 }}
+              <Avatar.Image
+                size={39}
+                style={{ marginTop: 5 }}
                 source={{
-                  uri: `https://randomuser.me/api/portraits/men/${user.id}.jpg`,
+                  uri: `https://randomuser.me/api/portraits/men/${userLogin.id}.jpg`,
                 }}
               />
               <View style={styles.boxProfile}>
-                <Text style={styles.name}>{user.fullname}</Text>
-                <Text style={styles.location}>{user.address}</Text>
+                <Text style={styles.name}>{userLogin.fullname}</Text>
+                <Text style={styles.location}>{userLogin.address}</Text>
 
                 <View style={{ flexDirection: 'row', width: '60%' }}>
                   <DropDownPicker
@@ -252,79 +271,97 @@ function Discover({ navigation }) {
                     containerStyle={{ height: 29, width: '70%', alignSelf: 'flex-start', marginTop: 4 }}
                     style={{ backgroundColor: '#fafafa' }}
                     itemStyle={{
-                      justifyContent: 'flex-start'
+                      justifyContent: 'flex-start',
                     }}
                     dropDownStyle={{ backgroundColor: '#fafafa' }}
-                    onChangeItem={(item) => handleInput(item.value, 'privacy')}
+                    onChangeItem={(item) => {
+                      setSelectedValue(item.value);
+                      handleInput(item.value, 'privacy');
+                    }}
                     labelStyle={{
                       fontSize: 13,
                       textAlign: 'left',
-                      color: '#000'
+                      color: '#000',
                     }}
                   />
                   {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
-                  <TouchableOpacity onPress={pickImage}><Text style={styles.addPhotos}><MaterialIcons name="add-a-photo" size={14} color="#707070" />  Photo</Text></TouchableOpacity>
+                  <TouchableOpacity onPress={pickImage}>
+                    <Text style={styles.addPhotos}>
+                      <MaterialIcons name="add-a-photo" size={14} color="#707070" /> Photo
+                    </Text>
+                  </TouchableOpacity>
                   {/* >>>>>>>>> IMAGE PICKER <<<<<<<<<<<<< */}
                 </View>
               </View>
             </View>
             <View style={styles.boxCard}>
-              {image && <Card style={styles.cardStatus}><Card.Cover source={{ uri: image }} /></Card>}
+              {image && (
+                <Card style={styles.cardStatus}>
+                  <Card.Cover source={{ uri: image }} />
+                </Card>
+              )}
               <View style={styles.boxStatus}>
-                <TextInput multiline defaultValue={payload.description} onChangeText={(text) => handleInput(text, 'description')} style={styles.inputStatus} placeholder="What’s on your mind?" placeholderTextColor="white" />
+                <TextInput
+                  multiline
+                  defaultValue={payload.description}
+                  onChangeText={(text) => handleInput(text, 'description')}
+                  style={styles.inputStatus}
+                  placeholder="What’s on your mind?"
+                  placeholderTextColor="white"
+                />
               </View>
             </View>
           </View>
-          {
-            timelines.map((el, index) => {
-              if (el.privacy === 'public' || el.User.RealEstateId === user.RealEstateId) {
-                return (
-                  <View key={`timeline${index}`} style={styles.box}>
-                    <View style={styles.hr} />
-                    <View style={styles.row}>
-                      <Avatar.Image size={39} style={{ marginTop: 5 }}
-                        source={{
-                          uri: `https://randomuser.me/api/portraits/men/${el.UserId}.jpg`,
-                        }}
-                      />
-                      <View style={styles.boxProfile}>
-
-                        {
-                          (el.UserId === user.id) ?
-                            <TouchableOpacity onLongPress={() => longPres(el.id)}>
-                              <Text style={styles.name}>{el.User.fullname}</Text>
-                            </TouchableOpacity> :
-                            <Text style={styles.name}>{el.User.fullname}</Text>
-                        }
-                        <Text styles={styles.location}>{el.User.address}</Text>
-                      </View>
+          {timelines.map((el, index) => {
+            if (el.privacy === 'public' || el.User.RealEstateId === userLogin.RealEstateId) {
+              return (
+                <View key={`timeline${index}`} style={styles.box}>
+                  <View style={styles.hr} />
+                  <View style={styles.row}>
+                    <Avatar.Image
+                      size={39}
+                      style={{ marginTop: 5 }}
+                      source={{
+                        uri: `https://randomuser.me/api/portraits/men/${el.UserId}.jpg`,
+                      }}
+                    />
+                    <View style={styles.boxProfile}>
+                      {el.UserId === userLogin.id ? (
+                        <TouchableOpacity onLongPress={() => longPres(el.id)}>
+                          <Text style={styles.name}>{el.User.fullname}</Text>
+                        </TouchableOpacity>
+                      ) : (
+                        <Text style={styles.name}>{el.User.fullname}</Text>
+                      )}
+                      <Text styles={styles.location}>{el.User.address}</Text>
                     </View>
-                    <View style={styles.hr} />
-                    <View style={styles.boxCard}>
-                      <View style={styles.boxText}>
-                        <Text style={styles.status}>{el.description}</Text>
-                      </View>
-                      {
-                        el.image &&
-                        <Card style={styles.card}>
-                          <Card.Cover source={{ uri: el.image }} />
-                        </Card>
-                      }
-                      <TouchableOpacity onPress={() => changePage(el.id)}>
-                        <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}</Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={styles.hr} />
                   </View>
-                )
-              }
-            })
-          }
+                  <View style={styles.hr} />
+                  <View style={styles.boxCard}>
+                    <View style={styles.boxText}>
+                      <Text style={styles.status}>{el.description}</Text>
+                    </View>
+                    {el.image.length > 0 ? (
+                      <Card style={styles.card}>
+                        <Card.Cover source={{ uri: el.image }} />
+                      </Card>
+                    ) : null}
+                    <TouchableOpacity onPress={() => changePage(el.id)}>
+                      <Text style={styles.status}>
+                        <FontAwesome name="comment" size={20} color="black" /> {el.Comments.length}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.hr} />
+                </View>
+              );
+            }
+          })}
         </ScrollView>
         <BottomNavigator navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
       </View>
-    </SafeAreaView >
-  )
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
