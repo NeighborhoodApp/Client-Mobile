@@ -13,7 +13,6 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     (async () => {
-      console.log('-----UseEffect Pertama');
       const userLogedIn = await getUserLogedIn();
       setUserLogin(userLogedIn);
     })();
@@ -72,6 +71,7 @@ export default function Home({ navigation }) {
                 continue;
               }
             }
+            console.log(key, user[key]);
             newVal[key] = user[key];
           }
         }
