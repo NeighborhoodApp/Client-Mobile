@@ -41,6 +41,7 @@ function Comment({ route, navigation }) {
 
   // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
   useEffect(() => {
+    let flag1 = false
     let temp
     setLoading(true)
     const tes = async () => {
@@ -48,17 +49,17 @@ function Comment({ route, navigation }) {
       const json = JSON.parse(value);
       temp = json.id
       setUser(json);
-      navigation.setOptions({
-        headerRight: () => (
-          <TouchableOpacity style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }} onPress={() => { navigation.navigate('Menu') }}>
-            <Avatar.Image size={39}
-              source={{
-                uri: `https://randomuser.me/api/portraits/men/${temp ? temp : null}.jpg`,
-              }}
-            />
-          </TouchableOpacity>
-        ),
-      })
+      // navigation.setOptions({
+      //   headerRight: () => (
+      //     <TouchableOpacity style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }} onPress={() => { navigation.navigate('Menu') }}>
+      //       <Avatar.Image size={39}
+      //         source={{
+      //           uri: `https://randomuser.me/api/portraits/men/${temp ? temp : null}.jpg`,
+      //         }}
+      //       />
+      //     </TouchableOpacity>
+      //   ),
+      // })
       fetchComment()
     }
     tes()
@@ -66,7 +67,10 @@ function Comment({ route, navigation }) {
     setTimeout(() => {
       setLoading(false)
     }, 500);
-  }, [navigation])
+    return(() => {
+      flag1 = true
+    })
+  }, [])
 
   useEffect(() => {
     let flag = false
