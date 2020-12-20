@@ -17,6 +17,7 @@ import Axios from 'axios';
 import callServerV2 from '../helpers/callServer.v2';
 import { actionRemoveTimeline } from '../store/actions/action';
 import { getUserLogedIn } from '../helpers/storange';
+import AppLoading from 'expo-app-loading';
 
 const defaultVal = {
   description: '',
@@ -242,8 +243,8 @@ function Discover({ navigation }) {
     )
   }
 
-  if (!loaded || !userLogin || loading) return <Loading />;
-  // if (!loaded || !stage || !user) return <AppLoading />;
+  if (!loaded || !userLogin) return <AppLoading />;
+  if (loading) return <Loading />;
   return (
     <SafeAreaView style={styles.bg}>
       <View style={styles.bg1}>

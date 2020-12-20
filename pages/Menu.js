@@ -4,6 +4,8 @@ import { useFonts, Roboto_500Medium } from '@expo-google-fonts/roboto';
 import { MaterialIcons, Fontisto, FontAwesome5, Ionicons, FontAwesome } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch } from 'react-redux';
+import { actionRemoveUser } from '../store/actions/action';
 
 function Menu({ navigation }) {
   const [loaded] = useFonts({
@@ -11,6 +13,7 @@ function Menu({ navigation }) {
   });
 
   const [user, setUser] = useState({ RoleId: 3 });
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const getUser = async () => {
@@ -23,7 +26,16 @@ function Menu({ navigation }) {
 
   const logout = async () => {
     await AsyncStorage.removeItem('userlogedin');
-    navigation.replace('Home');
+    dispatch(actionRemoveUser());
+    // navigation.replace('Login');
+    navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name: 'Login'
+        },
+      ],
+    });
   };
 
   if (!loaded) return <AppLoading />;

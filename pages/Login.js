@@ -13,6 +13,7 @@ import callServerV2 from '../helpers/callServer.v2';
 import { actionRemoveUser } from '../store/actions/action';
 import { getUserLogedIn, setUserLogedIn } from '../helpers/storange';
 import Loading from '../components/Loading';
+import { registerPushNotification } from '../helpers/PushNotification';
 
   const defaultVal = {
     email: '',
@@ -33,7 +34,8 @@ function Login({ navigation }) {
 
   useEffect(() => {
     (async () => {
-      dispatch(actionRemoveUser());
+      const token = await registerPushNotification();
+      setPayload({ expoPushToken: token });
     })();
   }, []);
 
@@ -102,7 +104,7 @@ function Login({ navigation }) {
     }
   };
 
-  if (!loaded || loading) {
+  if (!loaded) {
     return <Loading />;
   } else {
     return (

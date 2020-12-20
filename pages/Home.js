@@ -1,6 +1,6 @@
 import AppLoading from 'expo-app-loading';
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import callServerV2 from '../helpers/callServer.v2';
 import errorHandler from '../helpers/errorHandler';
@@ -39,7 +39,7 @@ export default function Home({ navigation }) {
             }),
           );
         } else {
-          navigation.replace('Login');
+          goJoin();
           console.log('Session Expired');
         }
       }
@@ -50,7 +50,7 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     (async () => {
-      if (user) {
+      if (user && userLogin) {
         // console.log('-----UseEffect User');
         dispatch(
           callServerV2({
@@ -92,6 +92,10 @@ export default function Home({ navigation }) {
   const goJoin = () => {
     navigation.replace('GetStarted');
   };
+
+  if (Platform.OS === 'ios') {
+    // if (loading) return <SplashScree
+  }
 
   if (loading) return <AppLoading />;
 

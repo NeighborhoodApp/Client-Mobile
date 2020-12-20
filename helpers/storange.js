@@ -7,7 +7,7 @@ export const getUserLogedIn = async () => {
       const data = JSON.parse(value);
       return data;
     } else {
-      alert('Your session is expired');
+      // alert('Your session is expired');
       return {};
     }
   } catch (e) {

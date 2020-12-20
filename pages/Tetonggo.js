@@ -11,7 +11,8 @@ import BottomNavigator from '../components/BottomNavigator'
 import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { axios } from '../helpers/Axios'
+import { axios } from '../helpers/Axios';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 const defaultVal = {
   description: '',
@@ -46,20 +47,7 @@ function Tetonggo({ navigation }) {
 
   const [image, setImage] = useState(null);
 
-  // const fetchTimeline = () => {
-  //   const option = {
-  //     url: 'timeline',
-  //     stage: 'getTimelines',
-  //     method: 'get',
-  //     body: null,
-  //     headers: true,
-  //     type: 'SET_TIMELINES',
-  //   };
-  //   dispatch(callServer(option));
-  // };
-
   useEffect(() => {
-    hasLoaded = false;
     let temp
     const tes = async () => {
       const value = await AsyncStorage.getItem('userlogedin');
@@ -122,37 +110,7 @@ function Tetonggo({ navigation }) {
 
   const newUser = user ? users.filter((el) =>
     (el.ComplexId === user.ComplexId && el.status === 'Active')) : null;
-  // useEffect(() => {
-  //   if (user) {
-  //     setSelectedUser(newUser);;
-  //   }
-  // }, [userNow]);;
-
-  const changePage = (id) => {
-    navigation.navigate('Comment', {
-      id,
-    });
-  };
-
-  const data = [
-    {
-      fullname: 'Riyan',
-      address: 'Palembang',
-    },
-    {
-      fullname: 'Moulia',
-      address: 'Palembang',
-    },
-    {
-      fullname: 'Ahmad',
-      address: 'Palembang',
-    },
-    {
-      fullname: 'Habibi',
-      address: 'Palembang',
-    },
-  ];
-  console.log(user, 'userrrr.....');
+  
   if (!loaded) return <AppLoading />;
 
   return (
@@ -173,7 +131,11 @@ function Tetonggo({ navigation }) {
                   />
 
                   <View style={styles.boxProfile}>
-                    <Text style={styles.name}>{el.fullname}</Text>
+                    <Text style={styles.name}>
+                      {el.fullname + ' '}
+                      {el.RoleId === 2 && <FontAwesome5 name="crown" size={15} color="orange" style={{ paddingLeft: 13 }} />}
+                      
+                    </Text>
                     <Text styles={styles.location}>{el.address}</Text>
                   </View>
                 </View>
@@ -270,6 +232,7 @@ const styles = StyleSheet.create({
     marginBottom: '1%',
   },
   boxProfile: {
+    display: 'flex',
     flexDirection: 'column',
     marginLeft: 20,
     marginBottom: 5,

@@ -5,19 +5,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { sendNotification } from '../helpers/PushNotification';
+import customAlert from '../helpers/alert';
+import callServerV2 from '../helpers/callServer.v2';
+import { getUserLogedIn } from '../helpers/storange';
 
 function CreateEvent({ navigation, route }) {
-  const [category, setCategory] = useState(null);
-  const [description, setDescription] = useState('');
-  const [name, setName] = useState('');
-  const [date, setDate] = useState(new Date());
-  const [mode, setMode] = useState('date');
-  const [show, setShow] = useState(false);
-  const [isFocused, setIsFocused] = useState(true);
-  const [isFocused1, setIsFocused1] = useState(true);
-  const [isFocused2, setIsFocused2] = useState(true);
-  const [user, setUser] = useState({});
-  const [selectedDate] = useState(route.params.date);;;
+  const [userLogin, setUserLogin] = useState(null);
   const [payload, setPayload] = useState({
     name: '',
     description: '',
@@ -28,15 +21,31 @@ function CreateEvent({ navigation, route }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const getUser = async () => {
-      const value = await AsyncStorage.getItem('userlogedin');
-      const json = JSON.parse(value);
-      setUser(json);
-    };
-    getUser();
+    (async () => {
+      const userLogedIn = await getUserLogedIn();
+      setUserLogin(userLogedIn);
+    })();
   }, []);
 
   const { users } = useSelector((state) => state.reducerUser);
+  const { event, stage, error } = useSelector((state) => state.reducerEvent);
+
+  useEffect(() => {
+    if (event) {
+      if (stage === 'addEvent') {
+        if (!error) {
+          sendNotify(payload);
+          customAlert({
+            actionConfirm: () => {
+              navigation.replace('EventCalendar');
+            },
+            title: 'Create Event Success',
+            message: `Hi ${userLogin.fullname}, Your Event is created! Your tetonggo will receive a notification in a short notice`,
+          });
+        }
+      }
+    }
+  }, [event]);
 
   const handlePayload = (key, value) => {
     setPayload({
@@ -47,55 +56,48 @@ function CreateEvent({ navigation, route }) {
 
   const handleSubmit = () => {
     console.log('payload', payload);
-  }
+    const { name, description, CategoryId, date } = payload;
+    payload.date = new Date(date);
 
-  const handleAddEvent = () => {
-    const payload = {
-      name: name,
-      description: description,
-      CategoryId: category,
-      image: 'hello',
-      date: date,
-      RealEstateId: user.RealEstateId,
-    };
-    const addEvent = () => {
-      const option = {
-        url: `event`,
-        stage: 'addEvent',
-        method: 'post',
-        body: payload,
-        headers: true,
-        type: 'ADD_EVENT',
-      };
-      sendNotify(payload);
-      dispatch(callServer(option));
-    };
-
-    addEvent();
-    Alert.alert('Success', `${name} Event is created! Your neighbours will receive a notification in a short notice`, [
-      // { text: "Don't leave", style: 'cancel', onPress: () => {} },
-      {
-        text: 'Ok',
-        style: 'destructive',
-        onPress: () => navigation.replace('Menu'),
-      },
-    ]);
+    if ((name, description, CategoryId)) {
+      dispatch(
+        callServerV2({
+          url: 'event',
+          stage: 'addEvent',
+          method: 'post',
+          body: payload,
+          headers: {
+            access_token: userLogin.access_token,
+          },
+          type: 'SET_EVENT',
+        }),
+      );
+    } else {
+      customAlert({
+        actionConfirm: () => {},
+        title: 'Create Event Failed',
+        message: 'Please, Fill all required.\ncategory, name and note is required.',
+      });
+    }
   };
 
-  const newUser = user ? users.filter((el) => el.RealEstateId === user.RealEstateId) : null;
+  const newUser = userLogin ? users.filter((el) => el.RealEstateId === userLogin.RealEstateId) : null;
 
-  const sendNotify = async (data) => {
-    const token = [];
-    for (let i = 0; i < newUser.length; i++) {
-      if (newUser[i].expoPushToken && newUser[i].id !== user.id) {
-        if (newUser[i].expoPushToken) {
-          token.push(newUser[i].expoPushToken);
+  const sendNotify = (data) => {
+    (async () => {
+      const token = [];
+      for (let i = 0; i < newUser.length; i++) {
+        if (newUser[i].expoPushToken && newUser[i].id !== userLogin.id) {
+          if (newUser[i].expoPushToken) {
+            token.push(newUser[i].expoPushToken);
+          }
         }
       }
-    }
-    await sendNotification(token, data.name, data.description, {
-      from: { fullname: user.fullname, userid: user.id },
-    });
+      console.log(token);;
+      sendNotification(token, data.name, data.description, {
+        from: { fullname: userLogin.fullname, userid: userLogin.id },
+      });
+    })();
   };
 
   return (
@@ -141,7 +143,7 @@ function CreateEvent({ navigation, route }) {
           </ScrollView>
         </View>
         <Text style={{ alignSelf: 'flex-start', marginLeft: 30, fontWeight: '600', color: '#666E83', marginTop: 20 }}>
-          Title
+          Title *
         </Text>
         <TextInput
           placeholder="Tetonggo Event"
@@ -151,7 +153,7 @@ function CreateEvent({ navigation, route }) {
         ></TextInput>
 
         <Text style={{ alignSelf: 'flex-start', marginLeft: 30, fontWeight: '600', color: '#666E83', marginTop: 20 }}>
-          Date
+          Date *
         </Text>
         <TextInput
           placeholder="Date"
@@ -159,7 +161,6 @@ function CreateEvent({ navigation, route }) {
           value={payload.date}
           placeholderTextColor="black"
           style={{ height: 40, width: 300, backgroundColor: 'white', borderBottomColor: 'black' }}
-          onChangeText={(text) => handleInputName(text)}
         ></TextInput>
 
         <Text
@@ -173,7 +174,7 @@ function CreateEvent({ navigation, route }) {
             marginTop: 20,
           }}
         >
-          Add a Note
+          Add a Note *
         </Text>
         <TextInput
           placeholder="Write a note here"
@@ -184,6 +185,7 @@ function CreateEvent({ navigation, route }) {
         <TouchableOpacity
           style={{ width: 300, height: 40, backgroundColor: '#161C2B', paddingVertical: 10, marginTop: 30 }}
           onPress={() => handleSubmit()}
+          // onPress={() => sendNotify()}
         >
           <Text style={{ alignSelf: 'center', fontWeight: 'bold', color: 'white' }}>SAVE</Text>
         </TouchableOpacity>
