@@ -157,10 +157,10 @@ function Comment({ route, navigation }) {
                 <Text style={styles.status}>{comments.description}</Text>
               </View>
               {
-                comments.image &&
+                comments.image ?
                 <Card style={styles.card}>
                   <Card.Cover source={{ uri: comments.image }} />
-                </Card>
+                </Card> : null
               }
               <Text style={styles.status}><FontAwesome name="comment" size={20} color="black" /> {comments.Comments.length}</Text>
             </View>
