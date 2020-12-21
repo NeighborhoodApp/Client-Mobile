@@ -20,6 +20,7 @@ import {
   EventCalendar,
   CreateFee,
   UpcomingEvent,
+  EventDetail,
 } from './pages';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Avatar } from 'react-native-paper';
@@ -274,6 +275,28 @@ export default function App() {
               headerTitle: () => (
                 <View style={styles.discoverRow}>
                   <Text style={styles.title}>Upcoming Event</Text>
+                  <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
+                </View>
+              ),
+              headerLeft: null,
+              headerStyle: {
+                backgroundColor: '#161C2B',
+                height: 100,
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                alignSelf: 'center',
+                color: '#fff',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="EventDetail"
+            component={EventDetail}
+            options={{
+              headerTitle: () => (
+                <View style={styles.row}>
+                  <Text style={styles.title}>Event Detail</Text>
                   <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
                 </View>
               ),

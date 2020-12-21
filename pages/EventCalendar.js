@@ -68,6 +68,7 @@ const EventCalendar = ({ navigation }) => {
             }
             newItems[date].push({
               height: 107,
+              eventId: el.id,
               name: el.name,
               tetonggo: el.User.fullname,
               description: el.description,
@@ -133,7 +134,7 @@ const EventCalendar = ({ navigation }) => {
     ) : (
       <TouchableOpacity
         style={[styles.item]}
-        // onPress={() => navigation.navigate('CreateEvent')}
+        onPress={() => navigation.navigate('EventDetail', {eventId: item.eventId})}
       >
         <View style={[[styles.card]]}>
           <View style={[styles.header]}>

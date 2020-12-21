@@ -4,6 +4,7 @@ export { default as CreateEvent } from './CreateEvent';
 export { default as CreateFee } from './CreateFee';
 export { default as Discover } from './Discover';
 export { default as EventCalendar } from './EventCalendar';
+export { default as EventDetail } from './EventDetail';
 export { default as GetStarted } from './GetStarted';
 export { default as Home } from "./Home";
 export { default as JoinUs } from './JoinUs';

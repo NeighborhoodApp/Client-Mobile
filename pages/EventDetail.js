@@ -1,32 +1,31 @@
 import React, { useEffect, useState } from 'react';
 
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, Image, TouchableOpacity } from 'react-native';
 import { Avatar } from 'react-native-paper';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
 
 import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
-import BottomNavigator from '../components/BottomNavigator';
 import { useDispatch, useSelector } from 'react-redux';
-import { FontAwesome5 } from '@expo/vector-icons';
-import { getUserLogedIn } from '../helpers/storange';
+import { getUserLogedIn, setUserLogedIn } from '../helpers/storange';
 import callServerV2 from '../helpers/callServer.v2';
 import Loading from '../components/Loading';
 
-const timeToString = (time) => {
-  const date = new Date(time);
-  return date.toISOString().split('T')[0];
-};
+const ePengajian = require('../assets/icon_events/e_pengajian.png');
+const eRapat = require('../assets/icon_events/e_rapat.png');
+const eLainnya = require('../assets/icon_events/e_others.png');
 
-export default function UpcomingEvent({ navigation }) {
+export default function EventDetail({ navigation, route }) {
   const [userLogin, setUserLogin] = useState(null);
-  const [upcoming, setUpcoming] = useState([]);
+
   const dispatch = useDispatch();
 
   let [loaded] = useFonts({
     Poppins_600SemiBold,
     Ubuntu_300Light,
   });
+
+  const eventId = route.params ? route.params.eventId : 1;
 
   useEffect(() => {
     (async () => {
@@ -39,17 +38,15 @@ export default function UpcomingEvent({ navigation }) {
     (async () => {
       if (userLogin) {
         if (userLogin.hasOwnProperty('access_token')) {
-          setupNavigation();
           dispatch(
             callServerV2({
-              url: `event`,
-              stage: 'getEvents',
+              url: `event/${eventId}`,
+              stage: 'getEvent',
               method: 'get',
-              body: null,
               headers: {
                 access_token: userLogin.access_token,
               },
-              type: 'SET_EVENTS',
+              type: 'SET_EVENT',
             }),
           );
         }
@@ -57,104 +54,64 @@ export default function UpcomingEvent({ navigation }) {
     })();
   }, [userLogin]);
 
-  const { events, loading } = useSelector((state) => state.reducerEvent);
+  const { event, loading } = useSelector((state) => state.reducerEvent);
 
   useEffect(() => {
-    (async () => {
-      if (userLogin) {
-        const upcoming = [];
-        events.forEach((el) => {
-          if (el.RealEstateId === userLogin.RealEstateId) {
-            const now = new Date();
-            const date = timeToString(el.date);
-            const curDate = timeToString(now);
-            const hmin1 = timeToString(now.setDate(now.getDate() + 1));
+    if (event && event.hasOwnProperty('id')) {
+      console.log('Eventsss....', event);
+    }
+  }, [event]);
 
-            if (date === hmin1 || date === curDate) {
-              upcoming.push(el);
-            }
-          }
-        });
-        upcoming.sort((a, b) => a.date > b.date);
-        setUpcoming(upcoming);
-      }
-    })();
-  }, [events]);
-
-  const setupNavigation = () => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }}
-          onPress={() => {
-            navigation.navigate('Menu');
-          }}
-        >
-          <Avatar.Image
-            size={39}
-            source={{
-              uri: `https://randomuser.me/api/portraits/men/1.jpg`,
-            }}
-          />
-        </TouchableOpacity>
-      ),
-    });
+  const eventImage = () => {
+    if (event.Category.category === 'Pengajian') {
+      return ePengajian;
+    } else if (event.Category.category === 'Arisan') {
+      return eRapat;
+    } else if (event.Category.category === 'Lainnya') {
+      return eLainnya;
+    } 
   };
 
   if (!loaded) return <AppLoading />;
-  if (loading) return <Loading />;
+  if (loading || !event) return <Loading />;
 
   return (
     <SafeAreaView style={styles.bg}>
       <View style={styles.border}></View>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
-        <Text style={styles.account}>Upcoming Events</Text>
-        <View style={styles.hr} />
+        {/* <Text style={styles.account}>My Tetonggo</Text> */}
         <View style={styles.box}>
-          {upcoming.map((el) => {
-            return (
-              <TouchableOpacity
-                key={el.id}
-                onPress={() => navigation.navigate('EventDetail', {eventId: el.id})}
-              >
-                <View style={styles.row}>
-                  <Avatar.Image
-                    size={39}
-                    source={{
-                      uri: `https://randomuser.me/api/portraits/men/${el.User.id}.jpg`,
-                    }}
-                  />
+          <View>
+            <Text style={styles.name}>{event.name}</Text>
+            <Text>{ event.Category.category } | {new Date(event.date).toDateString()}</Text>
+          </View>
+          <View style={styles.hr} />
+          <View style={[styles.body]}>
+            {/* <Text style={styles.name}>Description</Text> */}
+            <Text styles={styles.location}>{event.description}</Text>
+          </View>
+          <TouchableOpacity
+          // onPress={() => navigation.navigate('Profile')}
+          >
+            <View style={styles.row}>
+              <Avatar.Image
+                size={39}
+                source={{
+                  uri: `https://randomuser.me/api/portraits/men/${event.User.id}.jpg`,
+                }}
+              />
 
-                  <View style={styles.boxProfile}>
-                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                      <Text style={styles.name}>{el.name + ' '}</Text>
-                      <Text>
-                        <FontAwesome5
-                          name="clock"
-                          size={13}
-                          color="orange"
-                          style={{ textAlign: 'center', textAlignVertical: 'center' }}
-                        />
-                        {' ' + new Date(el.date).toDateString()}
-                      </Text>
-                    </View>
-
-                    <Text styles={styles.location}>
-                      {el.User.fullname} | {el.RealEstate.name}
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.hr} />
-              </TouchableOpacity>
-            );
-          })}
+              <View style={styles.boxProfile}>
+                <Text style={styles.name}>{event.User.fullname}</Text>
+                <Text styles={styles.location}>{event.RealEstate.name}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
         </View>
       </ScrollView>
-      <BottomNavigator
-        currentPage={'Notification'}
-        navigation={navigation}
-        // submitHandler={submitHandler}
-      ></BottomNavigator>
+      <View>
+        <Image style={styles.svgimgae} source={eventImage()} />
+      </View>
     </SafeAreaView>
   );
 }
@@ -162,10 +119,25 @@ export default function UpcomingEvent({ navigation }) {
 const styles = StyleSheet.create({
   bg: {
     position: 'absolute',
-    backgroundColor: '#fff',
+    backgroundColor: '#fff', //'#fff',
     width: '100%',
     height: '100%',
     top: 0,
+  },
+  svgimgae: {
+    width: 450,
+    height: 360,
+    alignSelf: 'flex-start',
+    marginLeft: -30,
+    position: 'absolute',
+    bottom: 10,
+  },
+  body: {
+    display: 'flex',
+    flexDirection: 'column',
+    // backgroundColor: 'red',
+    minHeight: 150,
+    justifyContent: 'space-between',
   },
   border: {
     position: 'absolute',
@@ -185,14 +157,13 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     marginTop: 10,
-    marginBottom: 10,
+    // backgroundColor: '#161C2B',
   },
   contentContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
-    paddingBottom: 50,
-    width: '100%',
+    paddingBottom: 10,
     // backgroundColor: '#FAFAFA',
     borderTopRightRadius: 35,
     borderTopLeftRadius: 35,
@@ -210,7 +181,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_600SemiBold',
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 15,
+    marginBottom: 20,
     position: 'relative',
     marginTop: 20,
     marginLeft: 40,
@@ -225,7 +196,7 @@ const styles = StyleSheet.create({
   boxAwal: {
     flexDirection: 'column',
     width: '100%',
-    marginLeft: '10%',
+    marginLeft: '15%',
     marginTop: 50,
 
     fontSize: 25,
@@ -233,22 +204,22 @@ const styles = StyleSheet.create({
   },
   box: {
     flexDirection: 'column',
+    // backgroundColor: 'red',
     width: '100%',
-    paddingLeft: '8%',
-    paddingRight: '8%',
-    marginTop: 5,
+    marginTop: 20,
+    paddingRight: 20,
+    paddingLeft: 20,
   },
   row: {
     flexDirection: 'row',
     marginTop: '1%',
     marginBottom: '1%',
+    marginTop: 10,
   },
   boxProfile: {
     display: 'flex',
     flexDirection: 'column',
-    width: '100%',
-    paddingLeft: 10,
-    paddingRight: 25,
+    marginLeft: 20,
     marginBottom: 5,
   },
   column: {
@@ -257,7 +228,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontFamily: 'Poppins_600SemiBold',
-    fontSize: 14,
+    fontSize: 15,
     marginBottom: 1,
     fontWeight: 'bold',
   },
@@ -293,7 +264,6 @@ const styles = StyleSheet.create({
   hr: {
     borderBottomColor: '#A2A2A2',
     borderBottomWidth: 0.25,
-    width: '100%',
     marginBottom: 8,
     marginTop: 5,
   },
