@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import SvgUri from 'expo-svg-uri';
 // import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import Modal from 'react-native-modal';
-import { TextInput } from 'react-native-paper';
+import { Avatar, TextInput } from 'react-native-paper';
 // import {Card, Avatar} from 'react-native-paper';
 // import { Button, Paragraph, Dialog, Portal, Provider, TextInput } from 'react-native-paper';
 import { Agenda } from 'react-native-calendars';
@@ -11,14 +11,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import callServerV2 from '../helpers/callServer.v2';
 import { getUserLogedIn } from '../helpers/storange';
 import Loading from '../components/Loading';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 
 const timeToString = (time) => {
   const date = new Date(time);
   return date.toISOString().split('T')[0];
 };
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const EventCalendar = ({ navigation }) => {
   const [items, setItems] = useState({});
@@ -57,7 +55,7 @@ const EventCalendar = ({ navigation }) => {
   }, [userLogin]);
 
   const { events, loading } = useSelector((state) => state.reducerEvent);
-
+  console.log(events)
   useEffect(() => {
     (async () => {
       if (userLogin) {
@@ -74,6 +72,7 @@ const EventCalendar = ({ navigation }) => {
               tetonggo: el.User.fullname,
               description: el.description,
               category: el.Category.category,
+              realEstateName: el.RealEstate.name,
               backgroundColor: getColor(el.CategoryId),
             });
           }
@@ -91,7 +90,7 @@ const EventCalendar = ({ navigation }) => {
 
   const loadItems = (day) => {
     console.log('day selected', day);
-    for (let i = -15; i < 10; i++) {
+    for (let i = -15; i < 80; i++) {
       const time = day.timestamp + i * 24 * 60 * 60 * 1000;
       const strTime = timeToString(time);
       if (!items[strTime]) {
@@ -132,16 +131,40 @@ const EventCalendar = ({ navigation }) => {
         />
       </TouchableOpacity>
     ) : (
-        <TouchableOpacity
-          style={[styles.item, { backgroundColor: item.backgroundColor }]}
+      <TouchableOpacity
+        style={[styles.item]}
         // onPress={() => navigation.navigate('CreateEvent')}
-        >
-          <Text style={{ fontWeight: 'bold' }}>Event Owner: {item.tetonggo}</Text>
-          <Text style={{ fontWeight: 'bold' }}>Category: {item.category}</Text>
-          <Text style={{ fontWeight: 'bold' }}>Title: {item.name}</Text>
+      >
+        <View style={[[styles.card]]}>
+          <View style={[styles.header]}>
+            <View style={[styles.title]}>
+              <Text style={{ fontWeight: 'bold' }}>{item.name}</Text>
+              <Text style={{ fontWeight: 'medium' }}>
+                {item.tetonggo} | {item.realEstateName}
+              </Text>
+            </View>
+            <View style={[styles.avatar]}>
+              <Avatar.Image
+                size={39}
+                source={{
+                  uri: `https://randomuser.me/api/portraits/men/1.jpg`,
+                }}
+              />
+            </View>
+          </View>
+          <View style={[styles.hr]} />
           <Text>{item.description}</Text>
-        </TouchableOpacity>
-      );
+          <View style={[styles.footer]}>
+            <View style={[styles.title]}>
+              <Text style={[styles.category, { backgroundColor: item.backgroundColor }]}>{item.category}</Text>
+            </View>
+            <View>
+              {/* <Text style={[styles.time, { backgroundColor: item.backgroundColor }]}>{item.name}</Text> */}
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
   };
 
   const renderEmptyDate = (item) => {
@@ -168,11 +191,11 @@ const EventCalendar = ({ navigation }) => {
       <Agenda
         items={items}
         loadItemsForMonth={loadItems}
-        selected={new Date().toISOString().slice(0, 10)}
+        selected={timeToString(new Date())}
         renderItem={renderItem}
         renderEmptyDate={renderEmptyDate}
         markedDates={{
-          [new Date().toISOString().slice(0, 10)]: { selected: true, selectedDayTextColor: 'blue' },
+          [timeToString(new Date())]: { selected: true, selectedDayTextColor: 'blue' },
         }}
         rowHasChanged={rowHasChanged}
       />
@@ -195,6 +218,40 @@ const styles = StyleSheet.create({
     padding: 10,
     marginRight: 10,
     marginTop: 17,
+  },
+  card: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  title: {},
+  hr: {
+    borderBottomColor: 'black',
+    borderBottomWidth: 0.25,
+    width: '100%',
+    marginBottom: 8,
+    marginTop: 8,
+  },
+  footer: {
+    paddingTop: 5,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  category: {
+    backgroundColor: 'gold',
+    // marginTop: 10,
+    marginBottom: 5,
+    padding: 6,
+    borderRadius: 5,
+  },
+  action: {
+    width: 100,
   },
 });
 
