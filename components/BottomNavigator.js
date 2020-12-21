@@ -75,7 +75,7 @@ export default function BottomNavigator({ currentPage, navigation, submitHandler
         >
           <TouchableOpacity
             onPress={() => {
-              Alert.alert('click');
+              navigation.navigate('UpcomingEvent');
             }}
             style={{ marginTop: 10 }}
           >
