@@ -95,8 +95,10 @@ function CreateEvent({ navigation, route }) {
           }
         }
       }
+      
+      console.log(token);;
       sendNotification(token, data.name, data.description, {
-        from: { fullname: userLogin.fullname, userid: userLogin.id },
+        from: { fullname: userLogin.fullname, userid: userLogin.id, eventId: data.eventId },
       });
     })();
   };
