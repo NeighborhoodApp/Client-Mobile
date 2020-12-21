@@ -34,11 +34,7 @@ function CreateEvent({ navigation, route }) {
     if (event) {
       if (stage === 'addEvent') {
         if (!error) {
-          const newPayload = {
-            ...payload,
-            eventId: event.id,
-          };
-          sendNotify(newPayload);
+          sendNotify(payload);
           customAlert({
             actionConfirm: () => {
               navigation.replace('EventCalendar');
@@ -59,7 +55,6 @@ function CreateEvent({ navigation, route }) {
   };
 
   const handleSubmit = () => {
-    console.log('payload', payload);
     const newPayload = {
       ...payload,
     };

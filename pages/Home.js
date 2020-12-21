@@ -1,6 +1,6 @@
 import AppLoading from 'expo-app-loading';
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet, Platform, ImageBackground } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import callServerV2 from '../helpers/callServer.v2';
 import errorHandler from '../helpers/errorHandler';
@@ -109,7 +109,8 @@ export default function Home({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text>Loading.....</Text>
+      <ImageBackground source={require('../assets/splashh.jpg')} style={styles.image}>
+      </ImageBackground>
       {/* <Button title="JOIN US PAGE" onPress={goJoin}></Button> */}
     </View>
   );
@@ -121,5 +122,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  image: {
+    flex: 1,
+    width: '100%'
   },
 });

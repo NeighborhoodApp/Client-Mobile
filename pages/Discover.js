@@ -33,12 +33,6 @@ const defaultVal = {
   privacy: 'public',
 };
 
-const wait = (timeout) => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, timeout);
-  });
-};
-
 function Discover({ navigation }) {
   const [selectedValue, setSelectedValue] = useState('public');
   const [payload, setPayload] = useState(defaultVal);
@@ -210,11 +204,9 @@ function Discover({ navigation }) {
   };
 
   const submitHandler = async () => {
-    console.log('press');
-    setLoading(true);
-    let uri;
     try {
       if (payload.description && formData) {
+        setLoading(true);
         const { data } = await axios({
           url: 'upload',
           method: 'post',
@@ -225,6 +217,7 @@ function Discover({ navigation }) {
         });
         setImgbUri(data);
       } else if (payload.description) {
+        setLoading(true);
         setImgbUri('noimage');
       }
 
@@ -291,16 +284,16 @@ function Discover({ navigation }) {
     try {
       setRefreshing(true);
       if (!userLogin) {
-        const userLogedIn = await getUserLogedIn()
-        await fetchTimeline(userLogedIn.access_token, userLogedIn.coordinate)
+        const userLogedIn = await getUserLogedIn();
+        await fetchTimeline(userLogedIn.access_token, userLogedIn.coordinate);
       } else {
-        await fetchTimeline()
+        await fetchTimeline();
       }
       setTimeout(() => {
-        setRefreshing(false)
+        setRefreshing(false);
       }, 2000);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }, []);
 

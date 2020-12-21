@@ -79,7 +79,7 @@ export default function EventDetail({ navigation, route }) {
       return eRapat;
     } else if (event.Category.category === 'Lainnya') {
       return eLainnya;
-    } 
+    }
   };
 
   if (!loaded) return <AppLoading />;
@@ -91,37 +91,35 @@ export default function EventDetail({ navigation, route }) {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
         {/* <Text style={styles.account}>My Tetonggo</Text> */}
         <View style={styles.box}>
+          <View style={styles.row}>
+            <Avatar.Image
+              size={39}
+              source={{
+                uri: `https://randomuser.me/api/portraits/men/${event.User.id}.jpg`,
+              }}
+            />
+
+            <View style={styles.boxProfile}>
+              <Text style={styles.name}>{event.User.fullname}</Text>
+              <Text styles={styles.location}>{event.RealEstate.name}</Text>
+            </View>
+            <View style={{flex:1, alignItems: 'flex-end'}}>
+              <Image style={styles.svgimgae} source={eventImage()} />
+            </View>
+          </View>
           <View>
             <Text style={styles.name}>{event.name}</Text>
-            <Text>{ event.Category.category } | {new Date(event.date).toDateString()}</Text>
+            <Text>
+              {event.Category.category} | {new Date(event.date).toDateString()}
+            </Text>
           </View>
           <View style={styles.hr} />
           <View style={[styles.body]}>
             {/* <Text style={styles.name}>Description</Text> */}
             <Text styles={styles.location}>{event.description}</Text>
           </View>
-          <TouchableOpacity
-          // onPress={() => navigation.navigate('Profile')}
-          >
-            <View style={styles.row}>
-              <Avatar.Image
-                size={39}
-                source={{
-                  uri: `https://randomuser.me/api/portraits/men/${event.User.id}.jpg`,
-                }}
-              />
-
-              <View style={styles.boxProfile}>
-                <Text style={styles.name}>{event.User.fullname}</Text>
-                <Text styles={styles.location}>{event.RealEstate.name}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
         </View>
       </ScrollView>
-      <View>
-        <Image style={styles.svgimgae} source={eventImage()} />
-      </View>
     </SafeAreaView>
   );
 }
@@ -135,11 +133,10 @@ const styles = StyleSheet.create({
     top: 0,
   },
   svgimgae: {
-    width: 450,
-    height: 300,
-    alignSelf: 'flex-start',
-    marginLeft: -30,
-    position: 'absolute',
+    width: 60,
+    height: 60,
+    // alignSelf: 'flex-start',
+    // position: 'absolute',
     bottom: 10,
   },
   body: {
@@ -221,6 +218,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
   row: {
+    flex: 1,
     flexDirection: 'row',
     marginTop: '1%',
     marginBottom: '1%',

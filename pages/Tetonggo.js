@@ -69,45 +69,6 @@ function Tetonggo({ navigation }) {
     tes()
   }, [navigation])
 
-  const submitHandler = async () => {
-    console.log('press');
-    let uri;
-    try {
-      if (payload.description && formData) {
-        console.log(formData);
-        const { data } = await axios({
-          url: 'upload',
-          method: 'post',
-          data: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        uri = data;
-      }
-      if (payload.description) {
-        await axios({
-          url: 'timeline',
-          method: 'post',
-          data: {
-            description: payload.description,
-            image: uri,
-            privacy: payload.privacy,
-          },
-          headers: {
-            access_token: user.access_token,
-          },
-        });
-      }
-      fetchTimeline();
-      setImage(null);
-      setFormData(null);
-      setPayload({ description: '', privacy: 'public' });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const newUser = user ? users.filter((el) =>
     (el.ComplexId === user.ComplexId && el.status === 'Active')) : null;
   
@@ -145,7 +106,7 @@ function Tetonggo({ navigation }) {
           );
         })}
       </ScrollView>
-      <BottomNavigator currentPage={'Tetonggo'} navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
+      <BottomNavigator currentPage={'Tetonggo'} navigation={navigation}></BottomNavigator>
     </SafeAreaView>
   );
 }
