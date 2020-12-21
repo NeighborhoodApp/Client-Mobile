@@ -112,12 +112,15 @@ export default function UpcomingEvent({ navigation }) {
         <View style={styles.box}>
           {upcoming.map((el) => {
             return (
-              <TouchableOpacity key={el.id} onPress={() => navigation.navigate('Profile')}>
+              <TouchableOpacity
+                key={el.id}
+                // onPress={() => navigation.navigate('Profile')}
+              >
                 <View style={styles.row}>
                   <Avatar.Image
                     size={39}
                     source={{
-                      uri: `https://randomuser.me/api/portraits/men/1.jpg`,
+                      uri: `https://randomuser.me/api/portraits/men/${el.User.id}.jpg`,
                     }}
                   />
 
@@ -131,7 +134,7 @@ export default function UpcomingEvent({ navigation }) {
                           color="orange"
                           style={{ textAlign: 'center', textAlignVertical: 'center' }}
                         />
-                        {' ' + timeToString(el.date)}
+                        {' ' + new Date(el.date).toDateString()}
                       </Text>
                     </View>
 
@@ -140,7 +143,7 @@ export default function UpcomingEvent({ navigation }) {
                     </Text>
                   </View>
                 </View>
-              <View style={styles.hr} />
+                <View style={styles.hr} />
               </TouchableOpacity>
             );
           })}
