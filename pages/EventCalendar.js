@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import callServerV2 from '../helpers/callServer.v2';
 import { getUserLogedIn } from '../helpers/storange';
 import Loading from '../components/Loading';
-import BottomNavigator from '../components/BottomNavigator'
+import BottomNavigator from '../components/BottomNavigator';
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 
 const timeToString = (time) => {
@@ -34,29 +34,25 @@ const EventCalendar = ({ navigation }) => {
       setUserLogin(userLogedIn);
     })();
   }, []);
-  
-  const fetchEvents = () => {
+
+  const fetchEvents = (access_token) => {
     (async () => {
-      if (userLogin) {
-        if (userLogin.hasOwnProperty('access_token')) {
-          dispatch(
-            callServerV2({
-              url: `event`,
-              stage: 'getEvents',
-              method: 'get',
-              body: null,
-              headers: {
-                access_token: userLogin.access_token,
-              },
-              type: 'SET_EVENTS',
-            }),
-          );
-        }
-      }
+      dispatch(
+        callServerV2({
+          url: `event`,
+          stage: 'getEvents',
+          method: 'get',
+          body: null,
+          headers: {
+            access_token: userLogin ? userLogin.access_token : access_token,
+          },
+          type: 'SET_EVENTS',
+        }),
+      );
     })();
   };
   useEffect(() => {
-    fetchEvents()
+    fetchEvents();
   }, [userLogin]);
 
   const { events, loading } = useSelector((state) => state.reducerEvent);
@@ -138,7 +134,7 @@ const EventCalendar = ({ navigation }) => {
     ) : (
       <TouchableOpacity
         style={[styles.item]}
-        onPress={() => navigation.navigate('EventDetail', {eventId: item.eventId})}
+        onPress={() => navigation.navigate('EventDetail', { eventId: item.eventId })}
       >
         <View style={[[styles.card]]}>
           <View style={[styles.header]}>
@@ -196,8 +192,11 @@ const EventCalendar = ({ navigation }) => {
   const onRefresh = useCallback(async () => {
     try {
       setRefreshing(true);
-      if (userLogin) {
-        fetchEvents()
+      if (!userLogin) {
+        const userLogedIn = await getUserLogedIn();
+        await fetchEvents(userLogedIn.access_token);
+      } else {
+        await fetchEvents();
       }
       setTimeout(() => {
         setRefreshing(false);
@@ -222,7 +221,7 @@ const EventCalendar = ({ navigation }) => {
           [timeToString(new Date())]: { selected: true, selectedDayTextColor: 'blue' },
         }}
         rowHasChanged={rowHasChanged}
-        style={{borderTopLeftRadius: 25, borderTopRightRadius: 25}}
+        style={{ borderTopLeftRadius: 25, borderTopRightRadius: 25 }}
       />
       <BottomNavigator currentPage={'EventCalendar'} navigation={navigation}></BottomNavigator>
     </View>

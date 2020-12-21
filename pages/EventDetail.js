@@ -35,7 +35,7 @@ export default function EventDetail({ navigation, route }) {
     Ubuntu_300Light,
   });
 
-  const eventId = route.params;
+  const {eventId} = route.params;
 
   useEffect(() => {
     (async () => {
