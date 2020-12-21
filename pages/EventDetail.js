@@ -10,10 +10,20 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUserLogedIn, setUserLogedIn } from '../helpers/storange';
 import callServerV2 from '../helpers/callServer.v2';
 import Loading from '../components/Loading';
+import * as Notifications from 'expo-notifications';
+import customAlert from '../helpers/alert';
 
 const ePengajian = require('../assets/icon_events/e_pengajian.png');
 const eRapat = require('../assets/icon_events/e_rapat.png');
 const eLainnya = require('../assets/icon_events/e_others.png');
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 export default function EventDetail({ navigation, route }) {
   const [userLogin, setUserLogin] = useState(null);
@@ -25,7 +35,7 @@ export default function EventDetail({ navigation, route }) {
     Ubuntu_300Light,
   });
 
-  const eventId = route.params ? route.params.eventId : 1;
+  const eventId = route.params;
 
   useEffect(() => {
     (async () => {

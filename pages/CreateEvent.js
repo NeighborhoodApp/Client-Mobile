@@ -93,22 +93,17 @@ function CreateEvent({ navigation, route }) {
   const sendNotify = (data) => {
     (async () => {
       const token = [];
-      // for (let i = 0; i < newUser.length; i++) {
-      //   if (newUser[i].expoPushToken && newUser[i].id !== userLogin.id) {
-      //     if (newUser[i].expoPushToken) {
-      //       token.push(newUser[i].expoPushToken);
-      //     }
-      //   }
-      // }
-
-      // console.log(token);
-      sendNotification(token, 'data.name', 'data.description',{
-        "from": {
-          "eventId": 30,
-          "fullname": "Siska",
-          "userid": 49,
-        },
-        // from: { fullname: userLogin.fullname, userid: userLogin.id, eventId: data.eventId },
+      for (let i = 0; i < newUser.length; i++) {
+        if (newUser[i].expoPushToken && newUser[i].id !== userLogin.id) {
+          if (newUser[i].expoPushToken) {
+            token.push(newUser[i].expoPushToken);
+          }
+        }
+      }
+      
+      console.log(token);;
+      sendNotification(token, data.name, data.description, {
+        from: { fullname: userLogin.fullname, userid: userLogin.id, eventId: data.eventId },
       });
     })();
   };
@@ -197,8 +192,8 @@ function CreateEvent({ navigation, route }) {
 
         <TouchableOpacity
           style={{ width: 300, height: 40, backgroundColor: '#161C2B', paddingVertical: 10, marginTop: 30 }}
-          // onPress={() => handleSubmit()}
-          onPress={() => sendNotify()}
+          onPress={() => handleSubmit()}
+          // onPress={() => sendNotify()}
         >
           <Text style={{ alignSelf: 'center', fontWeight: 'bold', color: 'white' }}>SAVE</Text>
         </TouchableOpacity>

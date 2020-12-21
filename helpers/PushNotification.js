@@ -10,7 +10,7 @@ export const sendNotification = (expoPushToken, title, body, payload = {}) => {
     const message = {
       to: ['ExponentPushToken[qknsphOeD4YJouvutpLQbZ]'],
       // to: expoPushToken,
-      // sound: 'default',
+      sound: 'default',
       title: title,
       body: body,
       data: { payload },

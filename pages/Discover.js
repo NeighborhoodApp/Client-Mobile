@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 
 import {
   View,
@@ -26,6 +26,7 @@ import callServerV2 from '../helpers/callServer.v2';
 import { actionRemoveTimeline } from '../store/actions/action';
 import { getUserLogedIn } from '../helpers/storange';
 import AppLoading from 'expo-app-loading';
+import * as Notifications from 'expo-notifications';
 
 const defaultVal = {
   description: '',
@@ -55,6 +56,10 @@ function Discover({ navigation }) {
   const [userLogin, setUserLogin] = useState(null);
   const [imgbUri, setImgbUri] = useState(null);
 
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
+
   // >>>>>>>>> HEADER OPTIONS <<<<<<<<<<<<<
 
   useEffect(() => {
@@ -62,6 +67,20 @@ function Discover({ navigation }) {
       console.log('-----UseEffect 1');
       const userLogedIn = await getUserLogedIn();
       setUserLogin(userLogedIn);
+      
+      // This listener is fired whenever a notification is received while the app is foregrounded
+      notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification);
+      });
+
+      // This listener is fired whenever a user taps on or interacts with a notification
+      // (works when app is foregrounded, backgrounded, or killed)
+      responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(response);
+        const eventId = response.notification.request.content.data.payload.from.eventId;
+        console.log('eventId', eventId);
+        navigation.navigate('EventDetail', { eventId: eventId });
+      });
     })();
   }, []);
 
