@@ -55,7 +55,7 @@ const EventCalendar = ({ navigation }) => {
   }, [userLogin]);
 
   const { events, loading } = useSelector((state) => state.reducerEvent);
-  console.log(events)
+
   useEffect(() => {
     (async () => {
       if (userLogin) {
@@ -139,7 +139,7 @@ const EventCalendar = ({ navigation }) => {
           <View style={[styles.header]}>
             <View style={[styles.title]}>
               <Text style={{ fontWeight: 'bold' }}>{item.name}</Text>
-              <Text style={{ fontWeight: 'medium' }}>
+              <Text style={{ fontWeight: 'normal' }}>
                 {item.tetonggo} | {item.realEstateName}
               </Text>
             </View>

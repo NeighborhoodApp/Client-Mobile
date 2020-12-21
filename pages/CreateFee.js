@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import callServer from '../helpers/callServer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function CreateEvent({ navigation }) {
+export default function CreateFee({ navigation }) {
   const [category, setCategory] = useState(null);
   const [description, setDescription] = useState('');
   const [name, setName] = useState('');
@@ -291,4 +291,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateEvent;
