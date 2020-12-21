@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Text, Image, TouchableOpacity, StyleSheet, Button, View } from 'react-native';
+import { Text, Image, TouchableOpacity, StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import {
@@ -26,7 +26,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Avatar } from 'react-native-paper';
 import { Provider } from 'react-redux';
 import store from './store';
-import NotificationPage from './pages/Notification';
 
 const Stack = createStackNavigator();
 

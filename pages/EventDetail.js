@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   },
   svgimgae: {
     width: 450,
-    height: 360,
+    height: 300,
     alignSelf: 'flex-start',
     marginLeft: -30,
     position: 'absolute',
