@@ -75,6 +75,7 @@ export default function UpcomingEvent({ navigation }) {
             }
           }
         });
+        upcoming.sort((a, b) => a.date > b.date);
         setUpcoming(upcoming);
       }
     })();
