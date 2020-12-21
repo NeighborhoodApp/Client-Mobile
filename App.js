@@ -116,12 +116,11 @@ export default function App() {
             component={Profile}
             options={{
               headerTitle: () => (
-                <View style={styles.row}>
+                <View style={styles.discoverRow}>
                   <Text style={styles.title}>Profile</Text>
                   <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
                 </View>
               ),
-              headerLeft: null,
               headerStyle: {
                 backgroundColor: '#161C2B',
                 height: 100,
@@ -138,12 +137,11 @@ export default function App() {
             component={CreateEvent}
             options={{
               headerTitle: () => (
-                <View style={styles.row}>
+                <View style={styles.discoverRow}>
                   <Text style={styles.title}>Add Event</Text>
                   <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
                 </View>
               ),
-              headerLeft: null,
               headerStyle: {
                 backgroundColor: '#161C2B',
                 height: 100,
@@ -160,12 +158,11 @@ export default function App() {
             component={CreateFee}
             options={{
               headerTitle: () => (
-                <View style={styles.row}>
+                <View style={styles.discoverRow}>
                   <Text style={styles.title}>Add Fee</Text>
                   <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
                 </View>
               ),
-              headerLeft: null,
               headerStyle: {
                 backgroundColor: '#161C2B',
                 height: 100,
@@ -187,7 +184,7 @@ export default function App() {
                   <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
                 </View>
               ),
-              headerLeft: null,
+              headerLeft: false,
               headerStyle: {
                 backgroundColor: '#161C2B',
                 height: 100,
@@ -227,7 +224,7 @@ export default function App() {
             component={Verification}
             options={{
               headerTitle: () => (
-                <View style={styles.row}>
+                <View style={styles.discoverRow}>
                   <Text style={styles.title}>Verification</Text>
                   <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
                 </View>
@@ -298,7 +295,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'center',
-    alignSelf: 'center',
   },
   discoverRow: {
     flexDirection: 'row',

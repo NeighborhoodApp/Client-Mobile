@@ -19,7 +19,7 @@ export default function BottomNavigator({ currentPage, navigation, submitHandler
 					</View>
 				</TouchableWithoutFeedback> */}
         <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <TouchableOpacity onPress={submitHandler}>
+          <TouchableOpacity onPress={submitHandler ? submitHandler : null}>
             <FontAwesome name="plus" size={30} color="#2FBBF0" style={{ marginTop: 10 }} />
           </TouchableOpacity>
         </View>

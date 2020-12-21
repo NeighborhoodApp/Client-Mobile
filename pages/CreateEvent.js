@@ -55,7 +55,6 @@ function CreateEvent({ navigation, route }) {
   };
 
   const handleSubmit = () => {
-    console.log('payload', payload);
     const newPayload = {
       ...payload,
     };
@@ -96,7 +95,6 @@ function CreateEvent({ navigation, route }) {
           }
         }
       }
-      console.log(token);;
       sendNotification(token, data.name, data.description, {
         from: { fullname: userLogin.fullname, userid: userLogin.id },
       });

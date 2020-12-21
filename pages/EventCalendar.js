@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, RefreshControl, Alert } from 'react-native';
 import SvgUri from 'expo-svg-uri';
 // import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import Modal from 'react-native-modal';
@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import callServerV2 from '../helpers/callServer.v2';
 import { getUserLogedIn } from '../helpers/storange';
 import Loading from '../components/Loading';
+import BottomNavigator from '../components/BottomNavigator'
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 
 const timeToString = (time) => {
@@ -22,6 +23,7 @@ const EventCalendar = ({ navigation }) => {
   const [items, setItems] = useState({});
   const [userLogin, setUserLogin] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [isFocused, setIsFocused] = useState('true');
 
   const dispatch = useDispatch();
@@ -32,8 +34,8 @@ const EventCalendar = ({ navigation }) => {
       setUserLogin(userLogedIn);
     })();
   }, []);
-
-  useEffect(() => {
+  
+  const fetchEvents = () => {
     (async () => {
       if (userLogin) {
         if (userLogin.hasOwnProperty('access_token')) {
@@ -52,10 +54,12 @@ const EventCalendar = ({ navigation }) => {
         }
       }
     })();
+  };
+  useEffect(() => {
+    fetchEvents()
   }, [userLogin]);
 
   const { events, loading } = useSelector((state) => state.reducerEvent);
-  console.log(events)
   useEffect(() => {
     (async () => {
       if (userLogin) {
@@ -139,7 +143,7 @@ const EventCalendar = ({ navigation }) => {
           <View style={[styles.header]}>
             <View style={[styles.title]}>
               <Text style={{ fontWeight: 'bold' }}>{item.name}</Text>
-              <Text style={{ fontWeight: 'medium' }}>
+              <Text style={{ fontWeight: '300' }}>
                 {item.tetonggo} | {item.realEstateName}
               </Text>
             </View>
@@ -173,10 +177,14 @@ const EventCalendar = ({ navigation }) => {
         style={{
           height: 15,
           flex: 1,
-          paddingTop: 30,
+          justifyContent: 'center',
+          marginTop: 15,
+          paddingHorizontal: 10,
+          borderRadius: 5,
+          backgroundColor: 'white',
         }}
       >
-        <Text>This is empty date!</Text>
+        <Text>No event</Text>
       </View>
     );
   };
@@ -184,11 +192,26 @@ const EventCalendar = ({ navigation }) => {
     return r1.name !== r2.name;
   };
 
+  const onRefresh = useCallback(async () => {
+    try {
+      setRefreshing(true);
+      if (userLogin) {
+        fetchEvents()
+      }
+      setTimeout(() => {
+        setRefreshing(false);
+      }, 2000);
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
   if (loading) return <Loading />;
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: '#161C2B' }}>
       <Agenda
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         items={items}
         loadItemsForMonth={loadItems}
         selected={timeToString(new Date())}
@@ -198,7 +221,9 @@ const EventCalendar = ({ navigation }) => {
           [timeToString(new Date())]: { selected: true, selectedDayTextColor: 'blue' },
         }}
         rowHasChanged={rowHasChanged}
+        style={{borderTopLeftRadius: 25, borderTopRightRadius: 25}}
       />
+      <BottomNavigator currentPage={'EventCalendar'} navigation={navigation}></BottomNavigator>
     </View>
   );
 };
