@@ -3,16 +3,12 @@ import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'reac
 import { useFonts, Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat';
 import { Fontisto, Feather } from '@expo/vector-icons';
-import errorHandler from '../helpers/errorHandler';
-import { axios } from '../helpers/Axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import callServer from '../helpers/callServer';
 import { useDispatch, useSelector } from 'react-redux';
 import callServerV2 from '../helpers/callServer.v2';
-import { actionRemoveUser } from '../store/actions/action';
 import { getUserLogedIn, setUserLogedIn } from '../helpers/storange';
 import Loading from '../components/Loading';
 import { registerPushNotification } from '../helpers/PushNotification';
+import errorHandler from '../helpers/errorHandler';
 
   const defaultVal = {
     email: '',
@@ -38,7 +34,7 @@ function Login({ navigation }) {
     })();
   }, []);
 
-  const { user, users, loading } = useSelector((state) => state.reducerUser);
+  const { user, users, error, loading } = useSelector((state) => state.reducerUser);
 
   useEffect(() => {
     (async () => {
@@ -74,6 +70,12 @@ function Login({ navigation }) {
       }
     })();
   }, [users]);
+
+  useEffect(() => {
+    if (error) {
+      setErrMessage(errorHandler(error));
+    }
+  }, [error])
 
   const toJoin = () => {
     navigation.replace('JoinUs');
