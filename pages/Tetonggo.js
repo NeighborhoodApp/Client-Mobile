@@ -7,27 +7,12 @@ import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
 import { Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import BottomNavigator from '../components/BottomNavigator';
 import { useDispatch, useSelector } from 'react-redux';
-import callServer from '../helpers/callServer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FontAwesome5 } from '@expo/vector-icons';
 import Loading from '../components/Loading';
+import { getUserLogedIn } from '../helpers/storange';
+import callServerV2 from '../helpers/callServer.v2';
 
 function Tetonggo({ navigation }) {
-  useEffect(() => {
-    const option = {
-      url: 'users',
-      stage: 'getRealEstates',
-      method: 'get',
-      body: null,
-      headers: true, // true
-      type: 'SET_USERS',
-    };
-    dispatch(callServer(option));
-  }, []);
-
-  const { users, loading } = useSelector((state) => state.reducerUser);
-  const [user, setUser] = useState(null);
-  const dispatch = useDispatch();
 
   let [loaded] = useFonts({
     Poppins_600SemiBold,
@@ -35,13 +20,39 @@ function Tetonggo({ navigation }) {
     Ubuntu_500Medium,
   });
 
+  const [userLogin, setUserLogin] = useState(null);
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    let temp;
-    const tes = async () => {
-      const value = await AsyncStorage.getItem('userlogedin');
-      const json = JSON.parse(value);
-      temp = json.id;
-      setUser(json);
+    (async () => {
+      (async () => {
+        const userLogedIn = await getUserLogedIn();
+        setUserLogin(userLogedIn);
+      })();
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (userLogin && userLogin.hasOwnProperty('access_token')) {
+        setupNavigation(userLogin.id);
+        dispatch(
+          callServerV2({
+            url: 'users',
+            stage: 'getAllUsers',
+            type: 'SET_USERS',
+            headers: {
+              access_token: userLogin.access_token,
+            },
+          }),
+        );
+      }
+    })();
+  }, [userLogin]);
+
+  const { users, loading } = useSelector((state) => state.reducerUser);
+
+  const setupNavigation = (userId) => {
       navigation.setOptions({
         headerRight: () => (
           <TouchableOpacity
@@ -53,35 +64,40 @@ function Tetonggo({ navigation }) {
             <Avatar.Image
               size={39}
               source={{
-                uri: `https://randomuser.me/api/portraits/men/${temp ? temp : null}.jpg`,
+                uri: `https://randomuser.me/api/portraits/men/${userId}.jpg`,
               }}
             />
           </TouchableOpacity>
         ),
       });
-    };
-    tes();
-  }, [navigation]);
+  }
 
   const kickHandler = (id) => {
-    const option = {
-      url: `users/${id}`,
-      stage: 'updateUser',
-      method: 'put',
-      body: {
-        status: 'Inactive',
-        RealEstateId: null,
-        ComplexId: null,
-      },
-      headers: true,
-      type: 'UPDATE_USER',
-      id: id,
-    };
-    dispatch(callServer(option));
+    (async () => {
+      dispatch(
+        callServerV2({
+          url: `users/${id}`,
+          stage: 'kickUser',
+          method: 'put',
+          body: {
+            status: 'Inactive',
+            RealEstateId: null,
+            ComplexId: null,
+          },
+          headers: {
+            access_token: userLogin.access_token
+          },
+          type: 'UPDATE_USER',
+          id: id,
+        }),
+      );
+    })();
   };
-  const newUser = user ? users.filter((el) => el.ComplexId === user.ComplexId && el.status === 'Active') : null;
+
+  const newUser = userLogin ? users.filter((el) => el.ComplexId === userLogin.ComplexId && el.status === 'Active') : null;
 
   if (loading || !loaded) return <Loading />;
+  
   return (
     <SafeAreaView style={styles.bg}>
       <View style={styles.border}></View>
@@ -111,7 +127,7 @@ function Tetonggo({ navigation }) {
                         </Text>
                         <Text styles={styles.location}>{el.address}</Text>
                       </View>
-                      {user.RoleId === 2 && el.RoleId !== 2 ? (
+                      {userLogin.RoleId === 2 && el.RoleId !== 2 ? (
                         <View style={styles.container_button}>
                           <TouchableOpacity onPress={() => kickHandler(el.id)} style={styles.btn_delete}>
                             <Text style={styles.delete}> Kick </Text>

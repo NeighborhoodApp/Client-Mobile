@@ -4,9 +4,9 @@ import { useFonts, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import { Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import VerificationList from '../components/VerificationList';
 import { useDispatch, useSelector } from 'react-redux';
-import callServer from '../helpers/callServer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loading from '../components/Loading';
+import callServerV2 from '../helpers/callServer.v2';
+import { getUserLogedIn } from '../helpers/storange';
 
 function Verification() {
   const [loaded] = useFonts({
@@ -15,93 +15,106 @@ function Verification() {
     Ubuntu_500Medium,
   });
 
-  const [admin, setAdmin] = useState({});
-  const { users, loading } = useSelector((state) => state.reducerUser);
-
-  const filteredUsers = users.filter(
-    (user) => user.ComplexId === admin.ComplexId && user.RoleId !== 2 && user.status === 'Inactive',
-  );
+  const [userLogin, setUserLogin] = useState(null);
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    (async () => {
+       (async () => {
+         const userLogedIn = await getUserLogedIn();
+         setUserLogin(userLogedIn);
+       })();
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async => {
+      if (userLogin !== null) {
+        if (userLogin.hasOwnProperty('access_token')) {
+          dispatch(
+            callServerV2({
+              url: 'users',
+              stage: 'getUsers',
+              type: 'SET_USERS',
+              headers: {
+                access_token: userLogin.access_token,
+              },
+            }),
+          );
+        }
+      }
+    })();
+  }, [userLogin])
+
+  const { users, loading, stage } = useSelector((state) => state.reducerUser);
+
+  useEffect(() => {
+    if (stage === 'declined' || stage === 'confirmed') {
+      console.log('User ' + stage)
+    }
+  }, [users]);
+
   const handleDecline = (user) => {
-    const updateUser = (user) => {
-      const option = {
-        url: `users/${user.id}`,
-        stage: 'updateUser',
-        method: 'put',
-        body: {
-          fullname: `${user.fullname}#declined`,
-          address: user.address,
-          RoleId: user.RoleId,
-          RealEstateId: null,
-          ComplexId: null,
-        },
-        headers: true,
-        type: 'UPDATE_USER',
-        id: user.id,
-      };
-      dispatch(callServer(option));
-    };
-    updateUser(user);
+    (async () => {
+      dispatch(
+        callServerV2({
+          url: `users/${user.id}`,
+          stage: 'declined',
+          method: 'put',
+          body: {
+            fullname: `${user.fullname}#declined`,
+            address: user.address,
+            RoleId: user.RoleId,
+            RealEstateId: null,
+            ComplexId: null,
+          },
+          headers: {
+            access_token: userLogin.access_token,
+          },
+          type: 'UPDATE_USER',
+          id: user.id,
+        }),
+      );
+    })();
   };
 
   const handleConfirm = (id) => {
-    const updateUser = (id) => {
-      const option = {
-        url: `users/${id}`,
-        stage: 'updateUser',
-        method: 'patch',
-        body: {
-          status: 'Active',
-        },
-        headers: true,
-        type: 'UPDATE_USER',
-        id: id,
-      };
-      dispatch(callServer(option));
-    };
-    updateUser(id);
+    (async () => {
+      dispatch(
+        callServerV2({
+          url: `users/${id}`,
+          stage: 'confirmed',
+          method: 'patch',
+          body: {
+            status: 'Active',
+          },
+          headers: {
+            access_token: userLogin.access_token,
+          },
+          type: 'UPDATE_USER',
+          id: id,
+        }),
+      );
+    })();
   };
 
-  useEffect(() => {
-    const fetchUsers = () => {
-      const option = {
-        url: 'users',
-        stage: 'getUsers',
-        method: 'get',
-        body: null,
-        headers: null,
-        type: 'SET_USERS',
-      };
-      dispatch(callServer(option));
-    };
-    fetchUsers();
-  }, []);
-
-  useEffect(() => {
-    const getUser = async () => {
-      const value = await AsyncStorage.getItem('userlogedin');
-      const json = JSON.parse(value);
-      setAdmin(json);
-    };
-    getUser();
-  }, []);
+  const filteredUsers = users.filter(
+    (user) => user.ComplexId === userLogin.ComplexId && user.RoleId !== 2 && user.status === 'Inactive',
+  );
 
   if (loading || !loaded) return <Loading />;
 
-  else {
-    return (
-      <View style={styles.container}>
-        <View style={styles.items}>
-          <Text style={styles.title}> New Users </Text>
-          {filteredUsers.map((user) => (
-            <VerificationList user={user} key={user.id} handleDecline={handleDecline} handleConfirm={handleConfirm} />
-          ))}
-        </View>
+  return (
+    <View style={styles.container}>
+      <View style={styles.items}>
+        <Text style={styles.title}> New Users </Text>
+        {filteredUsers.map((user) => (
+          <VerificationList user={user} key={user.id} handleDecline={handleDecline} handleConfirm={handleConfirm} />
+        ))}
       </View>
-    );
-  }
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
