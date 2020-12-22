@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import { useFonts, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import { Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import VerificationList from '../components/VerificationList';
@@ -16,6 +16,7 @@ function Verification() {
   });
 
   const [userLogin, setUserLogin] = useState(null);
+  const [filteredUsers, setFilteredUsers] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -52,6 +53,18 @@ function Verification() {
   useEffect(() => {
     if (stage === 'declined' || stage === 'confirmed') {
       console.log('User ' + stage)
+    }
+    if (userLogin) {
+      const filterUser = [];
+      console.log('Filteredddd', userLogin);
+      users.forEach((user) => {
+        if (user.ComplexId) {
+          if (user.ComplexId === userLogin.ComplexId && user.RoleId !== 2 && user.status === 'Inactive') {
+            filterUser.push(user);
+          }
+        }
+      });
+      setFilteredUsers(filterUser);
     }
   }, [users]);
 
@@ -99,21 +112,23 @@ function Verification() {
     })();
   };
 
-  const filteredUsers = users.filter(
-    (user) => user.ComplexId === userLogin.ComplexId && user.RoleId !== 2 && user.status === 'Inactive',
-  );
+  // const filteredUsers = users.filter(
+  //   (user) => user.ComplexId && user.ComplexId === userLogin.ComplexId && user.RoleId !== 2 && user.status === 'Inactive',
+  // );
 
   if (loading || !loaded) return <Loading />;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.items}>
-        <Text style={styles.title}> New Users </Text>
-        {filteredUsers.map((user) => (
-          <VerificationList user={user} key={user.id} handleDecline={handleDecline} handleConfirm={handleConfirm} />
-        ))}
+    <SafeAreaView style={styles.bg}>
+      <View style={styles.container}>
+        <View style={styles.items}>
+          <Text style={styles.title}> New Users </Text>
+          {filteredUsers.map((user) => (
+            <VerificationList user={user} key={user.id} handleDecline={handleDecline} handleConfirm={handleConfirm} />
+          ))}
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -124,6 +139,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     alignContent: 'space-between',
+    borderTopRightRadius: 35,
+    borderTopLeftRadius: 35,
+  },
+  bg: {
+    position: 'absolute',
+    backgroundColor: '#161C2B',
+    width: '100%',
+    height: '100%',
+    top: 0,
   },
   items: {
     position: 'absolute',

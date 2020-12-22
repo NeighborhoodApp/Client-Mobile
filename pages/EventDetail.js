@@ -35,7 +35,9 @@ export default function EventDetail({ navigation, route }) {
     Ubuntu_300Light,
   });
 
-  const {eventId} = route.params;
+  const { eventId } = route.params;
+  console.log('eventId', eventId);
+
 
   useEffect(() => {
     (async () => {
@@ -83,7 +85,7 @@ export default function EventDetail({ navigation, route }) {
   };
 
   if (!loaded) return <AppLoading />;
-  if (loading || !event) return <Loading />;
+  if (loading || !event.hasOwnProperty('User')) return <Loading />;
 
   return (
     <SafeAreaView style={styles.bg}>

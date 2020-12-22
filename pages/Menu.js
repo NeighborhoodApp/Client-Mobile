@@ -46,9 +46,9 @@ function Menu({ navigation }) {
       <View style={styles.container}>
         <Text style={styles.account}>Account</Text>
         <View style={styles.column}>
-          <TouchableOpacity style={styles.btn_menu}>
+          <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('UpcomingEvent')}>
             <MaterialIcons style={styles.icon} name="notifications-active" size={22} color="#2C6FC7" />
-            <Text style={styles.menu}> Notifications </Text>
+            <Text style={styles.menu}> Upcoming Event </Text>
           </TouchableOpacity>
           {/* <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('CreateEvent')}>
             <Fontisto style={styles.icon} name="calendar" size={22} color="#2C6FC7" />
@@ -68,10 +68,10 @@ function Menu({ navigation }) {
                 <FontAwesome5 style={styles.icon} name="house-user" size={20} color="#2C6FC7" />
                 <Text style={styles.menu}>Verifications </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('CreateFee')}>
+              {/* <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('CreateFee')}>
                 <MaterialIcons style={styles.icon} name="monetization-on" size={20} color="#2C6FC7" />
                 <Text style={styles.menu}> Create Fee </Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </>
           )}
           <TouchableOpacity style={styles.btn_logout} onPress={() => logout()}>
