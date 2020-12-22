@@ -2,13 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, Platform, Alert } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import callServer from '../helpers/callServer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { sendNotification } from '../helpers/PushNotification';
 import customAlert from '../helpers/alert';
 import callServerV2 from '../helpers/callServer.v2';
 import { getUserLogedIn } from '../helpers/storange';
-import { FontAwesome5 } from '@expo/vector-icons';
 
 function CreateEvent({ navigation, route }) {
   const [userLogin, setUserLogin] = useState(null);
@@ -35,7 +32,7 @@ function CreateEvent({ navigation, route }) {
     if (event) {
       if (stage === 'addEvent') {
         if (!error) {
-          sendNotify(payload);
+          sendNotify(event);
           customAlert({
             actionConfirm: () => {
               navigation.replace('EventCalendar');
@@ -96,9 +93,9 @@ function CreateEvent({ navigation, route }) {
           }
         }
       }
-      
+      console.log('data event', data.id);
       sendNotification(token, data.name, data.description, {
-        from: { fullname: userLogin.fullname, userid: userLogin.id, eventId: data.eventId },
+        from: { fullname: userLogin.fullname, userid: userLogin.id, eventId: data.id },
       });
     })();
   };

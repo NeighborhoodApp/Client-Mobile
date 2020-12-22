@@ -72,20 +72,32 @@ function Tetonggo({ navigation }) {
             <View key={`timeline${index}`} style={styles.box}>
               <TouchableOpacity onPress={() => navigation.navigate('Profile', { userId: el.id })}>
                 <View style={styles.row}>
-                  <Avatar.Image
+                  <View >
+                    <Avatar.Image
                     size={39}
                     source={{
                       uri: `https://randomuser.me/api/portraits/men/${el.id}.jpg`,
                     }}
                   />
 
-                  <View style={styles.boxProfile}>
-                    <Text style={styles.name}>
-                      {el.fullname + ' '}
-                      {el.RoleId === 2 && <FontAwesome5 name="crown" size={15} color="orange" style={{ paddingLeft: 13 }} />}
-                      
-                    </Text>
-                    <Text styles={styles.location}>{el.address}</Text>
+                    <View style={styles.boxProfile}>
+                      <Text style={styles.name}>
+                        {el.fullname + ' '}
+                        {el.RoleId === 2 && (
+                          <FontAwesome5 name="crown" size={15} color="orange" style={{ paddingLeft: 13 }} />
+                        )}
+                      </Text>
+                      <Text styles={styles.location}>{el.address}</Text>
+                    </View>
+                  </View>
+                  
+                  <View style={styles.container_button}>
+                    <TouchableOpacity onPress={() => {}} style={styles.btn_confirm}>
+                      <Text style={styles.confirm}> Confirm </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => {}} style={styles.btn_delete}>
+                      <Text style={styles.delete}> Decline </Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -179,6 +191,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: '1%',
     marginBottom: '1%',
+    justifyContent: "space-between"
   },
   boxProfile: {
     display: 'flex',
@@ -266,6 +279,53 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFA',
     borderColor: '#E3E3E3',
     borderRadius: 5,
+  },
+  btn_confirm: {
+    elevation: 8,
+    backgroundColor: '#5CB409',
+    borderRadius: 6,
+    marginTop: 5,
+    marginLeft: 2,
+    width: 60,
+    height: 30,
+    marginRight: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  btn_delete: {
+    elevation: 8,
+    backgroundColor: '#fff',
+    borderColor: '#161C2B',
+    borderWidth: 0.3,
+    borderRadius: 6,
+    marginTop: 5,
+    marginLeft: 2,
+    width: 60,
+    height: 30,
+    marginRight: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  confirm: {
+    fontFamily: 'Ubuntu_500Medium',
+    fontSize: 12,
+    color: 'white',
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  delete: {
+    fontFamily: 'Ubuntu_500Medium',
+    fontSize: 12,
+    color: '#161C2B',
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  container_button: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginLeft: 25,
   },
 });
 

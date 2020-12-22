@@ -7,11 +7,10 @@ import AppLoading from 'expo-app-loading';
 
 import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserLogedIn, setUserLogedIn } from '../helpers/storange';
+import { getUserLogedIn } from '../helpers/storange';
 import callServerV2 from '../helpers/callServer.v2';
 import Loading from '../components/Loading';
 import * as Notifications from 'expo-notifications';
-import customAlert from '../helpers/alert';
 
 const ePengajian = require('../assets/icon_events/e_pengajian.png');
 const eRapat = require('../assets/icon_events/e_rapat.png');
@@ -36,13 +35,14 @@ export default function EventDetail({ navigation, route }) {
   });
 
   const { eventId } = route.params;
+  console.log(eventId);
 
   useEffect(() => {
     (async () => {
       const userLogedIn = await getUserLogedIn();
       setUserLogin(userLogedIn);
     })();
-  }, []);
+  }, [eventId]);
 
   useEffect(() => {
     (async () => {
@@ -90,22 +90,6 @@ export default function EventDetail({ navigation, route }) {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
         {/* <Text style={styles.account}>My Tetonggo</Text> */}
         <View style={styles.box}>
-          <View style={styles.row}>
-            <Avatar.Image
-              size={39}
-              source={{
-                uri: `https://randomuser.me/api/portraits/men/${event.User.id}.jpg`,
-              }}
-            />
-
-            <View style={styles.boxProfile}>
-              <Text style={styles.name}>{event.User.fullname}</Text>
-              <Text styles={styles.location}>{event.RealEstate.name}</Text>
-            </View>
-            <View style={{flex:1, alignItems: 'flex-end'}}>
-              <Image style={styles.svgimgae} source={eventImage()} />
-            </View>
-          </View>
           <View>
             <Text style={styles.name}>{event.name}</Text>
             <Text>

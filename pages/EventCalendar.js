@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
 import { Avatar } from 'react-native-paper';
 import { Agenda } from 'react-native-calendars';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,6 +7,7 @@ import callServerV2 from '../helpers/callServer.v2';
 import { getUserLogedIn } from '../helpers/storange';
 import Loading from '../components/Loading';
 import { FontAwesome } from '@expo/vector-icons';
+import BottomNavigator from '../components/BottomNavigator';
 
 const timeToString = (time) => {
   const date = new Date(time);
@@ -17,6 +18,7 @@ const timeToString = (time) => {
 const EventCalendar = ({ navigation }) => {
   const [items, setItems] = useState({});
   const [userLogin, setUserLogin] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const dispatch = useDispatch();
 
