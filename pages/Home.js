@@ -2,6 +2,7 @@ import AppLoading from 'expo-app-loading';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import Loading from '../components/Loading';
 import callServerV2 from '../helpers/callServer.v2';
 import errorHandler from '../helpers/errorHandler';
 import { registerPushNotification } from '../helpers/PushNotification';
@@ -97,7 +98,7 @@ export default function Home({ navigation }) {
     // if (loading) return <SplashScree
   }
 
-  if (loading) return <AppLoading />;
+  if (loading) return <Loading />;
 
   if (error) {
     return (

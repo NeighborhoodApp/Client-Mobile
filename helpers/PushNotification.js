@@ -8,8 +8,8 @@ export const sendNotification = (expoPushToken, title, body, payload = {}) => {
   const sendNotify = async (expoPushToken) => {
     // console.log(typeof expoPushToken);
     const message = {
-      to: ['ExponentPushToken[qknsphOeD4YJouvutpLQbZ]'],
-      // to: expoPushToken,
+      // to: ['ExponentPushToken[qknsphOeD4YJouvutpLQbZ]'],
+      to: expoPushToken,
       sound: 'default',
       title: title,
       body: body,

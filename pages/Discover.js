@@ -67,7 +67,7 @@ function Discover({ navigation }) {
       console.log('-----UseEffect 1');
       const userLogedIn = await getUserLogedIn();
       setUserLogin(userLogedIn);
-      
+
       // This listener is fired whenever a notification is received while the app is foregrounded
       notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
         setNotification(notification);
@@ -82,6 +82,11 @@ function Discover({ navigation }) {
         navigation.navigate('EventDetail', { eventId: eventId });
       });
     })();
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener);
+      Notifications.removeNotificationSubscription(responseListener);
+    };
   }, []);
 
   useEffect(() => {

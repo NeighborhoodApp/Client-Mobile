@@ -8,6 +8,7 @@ import { sendNotification } from '../helpers/PushNotification';
 import customAlert from '../helpers/alert';
 import callServerV2 from '../helpers/callServer.v2';
 import { getUserLogedIn } from '../helpers/storange';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 function CreateEvent({ navigation, route }) {
   const [userLogin, setUserLogin] = useState(null);
@@ -28,7 +29,7 @@ function CreateEvent({ navigation, route }) {
   }, []);
 
   const { users } = useSelector((state) => state.reducerUser);
-  const { event, stage, error } = useSelector((state) => state.reducerEvent);
+  const { event, stage, loading, error } = useSelector((state) => state.reducerEvent);
 
   useEffect(() => {
     if (event) {
@@ -101,7 +102,7 @@ function CreateEvent({ navigation, route }) {
         }
       }
       
-      console.log(token);;
+      console.log(token);
       sendNotification(token, data.name, data.description, {
         from: { fullname: userLogin.fullname, userid: userLogin.id, eventId: data.eventId },
       });
@@ -194,8 +195,12 @@ function CreateEvent({ navigation, route }) {
           style={{ width: 300, height: 40, backgroundColor: '#161C2B', paddingVertical: 10, marginTop: 30 }}
           onPress={() => handleSubmit()}
           // onPress={() => sendNotify()}
+          disabled={loading}
         >
-          <Text style={{ alignSelf: 'center', fontWeight: 'bold', color: 'white' }}>SAVE</Text>
+          {/* <FontAwesome5 name="crown" size={15} color="orange" style={{ paddingLeft: 13 }} /> */}
+          <Text style={{ alignSelf: 'center', fontWeight: 'bold', color: 'white' }}>
+            {loading ? 'Processing' : 'SAVE'}
+          </Text>
         </TouchableOpacity>
         {/* <Button title=" x " onPress={toggleModal} /> */}
       </View>

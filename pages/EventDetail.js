@@ -51,7 +51,7 @@ export default function EventDetail({ navigation, route }) {
         if (userLogin.hasOwnProperty('access_token')) {
           dispatch(
             callServerV2({
-              url: `event/${eventId}`,
+              url: `event/${Number(eventId)}`,
               stage: 'getEvent',
               method: 'get',
               headers: {
@@ -68,7 +68,7 @@ export default function EventDetail({ navigation, route }) {
   const { event, loading } = useSelector((state) => state.reducerEvent);
 
   useEffect(() => {
-    if (event && event.hasOwnProperty('id')) {
+    if (event && event.hasOwnProperty('Category')) {
       console.log('Eventsss....', event);
     }
   }, [event]);
@@ -84,7 +84,11 @@ export default function EventDetail({ navigation, route }) {
   };
 
   if (!loaded) return <AppLoading />;
-  if (loading || !event) return <Loading />;
+  if (loading || !event || !event.hasOwnProperty('Category')) return <Loading />;
+
+  // if (!event.hasOwnProperty('Category')) {
+  //   return <Loading />;
+  // }
 
   return (
     <SafeAreaView style={styles.bg}>
@@ -94,7 +98,9 @@ export default function EventDetail({ navigation, route }) {
         <View style={styles.box}>
           <View>
             <Text style={styles.name}>{event.name}</Text>
-            <Text>{ event.Category.category } | {new Date(event.date).toDateString()}</Text>
+            <Text>
+              {event.Category.category} | {new Date(event.date).toDateString()}
+            </Text>
           </View>
           <View style={styles.hr} />
           <View style={[styles.body]}>
@@ -118,11 +124,11 @@ export default function EventDetail({ navigation, route }) {
               </View>
             </View>
           </TouchableOpacity>
+          <View>
+            <Image style={styles.svgimgae} source={eventImage()} />
+          </View>
         </View>
       </ScrollView>
-      <View>
-        <Image style={styles.svgimgae} source={eventImage()} />
-      </View>
     </SafeAreaView>
   );
 }
@@ -136,12 +142,8 @@ const styles = StyleSheet.create({
     top: 0,
   },
   svgimgae: {
-    width: 450,
+    width: '100%',
     height: 300,
-    alignSelf: 'flex-start',
-    marginLeft: -30,
-    position: 'absolute',
-    bottom: 10,
   },
   body: {
     display: 'flex',
