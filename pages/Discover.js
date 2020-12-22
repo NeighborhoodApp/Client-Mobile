@@ -216,7 +216,6 @@ function Discover({ navigation }) {
   const submitHandler = async () => {
     console.log('press');
     setLoading(true);
-    let uri;
     try {
       if (payload.description && formData) {
         const { data } = await axios({

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Animated, Text, Alert } from 'react-native';
 import { FontAwesome, MaterialIcons, Ionicons, AntDesign } from '@expo/vector-icons';
+import { FAB } from 'react-native-paper';
 
 export default function BottomNavigator({ currentPage, navigation, submitHandler }) {
   const getColor = (page) => {
@@ -12,17 +13,18 @@ export default function BottomNavigator({ currentPage, navigation, submitHandler
   };
   return (
     <>
-      <View style={styles.outerCircle}>
-        {/* <TouchableWithoutFeedback onPress={props.submitHandler}>
+      {/* <TouchableWithoutFeedback onPress={props.submitHandler}>
 					<View style={[styles.button, styles.actionBtn]}>
 						<FontAwesome name="plus" size={18} color="white" />
 					</View>
 				</TouchableWithoutFeedback> */}
-        <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <TouchableOpacity onPress={submitHandler}>
+      <View style={styles.outerCircle}>
+        <TouchableOpacity onPress={submitHandler}>
+          <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <FontAwesome name="plus" size={30} color="#2FBBF0" style={{ marginTop: 10 }} />
-          </TouchableOpacity>
-        </View>
+            {/* <FAB style={styles.fab} small icon="plus" onPress={() => console.log('Pressed')} /> */}
+          </View>
+        </TouchableOpacity>
       </View>
       {/* >>>>>>> BOX NAVIGATOR <<<<< */}
       <View
@@ -116,7 +118,8 @@ const styles = StyleSheet.create({
 		width: 50,
 		height: 50,
 		borderRadius: 35,
-		bottom: 35,
+    bottom: 35,
+    zIndex: 99
 	},
 	button: {
 		width: 40,
@@ -142,5 +145,11 @@ const styles = StyleSheet.create({
 		textShadowRadius: 10,
 		borderWidth: 2,
 		borderColor: '#fff'
-	}
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: "50%",
+    bottom: 0,
+  },
 });

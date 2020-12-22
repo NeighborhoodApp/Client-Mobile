@@ -10,7 +10,8 @@ import { FontAwesome } from '@expo/vector-icons';
 
 const timeToString = (time) => {
   const date = new Date(time);
-  return date.toISOString().split('T')[0];
+  // return date.toISOString().split('T')[0];
+  return date.toISOString().slice(0, 10);
 };
 
 const EventCalendar = ({ navigation }) => {
