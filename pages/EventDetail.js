@@ -36,7 +36,6 @@ export default function EventDetail({ navigation, route }) {
   });
 
   const { eventId } = route.params;
-  console.log(eventId);
 
   useEffect(() => {
     (async () => {
@@ -80,7 +79,7 @@ export default function EventDetail({ navigation, route }) {
       return eRapat;
     } else if (event.Category.category === 'Lainnya') {
       return eLainnya;
-    } 
+    }
   };
 
   if (loading || !event || !event.hasOwnProperty('Category') || !loaded ) return <Loading />;
@@ -91,6 +90,22 @@ export default function EventDetail({ navigation, route }) {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
         {/* <Text style={styles.account}>My Tetonggo</Text> */}
         <View style={styles.box}>
+          <View style={styles.row}>
+            <Avatar.Image
+              size={39}
+              source={{
+                uri: `https://randomuser.me/api/portraits/men/${event.User.id}.jpg`,
+              }}
+            />
+
+            <View style={styles.boxProfile}>
+              <Text style={styles.name}>{event.User.fullname}</Text>
+              <Text styles={styles.location}>{event.RealEstate.name}</Text>
+            </View>
+            <View style={{flex:1, alignItems: 'flex-end'}}>
+              <Image style={styles.svgimgae} source={eventImage()} />
+            </View>
+          </View>
           <View>
             <Text style={styles.name}>{event.name}</Text>
             <Text>
@@ -219,6 +234,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
   row: {
+    flex: 1,
     flexDirection: 'row',
     marginTop: '1%',
     marginBottom: '1%',

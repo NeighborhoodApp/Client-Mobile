@@ -27,29 +27,27 @@ const EventCalendar = ({ navigation }) => {
     })();
   }, []);
 
-  useEffect(() => {
+  const fetchEvents = (access_token) => {
     (async () => {
-      if (userLogin) {
-        if (userLogin.hasOwnProperty('access_token')) {
-          dispatch(
-            callServerV2({
-              url: `event`,
-              stage: 'getEvents',
-              method: 'get',
-              body: null,
-              headers: {
-                access_token: userLogin.access_token,
-              },
-              type: 'SET_EVENTS',
-            }),
-          );
-        }
-      }
+      dispatch(
+        callServerV2({
+          url: `event`,
+          stage: 'getEvents',
+          method: 'get',
+          body: null,
+          headers: {
+            access_token: userLogin ? userLogin.access_token : access_token,
+          },
+          type: 'SET_EVENTS',
+        }),
+      );
     })();
+  };
+  useEffect(() => {
+    fetchEvents();
   }, [userLogin]);
 
   const { events, loading } = useSelector((state) => state.reducerEvent);
-
   useEffect(() => {
     (async () => {
       if (userLogin) {
@@ -128,13 +126,13 @@ const EventCalendar = ({ navigation }) => {
     ) : (
       <TouchableOpacity
         style={[styles.item]}
-        onPress={() => navigation.navigate('EventDetail', {eventId: item.eventId})}
+        onPress={() => navigation.navigate('EventDetail', { eventId: item.eventId })}
       >
         <View style={[[styles.card]]}>
           <View style={[styles.header]}>
             <View style={[styles.title]}>
               <Text style={{ fontWeight: 'bold' }}>{item.name}</Text>
-              <Text style={{ fontWeight: 'normal' }}>
+              <Text style={{ fontWeight: '300' }}>
                 {item.tetonggo} | {item.realEstateName}
               </Text>
             </View>
@@ -168,10 +166,14 @@ const EventCalendar = ({ navigation }) => {
         style={{
           height: 15,
           flex: 1,
-          paddingTop: 30,
+          justifyContent: 'center',
+          marginTop: 15,
+          paddingHorizontal: 10,
+          borderRadius: 5,
+          backgroundColor: 'white',
         }}
       >
-        <Text>This is empty date!</Text>
+        <Text>No event</Text>
       </View>
     );
   };
@@ -179,11 +181,29 @@ const EventCalendar = ({ navigation }) => {
     return r1.name !== r2.name;
   };
 
+  const onRefresh = useCallback(async () => {
+    try {
+      setRefreshing(true);
+      if (!userLogin) {
+        const userLogedIn = await getUserLogedIn();
+        await fetchEvents(userLogedIn.access_token);
+      } else {
+        await fetchEvents();
+      }
+      setTimeout(() => {
+        setRefreshing(false);
+      }, 2000);
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
   if (loading) return <Loading />;
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: '#161C2B' }}>
       <Agenda
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         items={items}
         loadItemsForMonth={loadItems}
         selected={timeToString(new Date())}
@@ -193,7 +213,9 @@ const EventCalendar = ({ navigation }) => {
           [timeToString(new Date())]: { selected: true, selectedDayTextColor: 'blue' },
         }}
         rowHasChanged={rowHasChanged}
+        style={{ borderTopLeftRadius: 25, borderTopRightRadius: 25 }}
       />
+      <BottomNavigator currentPage={'EventCalendar'} navigation={navigation}></BottomNavigator>
     </View>
   );
 };
