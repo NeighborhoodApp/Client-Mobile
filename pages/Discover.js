@@ -25,7 +25,6 @@ import { axios } from '../helpers/Axios';
 import callServerV2 from '../helpers/callServer.v2';
 import { actionRemoveTimeline } from '../store/actions/action';
 import { getUserLogedIn } from '../helpers/storange';
-import AppLoading from 'expo-app-loading';
 import * as Notifications from 'expo-notifications';
 
 const defaultVal = {
@@ -309,8 +308,8 @@ function Discover({ navigation }) {
     }
   }, []);
 
-  if (!loaded || !userLogin) return <AppLoading />;
-  if (loading) return <Loading />;
+  if (loading || !userLogin || !loaded) return <Loading />;
+
   return (
     <SafeAreaView style={styles.bg}>
       <View style={styles.bg1}>

@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Avatar } from 'react-native-paper';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
-import AppLoading from 'expo-app-loading';
 
 import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
 import BottomNavigator from '../components/BottomNavigator';
@@ -101,8 +100,7 @@ export default function UpcomingEvent({ navigation }) {
     });
   };
 
-  if (!loaded) return <AppLoading />;
-  if (loading) return <Loading />;
+  if (loading || !loaded ) return <Loading />;
 
   return (
     <SafeAreaView style={styles.bg}>

@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity, Image, Alert } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity, Alert } from 'react-native'
 import { Avatar } from 'react-native-paper';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import { Card } from 'react-native-paper';
 import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
 import { useDispatch, useSelector } from 'react-redux';
-import AppLoading from 'expo-app-loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import callServer from '../helpers/callServer';
-import BottomNavigator from '../components/BottomNavigator'
-import { axios } from '../helpers/Axios'
-import Loading from '../components/Loading'
-import { socket } from '../helpers/socket'
-import SvgUri from 'expo-svg-uri';
+import { axios } from '../helpers/Axios';
+import Loading from '../components/Loading';
+import { socket } from '../helpers/socket';
 
 function Comment({ route, navigation }) {
   const { comments, error, stage } = useSelector((state) => state.reducerComment);
@@ -49,17 +46,6 @@ function Comment({ route, navigation }) {
       const json = JSON.parse(value);
       temp = json.id
       setUser(json);
-      // navigation.setOptions({
-      //   headerRight: () => (
-      //     <TouchableOpacity style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }} onPress={() => { navigation.navigate('Menu') }}>
-      //       <Avatar.Image size={39}
-      //         source={{
-      //           uri: `https://randomuser.me/api/portraits/men/${temp ? temp : null}.jpg`,
-      //         }}
-      //       />
-      //     </TouchableOpacity>
-      //   ),
-      // })
       fetchComment()
     }
     tes()
@@ -67,7 +53,7 @@ function Comment({ route, navigation }) {
     setTimeout(() => {
       setLoading(false)
     }, 500);
-    return(() => {
+    return (() => {
       flag1 = true
     })
   }, [])
@@ -80,7 +66,7 @@ function Comment({ route, navigation }) {
       setCom([...com, { comment, name, img }])
     })
 
-    return(() => {
+    return (() => {
       flag = true
     })
   }, [com])
@@ -100,7 +86,7 @@ function Comment({ route, navigation }) {
         access_token: user.access_token
       }
     })
-    socket.emit('new comment', { comment: state, id: id, name: user.fullname, img: user.id});
+    socket.emit('new comment', { comment: state, id: id, name: user.fullname, img: user.id });
 
     setState('')
   }
@@ -137,8 +123,7 @@ function Comment({ route, navigation }) {
     )
   }
 
-  if (loading) return <Loading />
-  if (!loaded || !stage) return <AppLoading />;
+  if ( loading ||!stage|| !loaded ) return <Loading />
   
   return (
     <SafeAreaView style={styles.bg}>

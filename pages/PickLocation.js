@@ -4,12 +4,11 @@ import { useFonts, Ubuntu_300Light, Ubuntu_500Medium, Ubuntu_700Bold } from '@ex
 import { Montserrat_500Medium } from '@expo-google-fonts/montserrat';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Icon from 'react-native-vector-icons/Feather';
-import AppLoading from 'expo-app-loading';
 import { useDispatch, useSelector } from 'react-redux';
-import errorHandler from '../helpers/errorHandler';
 import customAlert from '../helpers/alert';
 import { getUserLogedIn, setUserLogedIn } from '../helpers/storange';
 import callServerV2 from '../helpers/callServer.v2';
+import Loading from '../components/Loading';
 
 function PickLocation({ navigation }) {
   let [loaded] = useFonts({
@@ -58,8 +57,8 @@ function PickLocation({ navigation }) {
     })();
   }, [userLogin])
 
-  const { realEstates, error, loading } = useSelector((state) => state.reducerRealEstate);
-  const { user, stage } = useSelector((state) => state.reducerUser);
+  const { realEstates, loading } = useSelector((state) => state.reducerRealEstate);
+  const { user, stage, loading: userLoading } = useSelector((state) => state.reducerUser);
 
   useEffect(() => {
     if (realEstates.length > 0) {
@@ -158,7 +157,7 @@ function PickLocation({ navigation }) {
     }
   }
   
-  if (!loaded || loading) return <AppLoading />;
+  if (loading || userLoading || !loaded ) return <Loading />;
 
   return (
     <View style={styles.container}>

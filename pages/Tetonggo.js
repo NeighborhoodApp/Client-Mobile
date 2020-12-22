@@ -1,23 +1,17 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native'
 import { Avatar } from 'react-native-paper';
 import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
-import AppLoading from 'expo-app-loading';
 
 import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
 import BottomNavigator from '../components/BottomNavigator'
 import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { axios } from '../helpers/Axios';
 import { FontAwesome5 } from '@expo/vector-icons';
-
-const defaultVal = {
-  description: '',
-  privacy: 'public',
-}
+import Loading from '../components/Loading';
 
 function Tetonggo({ navigation }) {
   useEffect(() => {
@@ -32,20 +26,14 @@ function Tetonggo({ navigation }) {
     dispatch(callServer(option));
   }, []);
   
-  const { users, user: userNow, error, stage, loading } = useSelector((state) => state.reducerUser);
+  const { users, loading } = useSelector((state) => state.reducerUser);
   const [user, setUser] = useState(null);
-  const [selectedUser, setSelectedUser] = useState({ user: '', address: '' });
-  const [selectedValue, setSelectedValue] = useState('public');
-  const [payload, setPayload] = useState(defaultVal);
-  const [formData, setFormData] = useState(null);
   const dispatch = useDispatch();
 
   let [loaded] = useFonts({
     Poppins_600SemiBold,
     Ubuntu_300Light,
   });
-
-  const [image, setImage] = useState(null);
 
   useEffect(() => {
     let temp
@@ -69,49 +57,10 @@ function Tetonggo({ navigation }) {
     tes()
   }, [navigation])
 
-  const submitHandler = async () => {
-    console.log('press');
-    let uri;
-    try {
-      if (payload.description && formData) {
-        console.log(formData);
-        const { data } = await axios({
-          url: 'upload',
-          method: 'post',
-          data: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        uri = data;
-      }
-      if (payload.description) {
-        await axios({
-          url: 'timeline',
-          method: 'post',
-          data: {
-            description: payload.description,
-            image: uri,
-            privacy: payload.privacy,
-          },
-          headers: {
-            access_token: user.access_token,
-          },
-        });
-      }
-      fetchTimeline();
-      setImage(null);
-      setFormData(null);
-      setPayload({ description: '', privacy: 'public' });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const newUser = user ? users.filter((el) =>
     (el.ComplexId === user.ComplexId && el.status === 'Active')) : null;
   
-  if (!loaded) return <AppLoading />;
+  if (loading || !loaded) return <Loading />;
 
   return (
     <SafeAreaView style={styles.bg}>
@@ -145,7 +94,7 @@ function Tetonggo({ navigation }) {
           );
         })}
       </ScrollView>
-      <BottomNavigator currentPage={'Tetonggo'} navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
+      <BottomNavigator currentPage={'Tetonggo'} navigation={navigation} submitHandler={() => { }}></BottomNavigator>
     </SafeAreaView>
   );
 }

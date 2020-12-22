@@ -1,17 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import SvgUri from 'expo-svg-uri';
-// import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import Modal from 'react-native-modal';
-import { Avatar, TextInput } from 'react-native-paper';
-// import {Card, Avatar} from 'react-native-paper';
-// import { Button, Paragraph, Dialog, Portal, Provider, TextInput } from 'react-native-paper';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Avatar } from 'react-native-paper';
 import { Agenda } from 'react-native-calendars';
 import { useDispatch, useSelector } from 'react-redux';
 import callServerV2 from '../helpers/callServer.v2';
 import { getUserLogedIn } from '../helpers/storange';
 import Loading from '../components/Loading';
-import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 
 const timeToString = (time) => {
   const date = new Date(time);
@@ -21,8 +16,6 @@ const timeToString = (time) => {
 const EventCalendar = ({ navigation }) => {
   const [items, setItems] = useState({});
   const [userLogin, setUserLogin] = useState(null);
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [isFocused, setIsFocused] = useState('true');
 
   const dispatch = useDispatch();
 

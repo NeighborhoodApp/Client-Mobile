@@ -3,10 +3,10 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useFonts, Ubuntu_300Light, Ubuntu_500Medium, Ubuntu_700Bold } from '@expo-google-fonts/ubuntu';
 import { Montserrat_500Medium } from '@expo-google-fonts/montserrat';
 import { AntDesign } from '@expo/vector-icons'; 
-import AppLoading from 'expo-app-loading';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserLogedIn, setUserLogedIn } from '../helpers/storange';
 import callServerV2 from '../helpers/callServer.v2';
+import Loading from '../components/Loading';
 
 export default function Waiting({ navigation }) {
   let [loaded] = useFonts({
@@ -51,7 +51,7 @@ export default function Waiting({ navigation }) {
     }
   }, [userLogin]);
 
-  const { user, stage } = useSelector((state) => state.reducerUser);
+  const { user, stage, loading } = useSelector((state) => state.reducerUser);
 
   useEffect(() => {
     (async () => {
@@ -105,7 +105,7 @@ export default function Waiting({ navigation }) {
     }
   };
 
-  if (!loaded) return <AppLoading />;
+  if (loading || !loaded ) return <Loading />;
 
   return (
     <View style={styles.container}>

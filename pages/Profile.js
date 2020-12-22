@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { getUserLogedIn } from '../helpers/storange';
 import Loading from '../components/Loading';
 
-function Profile({ navigation, route }) {
+function Profile({ route }) {
   const [loaded] = useFonts({
     Ubuntu_300Light,
     Montserrat_600SemiBold,
@@ -17,11 +17,6 @@ function Profile({ navigation, route }) {
 
   const [userLogin, setUserLogin] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
-  // const [user, setUser] = useState({
-  //   fullname: '',
-  //   address: '',
-  //   email: ''
-  // });
 
   useEffect(() => {
     (async () => {
@@ -42,27 +37,13 @@ function Profile({ navigation, route }) {
     })();
   }, [userLogin]);
 
-  // console.log(user, 'user.....')
-  function toNotification() {
-    navigation.navigate('Notification');
-  }
-
-  if (!loaded || !selectedUser) return <Loading />;
-  console.log(selectedUser)
+  if (!selectedUser || !loaded) return <Loading />;
+  
   return (
     <View style={styles.bg}>
       <View style={styles.container}>
         {/* >>>>>> PROFILE PAGE <<<<<<< */}
         <View style={styles.images}>
-          {/* <SvgUri
-          width="100"
-          height="100"
-          source={{
-            uri: `https://avatars.dicebear.com/api/avataaars/:${
-              selectedUser ? selectedUser.fullname : 'random'
-            }.svg?mood[]=happy`,
-          }}
-        /> */}
           <Avatar.Image
             size={100}
             source={{

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'react-native';
-import AppLoading from 'expo-app-loading';
 import { useFonts, Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat';
 import { Fontisto, Feather } from '@expo/vector-icons';
@@ -105,7 +104,7 @@ function Login({ navigation }) {
     }
   };
 
-  if (!loaded) {
+  if (loading || !loaded) {
     return <Loading />;
   } else {
     return (

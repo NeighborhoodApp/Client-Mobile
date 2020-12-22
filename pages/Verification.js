@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useFonts, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import { Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
-import AppLoading from 'expo-app-loading';
 import VerificationList from '../components/VerificationList';
 import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Loading from '../components/Loading';
 
 function Verification() {
   const [loaded] = useFonts({
@@ -16,7 +16,7 @@ function Verification() {
   });
 
   const [admin, setAdmin] = useState({});
-  const { users, loading, stage, error } = useSelector((state) => state.reducerUser);
+  const { users, loading } = useSelector((state) => state.reducerUser);
 
   const filteredUsers = users.filter(
     (user) => user.ComplexId === admin.ComplexId && user.RoleId !== 2 && user.status === 'Inactive',
@@ -88,8 +88,8 @@ function Verification() {
     getUser();
   }, []);
 
-  if (!loaded) return <AppLoading />;
-  else if (loading) return <AppLoading />;
+  if (loading || !loaded) return <Loading />;
+
   else {
     return (
       <View style={styles.container}>

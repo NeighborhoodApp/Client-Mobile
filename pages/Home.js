@@ -1,4 +1,3 @@
-import AppLoading from 'expo-app-loading';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -47,7 +46,7 @@ export default function Home({ navigation }) {
     })();
   }, [userLogin]);
 
-  const { loading, user, users, error, stage } = useSelector((state) => state.reducerUser);
+  const { loading, user, users, stage, error } = useSelector((state) => state.reducerUser);
 
   useEffect(() => {
     (async () => {
@@ -83,8 +82,7 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     (async () => {
-      if (users.length > 0) {
-        console.log('-----UseEffect Users');
+      if (users.length > 0 && stage === 'getAllUser') {
         goJoin();
       }
     })();

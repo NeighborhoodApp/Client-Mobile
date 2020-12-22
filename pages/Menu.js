@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useFonts, Roboto_500Medium } from '@expo-google-fonts/roboto';
 import { MaterialIcons, Fontisto, FontAwesome5, Ionicons, FontAwesome } from '@expo/vector-icons';
-import AppLoading from 'expo-app-loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch } from 'react-redux';
 import { actionRemoveUser } from '../store/actions/action';
+import Loading from '../components/Loading';
 
 function Menu({ navigation }) {
   const [loaded] = useFonts({
@@ -38,7 +38,7 @@ function Menu({ navigation }) {
     });
   };
 
-  if (!loaded) return <AppLoading />;
+  if (!loaded) return <Loading />;
 
   return (
     <View style={styles.box}>

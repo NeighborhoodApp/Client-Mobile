@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
-import AppLoading from 'expo-app-loading';
 import { useFonts, Montserrat_600SemiBold, Montserrat_500Medium } from '@expo-google-fonts/montserrat';
 import { getUserLogedIn } from '../helpers/storange';
+import Loading from '../components/Loading';
 
 function GetStarted({ navigation }) {
   let [loaded] = useFonts({
@@ -33,7 +33,7 @@ function GetStarted({ navigation }) {
     }
   }
 
-  if (!loaded) return <AppLoading />;
+  if (!loaded) return <Loading />;
 
   return (
     <View style={styles.container}>
