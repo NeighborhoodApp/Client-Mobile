@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform, ImageBackground } from 'react-native';
+import { Button } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import Loading from '../components/Loading';
 import callServerV2 from '../helpers/callServer.v2';
 import errorHandler from '../helpers/errorHandler';
 import { registerPushNotification } from '../helpers/PushNotification';
-import { getUserLogedIn, setUserLogedIn } from '../helpers/storange';
+import { clearLocalStorange, getUserLogedIn, setUserLogedIn } from '../helpers/storange';
 
 export default function Home({ navigation }) {
   const [userLogin, setUserLogin] = useState(null);
+  const [retry, setRetry] = useState(1)
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -16,7 +18,7 @@ export default function Home({ navigation }) {
       const userLogedIn = await getUserLogedIn();
       setUserLogin(userLogedIn);
     })();
-  }, []);
+  }, [retry]);
 
   useEffect(() => {
     (async () => {
@@ -92,16 +94,16 @@ export default function Home({ navigation }) {
     navigation.replace('GetStarted');
   };
 
-  if (Platform.OS === 'ios') {
-    // if (loading) return <SplashScree
-  }
-
   if (loading) return <Loading />;
 
   if (error) {
+    (async () => {
+      await clearLocalStorange()
+    })()
     return (
       <View style={styles.container}>
         <Text>{errorHandler(error)}</Text>
+        <Button title="Try Again" onPress={() => setRetry(retry + 1)}>Try Again</Button>
       </View>
     );
   }

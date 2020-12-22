@@ -23,3 +23,7 @@ export const setUserLogedIn = async (user) => {
     return 'failed message: ' + e.stack;
   }
 };
+
+export const clearLocalStorange = async () => {
+  await AsyncStorage.removeItem('userlogedin');
+}

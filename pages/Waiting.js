@@ -80,8 +80,7 @@ export default function Waiting({ navigation }) {
         });
 
         const newUser = {
-          ...userLogin,
-          status,
+          ...user,
           fullname: splitName[0],
         };
         await setUserLogedIn(newUser);
