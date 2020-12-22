@@ -35,7 +35,7 @@ export default function EventDetail({ navigation, route }) {
     Ubuntu_300Light,
   });
 
-  const { eventId } = route.params;
+  const {eventId} = route.params;
 
   useEffect(() => {
     (async () => {
@@ -50,7 +50,7 @@ export default function EventDetail({ navigation, route }) {
         if (userLogin.hasOwnProperty('access_token')) {
           dispatch(
             callServerV2({
-              url: `event/${Number(eventId)}`,
+              url: `event/${eventId}`,
               stage: 'getEvent',
               method: 'get',
               headers: {
@@ -67,7 +67,7 @@ export default function EventDetail({ navigation, route }) {
   const { event, loading } = useSelector((state) => state.reducerEvent);
 
   useEffect(() => {
-    if (event && event.hasOwnProperty('Category')) {
+    if (event && event.hasOwnProperty('id')) {
       console.log('Eventsss....', event);
     }
   }, [event]);
@@ -82,7 +82,8 @@ export default function EventDetail({ navigation, route }) {
     }
   };
 
-  if (loading || !event || !event.hasOwnProperty('Category') || !loaded ) return <Loading />;
+  if (!loaded) return <AppLoading />;
+  if (loading || !event) return <Loading />;
 
   return (
     <SafeAreaView style={styles.bg}>
@@ -117,26 +118,6 @@ export default function EventDetail({ navigation, route }) {
             {/* <Text style={styles.name}>Description</Text> */}
             <Text styles={styles.location}>{event.description}</Text>
           </View>
-          <TouchableOpacity
-          // onPress={() => navigation.navigate('Profile')}
-          >
-            <View style={styles.row}>
-              <Avatar.Image
-                size={39}
-                source={{
-                  uri: `https://randomuser.me/api/portraits/men/${event.User.id}.jpg`,
-                }}
-              />
-
-              <View style={styles.boxProfile}>
-                <Text style={styles.name}>{event.User.fullname}</Text>
-                <Text styles={styles.location}>{event.RealEstate.name}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-          <View>
-            <Image style={styles.svgimgae} source={eventImage()} />
-          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -152,8 +133,11 @@ const styles = StyleSheet.create({
     top: 0,
   },
   svgimgae: {
-    width: '100%',
-    height: 300,
+    width: 60,
+    height: 60,
+    // alignSelf: 'flex-start',
+    // position: 'absolute',
+    bottom: 10,
   },
   body: {
     display: 'flex',
