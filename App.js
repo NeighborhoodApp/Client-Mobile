@@ -23,7 +23,6 @@ import {
   EventDetail,
 } from './pages';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Avatar } from 'react-native-paper';
 import { Provider } from 'react-redux';
 import store from './store';
 

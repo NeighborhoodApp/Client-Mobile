@@ -1,12 +1,11 @@
-
 import React, { useEffect, useState } from 'react';
 
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Avatar } from 'react-native-paper';
-import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
+import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
 
-import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
-import BottomNavigator from '../components/BottomNavigator'
+import { Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
+import BottomNavigator from '../components/BottomNavigator';
 import { useDispatch, useSelector } from 'react-redux';
 import callServer from '../helpers/callServer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -25,7 +24,7 @@ function Tetonggo({ navigation }) {
     };
     dispatch(callServer(option));
   }, []);
-  
+
   const { users, loading } = useSelector((state) => state.reducerUser);
   const [user, setUser] = useState(null);
   const dispatch = useDispatch();
@@ -33,68 +32,100 @@ function Tetonggo({ navigation }) {
   let [loaded] = useFonts({
     Poppins_600SemiBold,
     Ubuntu_300Light,
+    Ubuntu_500Medium,
   });
 
   useEffect(() => {
-    let temp
+    let temp;
     const tes = async () => {
       const value = await AsyncStorage.getItem('userlogedin');
       const json = JSON.parse(value);
-      temp = json.id
+      temp = json.id;
       setUser(json);
       navigation.setOptions({
         headerRight: () => (
-          <TouchableOpacity style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }} onPress={() => { navigation.navigate('Menu') }}>
-            <Avatar.Image size={39}
+          <TouchableOpacity
+            style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }}
+            onPress={() => {
+              navigation.navigate('Menu');
+            }}
+          >
+            <Avatar.Image
+              size={39}
               source={{
                 uri: `https://randomuser.me/api/portraits/men/${temp ? temp : null}.jpg`,
               }}
             />
           </TouchableOpacity>
         ),
-      })
-    }
-    tes()
-  }, [navigation])
+      });
+    };
+    tes();
+  }, [navigation]);
 
-  const newUser = user ? users.filter((el) =>
-    (el.ComplexId === user.ComplexId && el.status === 'Active')) : null;
-  
+  const kickHandler = (id) => {
+    const option = {
+      url: `users/${id}`,
+      stage: 'updateUser',
+      method: 'put',
+      body: {
+        status: 'Inactive',
+        RealEstateId: null,
+        ComplexId: null,
+      },
+      headers: true,
+      type: 'UPDATE_USER',
+      id: id,
+    };
+    dispatch(callServer(option));
+  };
+  const newUser = user ? users.filter((el) => el.ComplexId === user.ComplexId && el.status === 'Active') : null;
+
   if (loading || !loaded) return <Loading />;
-
   return (
     <SafeAreaView style={styles.bg}>
       <View style={styles.border}></View>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
         <Text style={styles.account}>My Tetonggo</Text>
-        {!newUser ? null : newUser.map((el, index) => {
-          return (
-            <View key={`timeline${index}`} style={styles.box}>
-              <TouchableOpacity onPress={() => navigation.navigate('Profile', { userId: el.id })}>
-                <View style={styles.row}>
-                  <Avatar.Image
-                    size={39}
-                    source={{
-                      uri: `https://randomuser.me/api/portraits/men/${el.id}.jpg`,
-                    }}
-                  />
-
-                  <View style={styles.boxProfile}>
-                    <Text style={styles.name}>
-                      {el.fullname + ' '}
-                      {el.RoleId === 2 && <FontAwesome5 name="crown" size={15} color="orange" style={{ paddingLeft: 13 }} />}
-                      
-                    </Text>
-                    <Text styles={styles.location}>{el.address}</Text>
-                  </View>
+        {!newUser
+          ? null
+          : newUser.map((el, index) => {
+              return (
+                <View key={`timeline${index}`} style={styles.box}>
+                  <TouchableOpacity onPress={() => navigation.navigate('Profile', { userId: el.id })}>
+                    <View style={styles.row}>
+                      <View>
+                        <Avatar.Image
+                          size={39}
+                          source={{
+                            uri: `https://randomuser.me/api/portraits/men/${el.id}.jpg`,
+                          }}
+                        />
+                      </View>
+                      <View style={styles.boxProfile}>
+                        <Text style={styles.name}>
+                          {el.fullname + ' '}
+                          {el.RoleId === 2 && (
+                            <FontAwesome5 name="crown" size={15} color="orange" style={{ paddingLeft: 13 }} />
+                          )}
+                        </Text>
+                        <Text styles={styles.location}>{el.address}</Text>
+                      </View>
+                      {user.RoleId === 2 && el.RoleId !== 2 ? (
+                        <View style={styles.container_button}>
+                          <TouchableOpacity onPress={() => kickHandler(el.id)} style={styles.btn_delete}>
+                            <Text style={styles.delete}> Kick </Text>
+                          </TouchableOpacity>
+                        </View>
+                      ) : null}
+                    </View>
+                  </TouchableOpacity>
+                  <View style={styles.hr} />
                 </View>
-              </TouchableOpacity>
-              <View style={styles.hr} />
-            </View>
-          );
-        })}
+              );
+            })}
       </ScrollView>
-      <BottomNavigator currentPage={'Tetonggo'} navigation={navigation} submitHandler={() => { }}></BottomNavigator>
+      <BottomNavigator currentPage={'Tetonggo'} navigation={navigation} submitHandler={() => {}}></BottomNavigator>
     </SafeAreaView>
   );
 }
@@ -172,13 +203,14 @@ const styles = StyleSheet.create({
   box: {
     flexDirection: 'column',
     width: '100%',
-    marginLeft: '15%',
     marginTop: 5,
   },
   row: {
     flexDirection: 'row',
     marginTop: '1%',
     marginBottom: '1%',
+    // justifyContent: 'space-between',
+    marginHorizontal: '5%',
   },
   boxProfile: {
     display: 'flex',
@@ -228,9 +260,10 @@ const styles = StyleSheet.create({
   hr: {
     borderBottomColor: '#A2A2A2',
     borderBottomWidth: 0.25,
-    width: '86%',
+    width: '90%',
     marginBottom: 8,
     marginTop: 5,
+    marginLeft: 20,
   },
   inputStatus: {
     width: '90%',
@@ -267,7 +300,54 @@ const styles = StyleSheet.create({
     borderColor: '#E3E3E3',
     borderRadius: 5,
   },
+  btn_confirm: {
+    elevation: 8,
+    backgroundColor: '#5CB409',
+    borderRadius: 6,
+    marginTop: 5,
+    marginLeft: 2,
+    width: 60,
+    height: 30,
+    marginRight: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  btn_delete: {
+    elevation: 8,
+    backgroundColor: 'red',
+    borderColor: 'red',
+    borderWidth: 0.3,
+    borderRadius: 6,
+    marginTop: 5,
+    marginLeft: 2,
+    width: 60,
+    height: 30,
+    marginRight: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  confirm: {
+    fontFamily: 'Ubuntu_500Medium',
+    fontSize: 12,
+    color: 'white',
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  delete: {
+    fontFamily: 'Ubuntu_500Medium',
+    fontSize: 12,
+    color: '#fff',
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  container_button: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginLeft: 25,
+  },
 });
 
-
-export default Tetonggo
+export default Tetonggo;
