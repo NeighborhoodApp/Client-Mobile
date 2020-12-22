@@ -108,7 +108,7 @@ export default function Home({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <ImageBackground source={require('../assets/splashh.jpg')} style={styles.image}>
+      <ImageBackground source={require('../assets/splashh.png')} style={styles.image}>
       </ImageBackground>
       {/* <Button title="JOIN US PAGE" onPress={goJoin}></Button> */}
     </View>
