@@ -21,7 +21,7 @@
     "android": {
       "useNextNotificationsApi": true,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/circle-cropped.png",
+        "foregroundImage": "./assets/circle-cropped.png"
       }
     },
     "web": {
