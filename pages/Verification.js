@@ -122,7 +122,7 @@ function Verification() {
     <SafeAreaView style={styles.bg}>
       <View style={styles.container}>
         <View style={styles.items}>
-          <Text style={styles.title}> New Users </Text>
+          <Text style={styles.title}>{filteredUsers.length ? 'New users' : 'No new users yet'}</Text>
           {filteredUsers.map((user) => (
             <VerificationList user={user} key={user.id} handleDecline={handleDecline} handleConfirm={handleConfirm} />
           ))}

@@ -183,7 +183,7 @@ function CreateEvent({ navigation, route }) {
         ></TextInput>
 
         <TouchableOpacity
-          style={{ width: 300, height: 40, backgroundColor: '#161C2B', paddingVertical: 10, marginTop: 30 }}
+          style={{ width: 300, height: 40, backgroundColor: '#161C2B', paddingVertical: 10, marginTop: 30, borderRadius: 10 }}
           onPress={() => handleSubmit()}
           // onPress={() => sendNotify()}
           disabled={loading}

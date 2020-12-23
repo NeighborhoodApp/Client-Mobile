@@ -31,18 +31,23 @@ const EventCalendar = ({ navigation }) => {
 
   const fetchEvents = (access_token) => {
     (async () => {
-      dispatch(
-        callServerV2({
-          url: `event`,
-          stage: 'getEvents',
-          method: 'get',
-          body: null,
-          headers: {
-            access_token: userLogin ? userLogin.access_token : access_token,
-          },
-          type: 'SET_EVENTS',
-        }),
-      );
+      if (userLogin) {
+        if (userLogin.hasOwnProperty('access_token')) {
+          setupNavigation();
+          dispatch(
+            callServerV2({
+              url: `event`,
+              stage: 'getEvents',
+              method: 'get',
+              body: null,
+              headers: {
+                access_token: userLogin ? userLogin.access_token : access_token,
+              },
+              type: 'SET_EVENTS',
+            }),
+          );
+        }
+      }
     })();
   };
   useEffect(() => {
@@ -68,6 +73,7 @@ const EventCalendar = ({ navigation }) => {
               description: el.description,
               category: el.Category.category,
               realEstateName: el.RealEstate.name,
+              id: el.User.id,
               backgroundColor: getColor(el.CategoryId),
             });
           }
@@ -142,7 +148,7 @@ const EventCalendar = ({ navigation }) => {
               <Avatar.Image
                 size={39}
                 source={{
-                  uri: `https://randomuser.me/api/portraits/men/1.jpg`,
+                  uri: `https://randomuser.me/api/portraits/men/${item.id}.jpg`,
                 }}
               />
             </View>
@@ -199,6 +205,26 @@ const EventCalendar = ({ navigation }) => {
       console.log(error);
     }
   }, []);
+
+  const setupNavigation = () => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }}
+          onPress={() => {
+            navigation.navigate('Menu');
+          }}
+        >
+          <Avatar.Image
+            size={39}
+            source={{
+              uri: `https://randomuser.me/api/portraits/men/${userLogin.id}.jpg`,
+            }}
+          />
+        </TouchableOpacity>
+      ),
+    });
+  };
 
   if (loading) return <Loading />;
 
