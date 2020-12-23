@@ -26,8 +26,9 @@ export default function reducer(state = initState, action) {
       }
       return { ...state, user: action.payload, stage: action.stage || action.stage || null, error: null };
     case 'UPDATE_USER':
-      console.log(action);
       const updatedUser = state.users.filter((user) => user.id !== action.payload);
+
+      console.log(action, updatedUser);
       return { ...state, result: action.payload, stage: action.stage, error: null, users: updatedUser };
     case 'REMOVE_USER':
       return { ...state, user: null, stage: null, error: null };
