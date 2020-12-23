@@ -87,6 +87,7 @@ export default function App() {
                 alignSelf: 'center',
                 color: '#fff',
               },
+              headerBackTitle: null,
             }}
           />
           <Stack.Screen
@@ -282,6 +283,7 @@ export default function App() {
                 alignSelf: 'center',
                 color: '#fff',
               },
+              headerBackTitle: null,
             }}
           />
           {/* <Stack.Screen name="NotificationPage" component={NotificationPage} options={{ headerShown: true }} /> */}

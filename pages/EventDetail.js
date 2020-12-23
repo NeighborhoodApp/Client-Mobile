@@ -82,8 +82,7 @@ export default function EventDetail({ navigation, route }) {
     }
   };
 
-  if (!loaded) return <AppLoading />;
-  if (loading || !event) return <Loading />;
+  if (loading || !event || !event.hasOwnProperty('User') ||!loaded) return <Loading />;
 
   return (
     <SafeAreaView style={styles.bg}>
