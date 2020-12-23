@@ -26,7 +26,7 @@ import callServerV2 from '../helpers/callServer.v2';
 import { actionRemoveTimeline } from '../store/actions/action';
 import { getUserLogedIn } from '../helpers/storange';
 import * as Notifications from 'expo-notifications';
-
+import Axios from 'axios';
 const defaultVal = {
   description: '',
   privacy: 'public',
@@ -39,7 +39,7 @@ function Discover({ navigation }) {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-
+  const [showCancel, setShowCancel] = useState(false);
   let [loaded] = useFonts({
     Poppins_600SemiBold,
     Ubuntu_300Light,
@@ -161,6 +161,11 @@ function Discover({ navigation }) {
     })();
   };
 
+  const toggleCancel = () => {
+    // let temp = showCancel
+    setShowCancel(!showCancel);
+  };
+
   const setupUpOption = () => {
     navigation.setOptions({
       headerRight: () => (
@@ -199,9 +204,10 @@ function Discover({ navigation }) {
       let type = match ? `image/${match[1]}` : `image`;
 
       const data = new FormData();
-      data.append('file', { uri: localUri, name: filename, type });
+      data.append('image', { uri: localUri, name: filename, type });
 
-      data.append('file', result.uri);
+      data.append('image', result.uri);
+
       setImgbUri(null);
       setFormData(data);
     }
@@ -211,15 +217,16 @@ function Discover({ navigation }) {
     try {
       if (payload.description && formData) {
         setLoading(true);
-        const { data } = await axios({
-          url: 'upload',
+        console.log(formData);
+        const { data } = await Axios({
+          url: 'https://api.imgbb.com/1/upload?key=d49e97d44b3f247ce10cf5e749bdfa6b',
           method: 'post',
           data: formData,
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
-        setImgbUri(data);
+        setImgbUri(data.data.display_url);
       } else if (payload.description) {
         setLoading(true);
         setImgbUri('noimage');
@@ -371,6 +378,8 @@ function Discover({ navigation }) {
                   style={styles.inputStatus}
                   placeholder="What’s on your mind?"
                   placeholderTextColor="white"
+                  onFocus={() => toggleCancel()}
+                  onEndEditing={() => toggleCancel()}
                 />
               </View>
             </View>
@@ -389,13 +398,7 @@ function Discover({ navigation }) {
                       }}
                     />
                     <View style={styles.boxProfile}>
-                      {el.UserId === userLogin.id ? (
-                        <TouchableOpacity onLongPress={() => longPres(el.id)}>
-                          <Text style={styles.name}>{el.User.fullname}</Text>
-                        </TouchableOpacity>
-                      ) : (
-                        <Text style={styles.name}>{el.User.fullname}</Text>
-                      )}
+                      <Text style={styles.name}>{el.User.fullname}</Text>
                       <Text styles={styles.location}>{el.User.RealEstate.name}</Text>
                     </View>
                     <FontAwesome
@@ -408,7 +411,13 @@ function Discover({ navigation }) {
                   <View style={styles.hr} />
                   <View style={styles.boxCard}>
                     <View style={styles.boxText}>
-                      <Text style={styles.status}>{el.description}</Text>
+                      {el.UserId === userLogin.id ? (
+                        <TouchableOpacity onLongPress={() => longPres(el.id)}>
+                          <Text style={styles.status}>{el.description}</Text>
+                        </TouchableOpacity>
+                      ) : (
+                        <Text style={styles.status}>{el.description}</Text>
+                      )}
                     </View>
                     {el.image ? (
                       <Card style={styles.card}>
@@ -427,7 +436,9 @@ function Discover({ navigation }) {
             }
           })}
         </ScrollView>
-        <BottomNavigator currentPage="Home" navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
+        {!showCancel && (
+          <BottomNavigator currentPage="Home" navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
+        )}
       </View>
     </SafeAreaView>
   );

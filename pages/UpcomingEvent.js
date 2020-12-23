@@ -93,7 +93,7 @@ export default function UpcomingEvent({ navigation }) {
           <Avatar.Image
             size={39}
             source={{
-              uri: `https://randomuser.me/api/portraits/men/1.jpg`,
+              uri: `https://randomuser.me/api/portraits/men/${userLogin.id}.jpg`,
             }}
           />
         </TouchableOpacity>

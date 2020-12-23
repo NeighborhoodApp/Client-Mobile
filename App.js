@@ -87,6 +87,7 @@ export default function App() {
                 alignSelf: 'center',
                 color: '#fff',
               },
+              headerBackTitle: null,
             }}
           />
           <Stack.Screen
@@ -157,12 +158,12 @@ export default function App() {
             component={EventCalendar}
             options={{
               headerTitle: () => (
-                <View style={styles.row}>
+                <View style={styles.discoverRow}>
                   <Text style={styles.title}>Event Calendar</Text>
                   <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
                 </View>
               ),
-              headerLeft: false,
+              headerLeft: null,
               headerStyle: {
                 backgroundColor: '#161C2B',
                 height: 100,
@@ -207,7 +208,6 @@ export default function App() {
                   <MaterialCommunityIcons name="moon-full" size={10} color="#2FBBF0" />
                 </View>
               ),
-              headerLeft: null,
               headerStyle: {
                 backgroundColor: '#161C2B',
                 height: 100,
@@ -217,6 +217,7 @@ export default function App() {
                 alignSelf: 'center',
                 color: '#fff',
               },
+              headerBackTitle: null
             }}
           />
           <Stack.Screen
@@ -282,6 +283,7 @@ export default function App() {
                 alignSelf: 'center',
                 color: '#fff',
               },
+              headerBackTitle: null,
             }}
           />
           {/* <Stack.Screen name="NotificationPage" component={NotificationPage} options={{ headerShown: true }} /> */}
