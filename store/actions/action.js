@@ -5,7 +5,13 @@ export const actionRemoveStageError = () => {
 export const actionRemoveRealEstate = () => {
   return { type: 'REMOVE_REAL_ESTATE', payload: null };
 };
+
 export const actionRemoveUser = () => {
   return { type: 'REMOVE_USER', payload: null };
 };
-;
+export const actionRemoveUsers = () => {
+  return { type: 'REMOVE_USERS', payload: null };
+};
+export const actionRemoveTimeline = () => {
+  return { type: 'REMOVE_NEW_TIMELINE', payload: null };
+};

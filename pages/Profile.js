@@ -1,111 +1,85 @@
-import React, { useEffect, useState }  from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity} from 'react-native'
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { Avatar } from 'react-native-paper';
-import { useFonts, Ubuntu_300Light,Ubuntu_500Medium } from '@expo-google-fonts/ubuntu'
-import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat'
-import { FontAwesome, Fontisto, Feather, Entypo, FontAwesome5, AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
-import AppLoading from 'expo-app-loading';
-import { useDispatch, useSelector } from 'react-redux';
-import callServer from '../helpers/callServer'
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import SvgUri from 'expo-svg-uri';
+import { useFonts, Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
+import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat';
+import { FontAwesome, Fontisto, Entypo } from '@expo/vector-icons';
+import { useSelector } from 'react-redux';
+import { getUserLogedIn } from '../helpers/storange';
+import Loading from '../components/Loading';
 
-function Profile({ navigation }) {
+function Profile({ route }) {
   const [loaded] = useFonts({
     Ubuntu_300Light,
     Montserrat_600SemiBold,
     Ubuntu_500Medium,
   });
 
-  const [user, setUser] = useState({
-    fullname: '',
-    address: '',
-    email: ''
-  });
+  const [userLogin, setUserLogin] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
-    const getUser = async () => {
-      const value = await AsyncStorage.getItem('userlogedin');
-      const json = JSON.parse(value);
-      setUser(json);
-    }
-    getUser()
+    (async () => {
+      const userLogedIn = await getUserLogedIn();
+      setUserLogin(userLogedIn);
+    })();
   }, [])
 
-  // const { user, error, stage, loading } = useSelector((state) => state.reducerUser);
-  console.log(user, 'user.....')
-  function toNotification() {
-    navigation.navigate('Notification');
-  }
+  const { users } = useSelector((state) => state.reducerUser);
 
-  if (!loaded) return <AppLoading />;
+  useEffect(() => {
+    (async () => {
+      if (userLogin) {
+        const userId = route.params ? route.params.userId : userLogin.id;
+        const userSelect = users.filter((el) => el.id === userId);
+        setSelectedUser(userSelect[0]);
+      }
+    })();
+  }, [userLogin]);
 
+  if (!selectedUser || !loaded) return <Loading />;
+  
   return (
-    <View style={styles.container}>
-      {/* >>>>>> PROFILE PAGE <<<<<<< */}
-      <View style={styles.images}>
-        {/* <Avatar.Image
-          size={100}
-          source={{
-            uri: 'https://i.pinimg.com/474x/73/c3/e7/73c3e7cca66a885c53718d8f3688b02c.jpg',
-          }}
-        /> */}
-        <SvgUri
-          width="100"
-          height="100"
-          source={{
-            uri: `https://avatars.dicebear.com/api/avataaars/:${user ? user.fullname : 'random'}.svg?mood[]=happy`,
-          }}
-        />
-        
-      </View>
-      <View style={styles.box}>
-        <View stle={styles.bg}></View>
-        <View style={styles.input}>
-          <FontAwesome name="user" size={20} color="white" style={{ marginLeft: 10 }} />
-          <TextInput
-            style={styles.Textinput}
-            value={user ? user.fullname : ''}
-            placeholder="Full Name"
-            placeholderTextColor="#FFF"
+    <View style={styles.bg}>
+      <View style={styles.container}>
+        {/* >>>>>> PROFILE PAGE <<<<<<< */}
+        <View style={styles.images}>
+          <Avatar.Image
+            size={100}
+            source={{
+              uri: `https://randomuser.me/api/portraits/men/${selectedUser.id}.jpg`,
+            }}
           />
         </View>
-        <View style={styles.hr} />
-        <View style={styles.input}>
-          <Fontisto name="email" size={20} color="white" style={{ marginLeft: 5 }} />
-          <TextInput
-            style={styles.Textinput}
-            value={user ? user.email : ''}
-            placeholder="Email"
-            placeholderTextColor="#FFF"
-            readOnly
-          />
-        </View>
-        {/* <View style={styles.hr} /> */}
-        {/* <View style={styles.input}>
-          <Feather name="lock" size={20} color="white" style={{ marginLeft: 5 }} />
-          <TextInput
-            style={styles.Textinput}
-            placeholder="Password"
-            placeholderTextColor="#FFF"
-            secureTextEntry={true}
-          />
-        </View> */}
-        <View style={styles.hr} />
-        <View style={styles.input}>
-          <Entypo name="location" size={20} color="white" style={{ marginLeft: 6 }} />
-          <TextInput
-            style={styles.Textinput}
-            value={user ? user.address : ''}
-            placeholder="Address"
-            placeholderTextColor="#FFF"
-            readOnly
-          />
-        </View>
-        <View style={styles.hr} />
+        <View style={styles.box}>
+          <View stle={styles.bg}></View>
+          <View style={styles.input}>
+            <FontAwesome name="user" size={20} color="white" style={{ marginRight: 5 }} />
+            <Text style={styles.Textinput}> {selectedUser.fullname}</Text>
+          </View>
+          <View style={styles.hr} />
+          <View style={styles.input}>
+            <Fontisto name="email" size={20} color="white" style={{ marginLeft: 0 }} />
+            <Text style={styles.Textinput}> {selectedUser.email}</Text>
+          </View>
+          <View style={styles.hr} />
+          <View style={styles.input}>
+            <Entypo name="location" size={20} color="white" style={{ marginLeft: 0 }} />
+            <Text style={styles.Textinput}> {selectedUser.address}</Text>
+          </View>
+          <View style={styles.hr} />
+          <View style={styles.input}>
+            <FontAwesome name="building" size={20} color="white" style={{ marginRight: 5 }} />
+            <Text style={styles.Textinput}> {selectedUser.RealEstate.name}</Text>
+          </View>
 
-        {/* >>>>>> FEES PAGE <<<<<<< */}
-        {/* <View style={styles.input}>
+          <View style={styles.hr} />
+          <View style={styles.input}>
+            <FontAwesome name="home" size={20} color="white" style={{ marginRight: 5 }} />
+            <Text style={styles.Textinput}> {selectedUser.Complex.name}</Text>
+          </View>
+          {/* >>>>>> FEES PAGE <<<<<<< */}
+          {/* <View style={styles.input}>
           <FontAwesome name="pencil-square-o" size={20} color="white" style={{ marginLeft: 6 }} />
           <TextInput style={styles.Textinput} placeholder="Title" placeholderTextColor="#FFF" readOnly />
         </View>
@@ -120,23 +94,33 @@ function Profile({ navigation }) {
           <TextInput style={styles.Textinput} placeholder="Due Date " placeholderTextColor="#FFF" readOnly />
         </View>
         <View style={styles.hr} /> */}
-        {/* >>>>>> BUTTON FOR CREATE FEES <<<<<<< */}
-        {/* <TouchableOpacity style={styles.btn}>
+          {/* >>>>>> BUTTON FOR CREATE FEES <<<<<<< */}
+          {/* <TouchableOpacity style={styles.btn}>
           <Text style={styles.submit} onPress={toNotification}>
             {' '}
             SUBMIT{' '}
           </Text>
         </TouchableOpacity> */}
+        </View>
       </View>
     </View>
   );
 }
 const styles = StyleSheet.create({
+  bg: {
+    position: 'absolute',
+    backgroundColor: '#161C2B',
+    width: '100%',
+    height: '100%',
+    top: 0
+  },
   container: {
     flex: 1,
     backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
+    borderTopRightRadius: 35,
+    borderTopLeftRadius: 35,
   },
   images: {
     top: 0,
@@ -161,20 +145,21 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     position: 'absolute',
     top: 100,
+    borderRadius: 20
   },
   Textinput: {
     height: 25,
     fontFamily: 'Ubuntu_300Light',
     color: 'white',
-    marginLeft: 15,
+    marginLeft: 10,
     fontSize: 15,
-    marginBottom: 8,
+    marginBottom: 4,
   },
   hr: {
     borderBottomColor: '#A2A2A2',
     borderBottomWidth: 0.6,
     width: '80%',
-    marginBottom: 10,
+    marginBottom: 4,
   },
   btn: {
     elevation: 8,

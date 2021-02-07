@@ -3,5 +3,5 @@ export default function errorHandler(error) {
     const { msg } = error.response.data;
     return msg;
   }
-  return 'Somthing Error : ' + error.message || error.stack;
+  return 'Error Message : ' + error.message;
 }

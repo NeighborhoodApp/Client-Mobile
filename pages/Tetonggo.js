@@ -1,179 +1,147 @@
-
 import React, { useEffect, useState } from 'react';
 
-import { View, Text, StyleSheet, Picker, ScrollView, SafeAreaView, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Avatar } from 'react-native-paper';
-import DropDownPicker from 'react-native-dropdown-picker';
-import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins'
-import AppLoading from 'expo-app-loading';
+import { useFonts, Poppins_600SemiBold } from '@expo-google-fonts/poppins';
 
-// import { registerPushNotification } from '../helpers/PushNotification';
-// import { verifyUser } from '../helpers/verify';
-import { Ubuntu_300Light } from '@expo-google-fonts/ubuntu';
-import BottomNavigator from '../components/BottomNavigator'
-import * as ImagePicker from 'expo-image-picker';
+import { Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
+import BottomNavigator from '../components/BottomNavigator';
 import { useDispatch, useSelector } from 'react-redux';
-import callServer from '../helpers/callServer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { axios } from '../helpers/Axios'
-import SvgUri from 'expo-svg-uri';
-
-const defaultVal = {
-  description: '',
-  privacy: 'public',
-}
+import { FontAwesome5 } from '@expo/vector-icons';
+import Loading from '../components/Loading';
+import { getUserLogedIn } from '../helpers/storange';
+import callServerV2 from '../helpers/callServer.v2';
 
 function Tetonggo({ navigation }) {
-  const { users, user: userNow, error, stage, loading } = useSelector((state) => state.reducerUser);
-  const [user, setUser] = useState(null);
-  const [selectedUser, setSelectedUser] = useState({ user: '', address: '' });
-  const [selectedValue, setSelectedValue] = useState('public');
-  const [payload, setPayload] = useState(defaultVal);
-  const [formData, setFormData] = useState(null);
-  const dispatch = useDispatch();
 
   let [loaded] = useFonts({
     Poppins_600SemiBold,
     Ubuntu_300Light,
+    Ubuntu_500Medium,
   });
 
-  const [image, setImage] = useState(null);
-
-  // const fetchTimeline = () => {
-  //   const option = {
-  //     url: 'timeline',
-  //     stage: 'getTimelines',
-  //     method: 'get',
-  //     body: null,
-  //     headers: true,
-  //     type: 'SET_TIMELINES',
-  //   };
-  //   dispatch(callServer(option));
-  // };
+  const [userLogin, setUserLogin] = useState(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    let temp
-    const tes = async () => {
-      const value = await AsyncStorage.getItem('userlogedin');
-      const json = JSON.parse(value);
-      temp = json.id
-      setUser(json);
+    (async () => {
+      (async () => {
+        const userLogedIn = await getUserLogedIn();
+        setUserLogin(userLogedIn);
+      })();
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (userLogin && userLogin.hasOwnProperty('access_token')) {
+        setupNavigation(userLogin.id);
+        dispatch(
+          callServerV2({
+            url: 'users',
+            stage: 'getAllUsers',
+            type: 'SET_USERS',
+            headers: {
+              access_token: userLogin.access_token,
+            },
+          }),
+        );
+      }
+    })();
+  }, [userLogin]);
+
+  const { users, loading } = useSelector((state) => state.reducerUser);
+
+  const setupNavigation = (userId) => {
       navigation.setOptions({
         headerRight: () => (
-          <TouchableOpacity style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }} onPress={() => { navigation.navigate('Menu') }}>
-            <Avatar.Image size={39}
+          <TouchableOpacity
+            style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }}
+            onPress={() => {
+              navigation.navigate('Menu');
+            }}
+          >
+            <Avatar.Image
+              size={39}
               source={{
-                uri: `https://randomuser.me/api/portraits/men/${temp ? temp : null}.jpg`,
+                uri: `https://randomuser.me/api/portraits/men/${userId}.jpg`,
               }}
             />
           </TouchableOpacity>
         ),
-      })
-    }
-    tes()
-  }, [navigation])
+      });
+  }
 
-  const submitHandler = async () => {
-    console.log('press');
-    let uri;
-    try {
-      if (payload.description && formData) {
-        console.log(formData);
-        const { data } = await axios({
-          url: 'upload',
-          method: 'post',
-          data: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        uri = data;
-      }
-      if (payload.description) {
-        await axios({
-          url: 'timeline',
-          method: 'post',
-          data: {
-            description: payload.description,
-            image: uri,
-            privacy: payload.privacy,
+  const kickHandler = (id) => {
+    (async () => {
+      dispatch(
+        callServerV2({
+          url: `users/${id}`,
+          stage: 'kickUser',
+          method: 'put',
+          body: {
+            status: 'Inactive',
+            RealEstateId: null,
+            ComplexId: null,
           },
           headers: {
-            access_token: user.access_token,
+            access_token: userLogin.access_token
           },
-        });
-      }
-      fetchTimeline();
-      setImage(null);
-      setFormData(null);
-      setPayload({ description: '', privacy: 'public' });
-    } catch (error) {
-      console.log(error);
-    }
+          type: 'UPDATE_USER',
+          id: id,
+        }),
+      );
+    })();
   };
 
-  const newUser = user ? users.filter((el) =>
-    (el.ComplexId === user.ComplexId && el.status === 'Active')) : null;
-  // useEffect(() => {
-  //   if (user) {
-  //     setSelectedUser(newUser);;
-  //   }
-  // }, [userNow]);;
+  const newUser = userLogin ? users.filter((el) => el.ComplexId === userLogin.ComplexId && el.status === 'Active') : null;
 
-  const changePage = (id) => {
-    navigation.navigate('Comment', {
-      id,
-    });
-  };
-
-  const data = [
-    {
-      fullname: 'Riyan',
-      address: 'Palembang',
-    },
-    {
-      fullname: 'Moulia',
-      address: 'Palembang',
-    },
-    {
-      fullname: 'Ahmad',
-      address: 'Palembang',
-    },
-    {
-      fullname: 'Habibi',
-      address: 'Palembang',
-    },
-  ];
-  console.log(user, 'userrrr.....');;
-  if (!loaded) return <AppLoading />;
-  // if (loading) return <AppLoading />;
-// console.log(newUser)
+  if (loading || !loaded) return <Loading />;
+  
   return (
     <SafeAreaView style={styles.bg}>
       <View style={styles.border}></View>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
-        <Text style={styles.account}>Account</Text>
-        {!newUser ? null : newUser.map((el, index) => {
-          return (
-            <View key={`timeline${index}`} style={styles.box}>
-              <View style={styles.row}>
-                <Avatar.Image size={39}
-                  source={{
-                    uri: `https://randomuser.me/api/portraits/men/${el.id}.jpg`,
-                  }}
-                />
-
-                <View style={styles.boxProfile}>
-                  <Text style={styles.name}>{el.fullname}</Text>
-                  <Text styles={styles.location}>{el.address}</Text>
+        <Text style={styles.account}>My Tetonggo</Text>
+        {!newUser
+          ? null
+          : newUser.map((el, index) => {
+              return (
+                <View key={`timeline${index}`} style={styles.box}>
+                  <TouchableOpacity onPress={() => navigation.navigate('Profile', { userId: el.id })}>
+                    <View style={styles.row}>
+                      <View>
+                        <Avatar.Image
+                          size={39}
+                          source={{
+                            uri: `https://randomuser.me/api/portraits/men/${el.id}.jpg`,
+                          }}
+                        />
+                      </View>
+                      <View style={styles.boxProfile}>
+                        <Text style={styles.name}>
+                          {el.fullname + ' '}
+                          {el.RoleId === 2 && (
+                            <FontAwesome5 name="crown" size={15} color="orange" style={{ paddingLeft: 13 }} />
+                          )}
+                        </Text>
+                        <Text styles={styles.location}>{el.address}</Text>
+                      </View>
+                      {userLogin.RoleId === 2 && el.RoleId !== 2 ? (
+                        <View style={styles.container_button}>
+                          <TouchableOpacity onPress={() => kickHandler(el.id)} style={styles.btn_delete}>
+                            <Text style={styles.delete}> Kick </Text>
+                          </TouchableOpacity>
+                        </View>
+                      ) : null}
+                    </View>
+                  </TouchableOpacity>
+                  <View style={styles.hr} />
                 </View>
-              </View>
-              <View style={styles.hr} />
-            </View>
-          );
-        })}
+              );
+            })}
       </ScrollView>
-      <BottomNavigator currentPage={'Tetonggo'} navigation={navigation} submitHandler={submitHandler}></BottomNavigator>
+      <BottomNavigator currentPage={'Tetonggo'} navigation={navigation} submitHandler={() => {}}></BottomNavigator>
     </SafeAreaView>
   );
 }
@@ -251,15 +219,17 @@ const styles = StyleSheet.create({
   box: {
     flexDirection: 'column',
     width: '100%',
-    marginLeft: '15%',
     marginTop: 5,
   },
   row: {
     flexDirection: 'row',
     marginTop: '1%',
     marginBottom: '1%',
+    // justifyContent: 'space-between',
+    marginHorizontal: '5%',
   },
   boxProfile: {
+    display: 'flex',
     flexDirection: 'column',
     marginLeft: 20,
     marginBottom: 5,
@@ -306,9 +276,10 @@ const styles = StyleSheet.create({
   hr: {
     borderBottomColor: '#A2A2A2',
     borderBottomWidth: 0.25,
-    width: '86%',
+    width: '90%',
     marginBottom: 8,
     marginTop: 5,
+    marginLeft: 20,
   },
   inputStatus: {
     width: '90%',
@@ -345,7 +316,54 @@ const styles = StyleSheet.create({
     borderColor: '#E3E3E3',
     borderRadius: 5,
   },
+  btn_confirm: {
+    elevation: 8,
+    backgroundColor: '#5CB409',
+    borderRadius: 6,
+    marginTop: 5,
+    marginLeft: 2,
+    width: 60,
+    height: 30,
+    marginRight: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  btn_delete: {
+    elevation: 8,
+    backgroundColor: 'red',
+    borderColor: 'red',
+    borderWidth: 0.3,
+    borderRadius: 6,
+    marginTop: 5,
+    marginLeft: 2,
+    width: 60,
+    height: 30,
+    marginRight: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  confirm: {
+    fontFamily: 'Ubuntu_500Medium',
+    fontSize: 12,
+    color: 'white',
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  delete: {
+    fontFamily: 'Ubuntu_500Medium',
+    fontSize: 12,
+    color: '#fff',
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  container_button: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginLeft: 25,
+  },
 });
 
-
-export default Tetonggo
+export default Tetonggo;

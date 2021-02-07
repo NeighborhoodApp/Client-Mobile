@@ -1,141 +1,169 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
+import { Avatar } from 'react-native-paper';
 import { Agenda } from 'react-native-calendars';
 import { useDispatch, useSelector } from 'react-redux';
-import callServer from '../helpers/callServer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Loading from '../components/Loading'
+import callServerV2 from '../helpers/callServer.v2';
+import { getUserLogedIn } from '../helpers/storange';
+import Loading from '../components/Loading';
+import { FontAwesome } from '@expo/vector-icons';
+import BottomNavigator from '../components/BottomNavigator';
 
 const timeToString = (time) => {
   const date = new Date(time);
-  return date.toISOString().split('T')[0];
+  // return date.toISOString().split('T')[0];
+  return date.toISOString().slice(0, 10);
 };
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const EventCalendar = ({ navigation }) => {
-  const [dateNow, setDateNow] = useState()
-  const { fees, loading, error, stage } = useSelector(state => state.reducerFee)
-  const { events } = useSelector(state => state.reducerEvent)
-  // const [filterFees, setFilterFees] = ([])
-  // const [filterEvents, setFilterEvents] = ([])
   const [items, setItems] = useState({});
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [isFocused, setIsFocused] = useState('true');
-  const [user, setUser] = useState(null);
+  const [userLogin, setUserLogin] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const tes = async () => {
-      const value = await AsyncStorage.getItem('userlogedin');
-      const json = JSON.parse(value);
-      setUser(json);
-    }
-    tes()
-    setDateNow(new Date())
-    const fetchFee = () => {
-      const option = {
-        url: `fee`,
-        stage: 'getFees',
-        method: 'get',
-        body: null,
-        headers: true,
-        type: 'SET_FEES',
-      };
-      dispatch(callServer(option));
-    };
-    fetchFee()
+    (async () => {
+      const userLogedIn = await getUserLogedIn();
+      setUserLogin(userLogedIn);
+    })();
+  }, []);
 
-    const fetchEvent = () => {
-      const option = {
-        url: `event`,
-        stage: 'getEvents',
-        method: 'get',
-        body: null,
-        headers: true,
-        type: 'SET_EVENTS',
-      };
-      dispatch(callServer(option));
-    };
-    fetchEvent()
-  }, [])
-  if (!user) return <Loading />
-
-  console.log(fees[0])
-  console.log(events[0])
-  const loadItems = (day) => {
-    setTimeout(() => {
-      const filterFees = fees.filter(el => el.ComplexId === user.ComplexId)
-      const filterEvents = events.filter(el => el.RealEstateId === user.RealEstateId)
-
-      for (let i = -15; i < 85; i++) {
-        const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-        const strTime = timeToString(time);
-        // let temp = {...items}
-        // console.log(strTime, 'sssssssssssss')
-        // fees.forEach(el => {
-        //   if (el.due_date.includes(strTime)) {
-        //     temp[strTime]
-        //   }
-        // });
-        // let found = true
-
-        if (!items[strTime]) {
-          items[strTime] = [];
-
-          filterFees.forEach(el => {
-            if (el.due_date.includes(strTime)) {
-              // found = false
-              items[strTime].push({
-                name: el.name,
-                description: el.description,
-                height: 100,
-                backgroundColor: '#fff3b2'
-              });
-            }
-          })
-          filterEvents.forEach(el => {
-            if (el.date.includes(strTime)) {
-              // found = false
-              items[strTime].push({
-                name: 'Event',
-                description: el.description,
-                height: 100,
-                backgroundColor: (el.CategoryId === 1) ? '#ffe0d8' : '#ff9b93'
-              });
-            }
-          })
+  const fetchEvents = (access_token) => {
+    (async () => {
+      if (userLogin) {
+        if (userLogin.hasOwnProperty('access_token')) {
+          setupNavigation();
+          dispatch(
+            callServerV2({
+              url: `event`,
+              stage: 'getEvents',
+              method: 'get',
+              body: null,
+              headers: {
+                access_token: userLogin ? userLogin.access_token : access_token,
+              },
+              type: 'SET_EVENTS',
+            }),
+          );
         }
-        // if (found) {
-        //   items[strTime].push({
-        //     name: '',
-        //     description: '',
-        //     height: 100,
-        //   });
-        // }
       }
-      const newItems = {};
-      Object.keys(items).forEach((key) => {
-        console.log(key)
-        newItems[key] = items[key];
-      });
-      setItems(newItems);
-    }, 1000);
+    })();
   };
-  // console.log(fees)
+  useEffect(() => {
+    fetchEvents();
+  }, [userLogin]);
+
+  const { events, loading } = useSelector((state) => state.reducerEvent);
+  useEffect(() => {
+    (async () => {
+      if (userLogin) {
+        const newItems = {};
+        events.forEach((el) => {
+          if (el.RealEstateId === userLogin.RealEstateId) {
+            const date = timeToString(el.date);
+            if (!newItems[date]) {
+              newItems[date] = [];
+            }
+            newItems[date].push({
+              height: 107,
+              eventId: el.id,
+              name: el.name,
+              tetonggo: el.User.fullname,
+              description: el.description,
+              category: el.Category.category,
+              realEstateName: el.RealEstate.name,
+              id: el.User.id,
+              backgroundColor: getColor(el.CategoryId),
+            });
+          }
+        });
+        setItems(newItems);
+      }
+    })();
+  }, [events]);
+
+  const getColor = (categoryId) => {
+    if (categoryId == 1) return '#9CEFFE';
+    if (categoryId == 2) return '#2FBBF0';
+    if (categoryId == 3) return '#ff9b93';
+  };
+
+  const loadItems = (day) => {
+    console.log('day selected', day);
+    for (let i = -15; i < 80; i++) {
+      const time = day.timestamp + i * 24 * 60 * 60 * 1000;
+      const strTime = timeToString(time);
+      if (!items[strTime]) {
+        items[strTime] = [];
+      }
+      const selectedDay = new Date(strTime);
+      const currentDay = new Date(new Date().toISOString().slice(0, 10));
+      if (selectedDay > currentDay) {
+        const found = items[strTime].filter((el) => el.category === 'addnewitem');
+        if (found.length < 1) {
+          items[strTime].push({
+            category: 'addnewitem',
+            date: strTime,
+            backgroundColor: '#cddef6',
+          });
+        }
+      }
+    }
+
+    const newItems = {};
+    Object.keys(items).forEach((key) => {
+      newItems[key] = items[key];
+    });
+    setItems(newItems);
+  };
+
   const renderItem = (item) => {
-    console.log(item.backgroundColor)
-    return (
+    return item.category == 'addnewitem' ? (
       <TouchableOpacity
-        style={[styles.item, { height: item.height, backgroundColor: item.backgroundColor }]}
-      // onPress={() =>
-      //   navigation.navigate('CreateEvent', {
-      //     date: item.name,
-      //   })
-      // }
+        style={[styles.item, { backgroundColor: item.backgroundColor }]}
+        onPress={() => navigation.navigate('CreateEvent', { date: item.date })}
       >
-        <Text style={{ fontWeight: 'bold' }}>{item.name}</Text>
-        <Text >{item.description}</Text>
+        <FontAwesome
+          name="plus"
+          size={20}
+          color="black"
+          style={{ marginRight: 5, textAlign: 'center', textAlignVertical: 'center' }}
+        />
+      </TouchableOpacity>
+    ) : (
+      <TouchableOpacity
+        style={[styles.item]}
+        onPress={() => navigation.navigate('EventDetail', { eventId: item.eventId })}
+      >
+        <View style={[[styles.card]]}>
+          <View style={[styles.header]}>
+            <View style={[styles.title]}>
+              <Text style={{ fontWeight: 'bold' }}>{item.name}</Text>
+              <Text style={{ fontWeight: '300' }}>
+                {item.tetonggo} | {item.realEstateName}
+              </Text>
+            </View>
+            <View style={[styles.avatar]}>
+              <Avatar.Image
+                size={39}
+                source={{
+                  uri: `https://randomuser.me/api/portraits/men/${item.id}.jpg`,
+                }}
+              />
+            </View>
+          </View>
+          <View style={[styles.hr]} />
+          <Text>{item.description}</Text>
+          <View style={[styles.footer]}>
+            <View style={[styles.title]}>
+              <Text style={[styles.category, { backgroundColor: item.backgroundColor }]}>{item.category}</Text>
+            </View>
+            <View>
+              {/* <Text style={[styles.time, { backgroundColor: item.backgroundColor }]}>{item.name}</Text> */}
+            </View>
+          </View>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -143,9 +171,17 @@ const EventCalendar = ({ navigation }) => {
   const renderEmptyDate = (item) => {
     return (
       <View
-        style={[styles.item, { height: 60, backgroundColor: 'white'}]}
+        style={{
+          height: 15,
+          flex: 1,
+          justifyContent: 'center',
+          marginTop: 15,
+          paddingHorizontal: 10,
+          borderRadius: 5,
+          backgroundColor: 'white',
+        }}
       >
-        {/* <Text>This is empty date!</Text> */}
+        <Text>No event</Text>
       </View>
     );
   };
@@ -153,19 +189,61 @@ const EventCalendar = ({ navigation }) => {
     return r1.name !== r2.name;
   };
 
+  const onRefresh = useCallback(async () => {
+    try {
+      setRefreshing(true);
+      if (!userLogin) {
+        const userLogedIn = await getUserLogedIn();
+        await fetchEvents(userLogedIn.access_token);
+      } else {
+        await fetchEvents();
+      }
+      setTimeout(() => {
+        setRefreshing(false);
+      }, 2000);
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  const setupNavigation = () => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          style={{ marginRight: 30, borderWidth: 3, borderColor: 'white', borderRadius: 50 }}
+          onPress={() => {
+            navigation.navigate('Menu');
+          }}
+        >
+          <Avatar.Image
+            size={39}
+            source={{
+              uri: `https://randomuser.me/api/portraits/men/${userLogin.id}.jpg`,
+            }}
+          />
+        </TouchableOpacity>
+      ),
+    });
+  };
+
+  if (loading) return <Loading />;
+
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: '#161C2B' }}>
       <Agenda
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         items={items}
         loadItemsForMonth={loadItems}
-        selected={dateNow}
+        selected={timeToString(new Date())}
         renderItem={renderItem}
         renderEmptyDate={renderEmptyDate}
         markedDates={{
-          dateNow: { selected: true, selectedDayTextColor: 'blue' },
+          [timeToString(new Date())]: { selected: true, selectedDayTextColor: 'blue' },
         }}
         rowHasChanged={rowHasChanged}
+        style={{ borderTopLeftRadius: 25, borderTopRightRadius: 25 }}
       />
+      <BottomNavigator currentPage={'EventCalendar'} navigation={navigation}></BottomNavigator>
     </View>
   );
 };
@@ -178,12 +256,47 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   item: {
-    // backgroundColor: 'white',
+    backgroundColor: 'white',
     flex: 1,
     borderRadius: 5,
+    justifyContent: 'center',
     padding: 10,
     marginRight: 10,
     marginTop: 17,
+  },
+  card: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  title: {},
+  hr: {
+    borderBottomColor: 'black',
+    borderBottomWidth: 0.25,
+    width: '100%',
+    marginBottom: 8,
+    marginTop: 8,
+  },
+  footer: {
+    paddingTop: 5,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  category: {
+    backgroundColor: 'gold',
+    // marginTop: 10,
+    marginBottom: 5,
+    padding: 6,
+    borderRadius: 5,
+  },
+  action: {
+    width: 100,
   },
 });
 

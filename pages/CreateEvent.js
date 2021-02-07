@@ -1,131 +1,103 @@
 import React, { useState, useEffect } from 'react';
-// import { View, Text, StyleSheet } from 'react-native'
-import { Button, Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, Platform, Alert } from 'react-native';
-// import Modal from 'react-native-modal';
+import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, Platform, Alert } from 'react-native';
 import { TextInput } from 'react-native-paper';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { useDispatch, useSelector } from 'react-redux';
-import callServer from '../helpers/callServer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { sendNotification } from '../helpers/PushNotification';
+import customAlert from '../helpers/alert';
+import callServerV2 from '../helpers/callServer.v2';
+import { getUserLogedIn } from '../helpers/storange';
 
-function CreateEvent({ navigation }) {
-  const [category, setCategory] = useState(null);
-  const [description, setDescription] = useState('');
-  const [name, setName] = useState('');
-  const [date, setDate] = useState(new Date());
-  const [mode, setMode] = useState('date');
-  const [show, setShow] = useState(false);
-  const [isFocused, setIsFocused] = useState(true);
-  const [isFocused1, setIsFocused1] = useState(true);
-  const [isFocused2, setIsFocused2] = useState(true);
-  const [user, setUser] = useState({});
+function CreateEvent({ navigation, route }) {
+  const [userLogin, setUserLogin] = useState(null);
+  const [payload, setPayload] = useState({
+    name: '',
+    description: '',
+    image: 'noimage',
+    date: route.params.date,
+    CategoryId: 0,
+  });
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const getUser = async () => {
-      const value = await AsyncStorage.getItem('userlogedin');
-      const json = JSON.parse(value);
-      setUser(json);
-    };
-    getUser();
+    (async () => {
+      const userLogedIn = await getUserLogedIn();
+      setUserLogin(userLogedIn);
+    })();
   }, []);
 
   const { users } = useSelector((state) => state.reducerUser);
+  const { event, stage, loading, error } = useSelector((state) => state.reducerEvent);
 
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShow(Platform.OS === 'ios');
-    setDate(currentDate);
-  };
-
-  const showMode = (currentMode) => {
-    setShow(true);
-    setMode(currentMode);
-  };
-
-  const showDatepicker = () => {
-    showMode('date');
-  };
-
-  const showTimepicker = () => {
-    showMode('time');
-  };
-
-  const setStyle = () => {
-    setIsFocused(!isFocused);
-    setIsFocused1(isFocused);
-    setIsFocused2(isFocused);
-    setCategory(1);
-  };
-  const setStyle1 = () => {
-    setIsFocused1(!isFocused1);
-    setIsFocused(isFocused1);
-    setIsFocused2(isFocused1);
-    setCategory(2);
-  };
-  const setStyle2 = () => {
-    setIsFocused2(!isFocused2);
-    setIsFocused1(isFocused2);
-    setIsFocused(isFocused2);
-    setCategory(3);
-  };
-
-  const handleInputDesc = (text) => {
-    setDescription(text);
-  };
-
-  const handleInputName = (text) => {
-    setName(text);
-  };
-
-  const handleAddEvent = () => {
-    const payload = {
-      name: name,
-      description: description,
-      CategoryId: category,
-      image: 'hello',
-      date: date,
-      RealEstateId: user.RealEstateId,
-    };
-    const addEvent = () => {
-      const option = {
-        url: `event`,
-        stage: 'addEvent',
-        method: 'post',
-        body: payload,
-        headers: true,
-        type: 'ADD_EVENT',
-      };
-      sendNotify(payload);
-      dispatch(callServer(option));
-    };
-    addEvent();
-    Alert.alert('Success', `${name} Event is created! Your neighbours will receive a notification in a short notice`, [
-      // { text: "Don't leave", style: 'cancel', onPress: () => {} },
-      {
-        text: 'Ok',
-        style: 'destructive',
-        onPress: () => navigation.replace('Menu'),
-      },
-    ]);
-  };
-
-  const newUser = user ? users.filter((el) => el.RealEstateId === user.RealEstateId) : null;
-
-  const sendNotify = async (data) => {
-    console.log(newUser.expoPushToken, 'newUser.expoPushToken');
-    const token = []
-    for (let i = 0; i < newUser.length; i++) {
-      if (newUser[i].expoPushToken && newUser[i].id !== user.id) {
-        if (newUser[i].expoPushToken) {
-          token.push(newUser[i].expoPushToken);
+  useEffect(() => {
+    if (event) {
+      if (stage === 'addEvent') {
+        if (!error) {
+          sendNotify(event);
+          customAlert({
+            actionConfirm: () => {
+              navigation.replace('EventCalendar');
+            },
+            title: 'Create Event Success',
+            message: `Hi ${userLogin.fullname}, Your Event is created! Your tetonggo will receive a notification in a short notice`,
+          });
         }
       }
     }
-    await sendNotification(token, 'data.name', 'data.description', {
-      from: { fullname: user.fullname, userid: user.id },
+  }, [event]);
+
+  const handlePayload = (key, value) => {
+    setPayload({
+      ...payload,
+      [key]: value,
     });
+  };
+
+  const handleSubmit = () => {
+    const newPayload = {
+      ...payload,
+    };
+    const { name, description, CategoryId, date } = payload;
+    newPayload.date = new Date(date);
+
+    if ((name, description, CategoryId)) {
+      dispatch(
+        callServerV2({
+          url: 'event',
+          stage: 'addEvent',
+          method: 'post',
+          body: newPayload,
+          headers: {
+            access_token: userLogin.access_token,
+          },
+          type: 'SET_EVENT',
+        }),
+      );
+    } else {
+      customAlert({
+        actionConfirm: () => {},
+        title: 'Create Event Failed',
+        message: 'Please, Fill all required.\ncategory, name and note is required.',
+      });
+    }
+  };
+
+  const newUser = userLogin ? users.filter((el) => el.RealEstateId === userLogin.RealEstateId) : null;
+
+  const sendNotify = (data) => {
+    (async () => {
+      const token = [];
+      for (let i = 0; i < newUser.length; i++) {
+        if (newUser[i].expoPushToken && newUser[i].id !== userLogin.id) {
+          if (newUser[i].expoPushToken) {
+            token.push(newUser[i].expoPushToken);
+          }
+        }
+      }
+      console.log('data event', data.id);
+      sendNotification(token, data.name, data.description, {
+        from: { fullname: userLogin.fullname, userid: userLogin.id, eventId: data.id },
+      });
+    })();
   };
 
   return (
@@ -134,99 +106,63 @@ function CreateEvent({ navigation }) {
         <View style={{ height: 130, marginTop: 20, marginLeft: 20 }}>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
             <TouchableOpacity
-              style={isFocused ? styles.button1 : styles.button2}
-              onPress={() => setStyle()}
-              disabled={!isFocused}
+              style={payload.CategoryId === 1 ? styles.button2 : styles.button1}
+              onPress={() => setPayload({ ...payload, CategoryId: 1 })}
+              disabled={payload.CategoryId === 1}
             >
               <Image
-                style={isFocused ? styles.image1 : styles.image2}
-                source={require('../assets/icon_events/e_rapat.png')}
-              />
-              <Text style={isFocused ? styles.textBtn1 : styles.textBtn2}>Arisan</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={isFocused1 ? styles.button1 : styles.button2}
-              onPress={() => setStyle1()}
-              disabled={!isFocused1}
-            >
-              <Image
-                style={isFocused1 ? styles.image1 : styles.image2}
+                style={payload.CategoryId === 1 ? styles.image2 : styles.image1}
                 source={require('../assets/icon_events/e_pengajian.png')}
               />
-              <Text style={isFocused1 ? styles.textBtn1 : styles.textBtn2}>Pengajian</Text>
+              <Text style={payload.CategoryId === 1 ? styles.textBtn2 : styles.textBtn1}>Pengajian</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={isFocused2 ? styles.button1 : styles.button2}
-              onPress={() => setStyle2()}
-              disabled={!isFocused2}
+              style={payload.CategoryId === 2 ? styles.button2 : styles.button1}
+              onPress={() => setPayload({ ...payload, CategoryId: 2 })}
+              disabled={payload.CategoryId === 2}
             >
               <Image
-                style={isFocused2 ? styles.image1 : styles.image2}
+                style={payload.CategoryId === 2 ? styles.image2 : styles.image1}
+                source={require('../assets/icon_events/e_rapat.png')}
+              />
+              <Text style={payload.CategoryId === 2 ? styles.textBtn2 : styles.textBtn1}>Arisan</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={payload.CategoryId === 3 ? styles.button2 : styles.button1}
+              onPress={() => setPayload({ ...payload, CategoryId: 3 })}
+              disabled={payload.CategoryId === 3}
+            >
+              <Image
+                style={payload.CategoryId === 3 ? styles.image2 : styles.image1}
                 source={require('../assets/icon_events/e_others.png')}
               />
-              <Text style={isFocused2 ? styles.textBtn1 : styles.textBtn2}>Others</Text>
+              <Text style={payload.CategoryId === 3 ? styles.textBtn2 : styles.textBtn1}>Others</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>
         <Text style={{ alignSelf: 'flex-start', marginLeft: 30, fontWeight: '600', color: '#666E83', marginTop: 20 }}>
-          Title
+          Title *
         </Text>
         <TextInput
           placeholder="Tetonggo Event"
           placeholderTextColor="black"
           style={{ height: 40, width: 300, backgroundColor: 'white', borderBottomColor: 'black' }}
-          onChangeText={(text) => handleInputName(text)}
+          onChangeText={(text) => handlePayload('name', text)}
         ></TextInput>
-        <Text
-          style={{
-            textAlign: 'left',
-            alignSelf: 'flex-start',
-            marginLeft: 30,
-            marginBottom: 10,
-            fontWeight: '600',
-            color: '#434853',
-            marginTop: 20,
-          }}
-        >
-          Date
+
+        <Text style={{ alignSelf: 'flex-start', marginLeft: 30, fontWeight: '600', color: '#666E83', marginTop: 20 }}>
+          Date *
         </Text>
-        {/* <TextInput
+        <TextInput
           placeholder="Date"
+          editable={false}
+          value={String(payload.date)}
+          placeholderTextColor="black"
           style={{ height: 40, width: 300, backgroundColor: 'white', borderBottomColor: 'black' }}
-        ></TextInput> */}
-        <View>
-          <View>
-            <Button onPress={showDatepicker} title="Pick a Date" />
-          </View>
-          <View style={{ marginTop: 10 }}>
-            <Button onPress={showTimepicker} title="Pick a time" />
-          </View>
-          {show && (
-            <DateTimePicker
-              testID="dateTimePicker"
-              value={date}
-              mode={mode}
-              is24Hour={true}
-              display="default"
-              onChange={onChange}
-            />
-          )}
-          <Text
-            style={{
-              textAlign: 'left',
-              alignSelf: 'flex-start',
-              marginLeft: 30,
-              marginBottom: 10,
-              fontWeight: '600',
-              color: '#434853',
-              marginTop: 20,
-            }}
-          >
-            {date.toDateString()}
-          </Text>
-        </View>
+        ></TextInput>
+
         <Text
           style={{
             textAlign: 'left',
@@ -238,18 +174,24 @@ function CreateEvent({ navigation }) {
             marginTop: 20,
           }}
         >
-          Add a Note
+          Add a Note *
         </Text>
         <TextInput
           placeholder="Write a note here"
           style={{ height: 40, width: 300, backgroundColor: 'white', borderBottomColor: 'black' }}
-          onChangeText={(text) => handleInputDesc(text)}
+          onChangeText={(text) => handlePayload('description', text)}
         ></TextInput>
+
         <TouchableOpacity
-          style={{ width: 300, height: 40, backgroundColor: '#161C2B', paddingVertical: 10, marginTop: 30 }}
-          onPress={() => sendNotify()}
+          style={{ width: 300, height: 40, backgroundColor: '#161C2B', paddingVertical: 10, marginTop: 30, borderRadius: 10 }}
+          onPress={() => handleSubmit()}
+          // onPress={() => sendNotify()}
+          disabled={loading}
         >
-          <Text style={{ alignSelf: 'center', fontWeight: 'bold', color: 'white' }}>SAVE</Text>
+          {/* <FontAwesome5 name="crown" size={15} color="orange" style={{ paddingLeft: 13 }} /> */}
+          <Text style={{ alignSelf: 'center', fontWeight: 'bold', color: 'white' }}>
+            {loading ? 'Processing' : 'SAVE'}
+          </Text>
         </TouchableOpacity>
         {/* <Button title=" x " onPress={toggleModal} /> */}
       </View>

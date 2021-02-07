@@ -6,13 +6,11 @@ import { Platform } from 'react-native';
 // function untuk kirim pesan
 export const sendNotification = (expoPushToken, title, body, payload = {}) => {
   const sendNotify = async (expoPushToken) => {
-    console.log(typeof expoPushToken);
+    // console.log(typeof expoPushToken);
     const message = {
-      //       to: ["ExponentPushToken[IuEO2WJxbwysd72pJYr_kI]",
-      // "ExponentPushToken[WmRcgCCuKxdCmaBqFTW9dn]",
-      // "ExponentPushToken[XG7rbNBJdVLpU2B_0kIviz]"],
-      //       sound: 'default',
+      // to: ['ExponentPushToken[qknsphOeD4YJouvutpLQbZ]'],
       to: expoPushToken,
+      sound: 'default',
       title: title,
       body: body,
       data: { payload },

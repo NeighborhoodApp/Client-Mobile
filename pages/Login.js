@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'react-native';
-import AppLoading from 'expo-app-loading';
 import { useFonts, Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat';
 import { Fontisto, Feather } from '@expo/vector-icons';
+import { useDispatch, useSelector } from 'react-redux';
+import callServerV2 from '../helpers/callServer.v2';
+import { getUserLogedIn, setUserLogedIn } from '../helpers/storange';
+import Loading from '../components/Loading';
+import { registerPushNotification } from '../helpers/PushNotification';
 import errorHandler from '../helpers/errorHandler';
-import { axios } from '../helpers/Axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import callServer from '../helpers/callServer';
-import { useDispatch } from 'react-redux';
 
   const defaultVal = {
     email: '',
@@ -27,9 +27,59 @@ function Login({ navigation }) {
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    (async () => {
+      const token = await registerPushNotification();
+      setPayload({ expoPushToken: token });
+    })();
+  }, []);
+
+  const { user, users, error, loading } = useSelector((state) => state.reducerUser);
+
+  useEffect(() => {
+    (async () => {
+      if (user) {
+        await setUserLogedIn(user);
+        dispatch(
+          callServerV2({
+            url: 'users',
+            stage: 'getUsers',
+            headers: {
+              access_token: user.access_token,
+            },
+            type: 'SET_USERS',
+          }),
+        );
+      }
+    })();
+  }, [user]);
+
+  useEffect(() => {
+    (async () => {
+      console.log('List Users', users.length);
+      if (users.length > 0 && user) {
+        const userLogin = await getUserLogedIn();
+        // console.log('userLogin', userLogin);
+        if (!user.RealEstateId) {
+          navigation.replace('PickLocation');
+        } else if (user.status === 'Inactive') {
+          navigation.replace('Waiting');
+        } else {
+          navigation.replace('Discover');
+        }
+      }
+    })();
+  }, [users]);
+
+  useEffect(() => {
+    if (error) {
+      setErrMessage(errorHandler(error));
+    }
+  }, [error])
+
   const toJoin = () => {
     navigation.replace('JoinUs');
-  }
+  };
 
   const handleInput = (text, name) => {
     const value = {
@@ -40,53 +90,24 @@ function Login({ navigation }) {
   };
 
   const prosesLogin = async () => {
+    console.log('payload', payload);
     if (payload.email && payload.password) {
-      try {
-        const { data } = await axios({
+      dispatch(
+        callServerV2({
           url: 'users/login-client',
           method: 'post',
-          data: payload,
-        });
-        console.log('UserLogedIn', data);
-        if (data.id) {
-
-          const newName = data.fullname.split('#');
-          data.fullname = newName[0];
-
-          const option = {
-            url: 'users',
-            stage: 'getRealEstates',
-            method: 'get',
-            body: null,
-            headers: true, // true
-            type: 'SET_USERS',
-          };
-          // console.log(data, 'data login ..........');
-          dispatch(callServer(option));
-          const jsonValue = JSON.stringify(data);
-          await AsyncStorage.setItem('userlogedin', jsonValue);
-        }
-
-        if (!data.RealEstateId) {
-          navigation.replace('PickLocation');
-        } else if (data.status === 'Inactive') {
-          navigation.replace('Waiting');
-        } else {
-          navigation.replace('Discover');
-        }
-        console.log('Welcome,' + data.fullname);
-      } catch (error) {
-        const msg = errorHandler(error);
-        console.log(msg);
-        setErrMessage(msg)
-      }
+          stage: 'LoginUser',
+          body: payload,
+          type: 'SET_USER',
+        }),
+      );
     } else {
-      console.log('All field required!')
+      setErrMessage('All field required!');
     }
   };
 
-  if (!loaded) {
-    return <AppLoading />;
+  if (loading || !loaded) {
+    return <Loading />;
   } else {
     return (
       <View style={styles.container}>
@@ -114,9 +135,7 @@ function Login({ navigation }) {
         </View>
 
         <View style={styles.hr} />
-        {errMessage ?
-          <Text style={styles.errortext}>{errMessage}</Text> : null
-        }
+        {errMessage ? <Text style={styles.errortext}>{errMessage}</Text> : null}
 
         <TouchableOpacity onPress={() => prosesLogin()} style={styles.btn}>
           <Text style={styles.btn_Text}> SUBMIT </Text>

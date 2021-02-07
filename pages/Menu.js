@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useFonts, Roboto_500Medium } from '@expo-google-fonts/roboto';
 import { MaterialIcons, Fontisto, FontAwesome5, Ionicons, FontAwesome } from '@expo/vector-icons';
-import AppLoading from 'expo-app-loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch } from 'react-redux';
+import { actionRemoveUser } from '../store/actions/action';
+import Loading from '../components/Loading';
 
 function Menu({ navigation }) {
   const [loaded] = useFonts({
@@ -11,6 +13,7 @@ function Menu({ navigation }) {
   });
 
   const [user, setUser] = useState({ RoleId: 3 });
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const getUser = async () => {
@@ -23,10 +26,19 @@ function Menu({ navigation }) {
 
   const logout = async () => {
     await AsyncStorage.removeItem('userlogedin');
-    navigation.replace('Home');
+    dispatch(actionRemoveUser());
+    // navigation.replace('Login');
+    navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name: 'Login'
+        },
+      ],
+    });
   };
 
-  if (!loaded) return <AppLoading />;
+  if (!loaded) return <Loading />;
 
   return (
     <View style={styles.box}>
@@ -34,14 +46,14 @@ function Menu({ navigation }) {
       <View style={styles.container}>
         <Text style={styles.account}>Account</Text>
         <View style={styles.column}>
-          <TouchableOpacity style={styles.btn_menu}>
+          <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('UpcomingEvent')}>
             <MaterialIcons style={styles.icon} name="notifications-active" size={22} color="#2C6FC7" />
-            <Text style={styles.menu}> Notifications </Text>
+            <Text style={styles.menu}> Upcoming Event </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('CreateEvent')}>
+          {/* <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('CreateEvent')}>
             <Fontisto style={styles.icon} name="calendar" size={22} color="#2C6FC7" />
             <Text style={styles.menu}> Create Event </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('Tetonggo')}>
             <FontAwesome5 style={styles.icon} name="users" size={18} color="#2C6FC7" />
             <Text style={styles.menu}> Neighbours </Text>
@@ -56,10 +68,10 @@ function Menu({ navigation }) {
                 <FontAwesome5 style={styles.icon} name="house-user" size={20} color="#2C6FC7" />
                 <Text style={styles.menu}>Verifications </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('CreateFee')}>
+              {/* <TouchableOpacity style={styles.btn_menu} onPress={() => navigation.navigate('CreateFee')}>
                 <MaterialIcons style={styles.icon} name="monetization-on" size={20} color="#2C6FC7" />
                 <Text style={styles.menu}> Create Fee </Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </>
           )}
           <TouchableOpacity style={styles.btn_logout} onPress={() => logout()}>

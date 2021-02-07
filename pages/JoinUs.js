@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'react-native';
-import AppLoading from 'expo-app-loading';
 import { useFonts, Ubuntu_300Light, Ubuntu_500Medium } from '@expo-google-fonts/ubuntu';
 import { Montserrat_600SemiBold } from '@expo-google-fonts/montserrat';
 import { FontAwesome, Fontisto, Feather, Entypo } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import errorHandler from '../helpers/errorHandler';
 import { axios } from '../helpers/Axios';
+import Loading from '../components/Loading';
 
 const defaultVal = {
   fullname: '',
@@ -59,7 +59,7 @@ function JoinUs({ navigation }) {
   };
 
   if (!loaded) {
-    return <AppLoading />;
+    return <Loading />;
   } else {
     return (
       <View style={styles.container}>

@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
-import AppLoading from 'expo-app-loading';
 import { useFonts, Montserrat_600SemiBold, Montserrat_500Medium } from '@expo-google-fonts/montserrat';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-// Notification
+import { getUserLogedIn } from '../helpers/storange';
+import Loading from '../components/Loading';
 
 function GetStarted({ navigation }) {
   let [loaded] = useFonts({
@@ -11,44 +10,45 @@ function GetStarted({ navigation }) {
     Montserrat_500Medium,
   });
 
-  const [expoPushToken, setExpoPushToken] = useState('');
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({});
 
   useEffect(() => {
-    const getStorange = async () => {
-      const value = await AsyncStorage.getItem('userlogedin');
-      const json = JSON.parse(value);
-      setUser(json);
-    };
-    getStorange();
+    (async () => {
+      const userLogedIn = await getUserLogedIn();
+      setUser(userLogedIn);
+    })()
   }, []);
 
   function goJoin() {
-    if (user) {
-      navigation.replace('Discover');
+    if (user.hasOwnProperty('id')) {
+      if (!user.RealEstateId) {
+        navigation.replace('PickLocation');
+      } else if (user.status === 'Inactive') {
+        navigation.replace('Waiting');
+      } else if (user.status === 'Active') {
+        navigation.replace('Discover');
+      }
     } else {
       navigation.replace('Login');
     }
   }
 
-  if (!loaded) {
-    return <AppLoading />;
-  } else {
-    return (
-      <View style={styles.container}>
-        <Image style={styles.homeLogo} source={require('../assets/i-homelogo.png')} />
-        <Text style={styles.title}>Love neighbour{'\n'}As yourself.</Text>
-        <Text style={styles.akronim}>A good neighbour increases {'\n'}the value of your property .</Text>
-        <Image style={styles.homeImage} source={require('../assets/home-image.png')} />
-        <TouchableOpacity style={styles.btnStart} onPress={goJoin}>
-          <Image style={styles.bgButton} source={require('../assets/btn_started.png')} />
-          <View>
-            <Text style={styles.getStarted}> Get Started </Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  if (!loaded) return <Loading />;
+
+  return (
+    <View style={styles.container}>
+      <Image style={styles.homeLogo} source={require('../assets/i-homelogo.png')} />
+      <Text style={styles.title}>Love neighbour{'\n'}As yourself.</Text>
+      <Text style={styles.akronim}>A good neighbour increases {'\n'}the value of your property .</Text>
+      <Image style={styles.homeImage} source={require('../assets/home-image.png')} />
+      <TouchableOpacity style={styles.btnStart} onPress={goJoin}>
+        <Image style={styles.bgButton} source={require('../assets/btn_started.png')} />
+        <View>
+          <Text style={styles.getStarted}> Get Started </Text>
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
